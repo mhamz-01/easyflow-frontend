@@ -1,0 +1,84 @@
+"use client";
+import { useEffect, useState } from "react";
+import { Button } from "../../../../../components/shadcn/button";
+import {
+  SidebarTrigger,
+  useSidebar,
+} from "../../../../../components/shadcn/sidebar";
+import Breadcrumbs from "../../../../../components/custom/breadcrumbs";
+import { usePathname, useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { useWorkspaceStore } from "@/src/store/workspace";
+import { useProjectStore } from "@/src/store/useProjectStore";
+import { useAuth } from "@clerk/nextjs";
+import { createDoc } from "@/src/lib/api/documents/services";
+import { Spinner } from "../../../../../components/shadcn/spinner";
+import { Ellipsis, Maximize, Users, X } from "lucide-react";
+
+// This header will be used for docs, whiteboards and tasks page
+export function DocsHeader() {
+  const { open } = useSidebar();
+  const workspaceId = useWorkspaceStore((s) => s.workspace?.id);
+  const projectId = useProjectStore((s) => s.project?.id);
+  const { userId } = useAuth();
+  const router = useRouter();
+
+  // local states
+
+  const mutationDocs = useMutation({
+    mutationFn: createDoc,
+    onSuccess: (data) => {
+      router.push(`docs/${data.createdDoc.id}`);
+    },
+  });
+
+  // handle create
+  const handleCreate = () => {
+    // check for doc type
+    if (workspaceId && projectId && userId) {
+      mutationDocs.mutate({ workspaceId, projectId, createdBy: userId });
+    }
+  };
+
+  return (
+    <section className="flex items-center justify-between py-4">
+      <div className="flex items-center gap-3">
+        {/* Only show the SidebarTrigger if the sidebar is closed && it is mobile view */}
+        {<SidebarTrigger className={!open ? "" : "md:hidden"} />}
+        <Breadcrumbs
+          items={[
+            { label: "Home", path: "/" },
+            { label: "Project name", path: "/" },
+            { label: "Docs", path: "" },
+          ]}
+        />
+      </div>
+      {/* actions when doc | whitboard | task is open */}
+      <div className="flex items-center gap-5 border-2 overflow-hidden p-3 rounded-2xl">
+        <Users size={18} />
+        <span>share</span>
+        <Ellipsis size={18} />
+        <Maximize size={18} />
+        <X size={18} />
+      </div>
+      <Button
+        onClick={handleCreate}
+        variant="primary"
+        className="relative"
+        disabled={mutationDocs.isPending}
+      >
+        {/* Invisible text keeps width */}
+        <span className={mutationDocs.isPending ? "invisible" : "visible"}>
+          Create Document
+        </span>
+
+        {/* Spinner overlay */}
+        {mutationDocs.isPending && (
+          <span className="absolute inset-0 flex items-center justify-center">
+            <Spinner />
+          </span>
+        )}
+      </Button>
+    </section>
+  );
+}
