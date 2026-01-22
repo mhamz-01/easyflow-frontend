@@ -11,6 +11,7 @@ import { useAuth } from "@clerk/nextjs";
 import { Ellipsis, Maximize, Users, X } from "lucide-react";
 import { Dialog, DialogTrigger } from "@/src/components/shadcn/dialog";
 import { Button } from "@/src/components/shadcn/button";
+import CreateTaskModal from "@/src/components/modals/create-task";
 
 // This header will be used for docs, whiteboards and tasks page
 export function TasksHeader() {
@@ -50,6 +51,7 @@ export function TasksHeader() {
           <DialogTrigger>
             <Button variant={"primary"}>Create Task</Button>
           </DialogTrigger>
+          <CreateTaskModal />
         </Dialog>
       )}
     </section>

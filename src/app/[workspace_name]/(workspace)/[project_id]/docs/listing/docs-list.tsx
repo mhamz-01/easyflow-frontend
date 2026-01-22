@@ -37,13 +37,16 @@ const DocsList = ({ docsListData }: { docsListData: Doc[] }) => {
     mutationFn: deleteDoc,
     onSuccess: (data) => {
       // remove data from the current list
+      console.log("workspace id roject is", workspaceId, projectId);
       queryClient.setQueryData(
         ["docs", workspaceId, projectId],
         (oldData: Partial<docsListResponse>) => {
           console.log("fetched data", data);
+          console.log("old data", oldData);
           const updatedData = oldData.docs?.filter(
             (doc) => doc.id !== Number(data.id),
           );
+          console.log("updated data", updatedData);
           return {
             ...oldData,
             docs: updatedData,
@@ -108,7 +111,7 @@ const DocsList = ({ docsListData }: { docsListData: Doc[] }) => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem
-                      onClick={() => router.push(`/docs/${doc.id}`)}
+                      onClick={() => router.push(`docs/${doc.id}`)}
                     >
                       <Edit />
                       Edit

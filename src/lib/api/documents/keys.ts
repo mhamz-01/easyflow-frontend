@@ -1,7 +1,7 @@
 export const docsKeys = {
-  all: (projectId: number, workspaceId: number) => [
+  all: (workspaceId: number, projectId: number) => [
     "docs",
-    projectId,
     workspaceId,
+    projectId,
   ],
 };

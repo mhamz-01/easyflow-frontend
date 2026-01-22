@@ -7,13 +7,14 @@ import {
 } from "../../../../../components/shadcn/sidebar";
 import Breadcrumbs from "../../../../../components/custom/breadcrumbs";
 import { usePathname, useRouter } from "next/navigation";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useWorkspaceStore } from "@/src/store/workspace";
 import { useProjectStore } from "@/src/store/useProjectStore";
 import { useAuth } from "@clerk/nextjs";
 import { createDoc } from "@/src/lib/api/documents/services";
 import { Spinner } from "../../../../../components/shadcn/spinner";
 import { Ellipsis, Maximize, Users, X } from "lucide-react";
+import { createdDocResponse, docsListResponse } from "@/src/types/documents";
 
 // This header will be used for docs, whiteboards and tasks page
 export function DocsHeader() {
@@ -22,13 +23,30 @@ export function DocsHeader() {
   const projectId = useProjectStore((s) => s.project?.id);
   const { userId } = useAuth();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   // local states
 
   const mutationDocs = useMutation({
     mutationFn: createDoc,
-    onSuccess: (data) => {
+    onSuccess: (data: createdDocResponse) => {
       router.push(`docs/${data.createdDoc.id}`);
+      queryClient.setQueryData(
+        ["docs", workspaceId, projectId],
+        (oldData: Partial<docsListResponse>) => {
+          return {
+            ...oldData,
+            docs: [
+              {
+                id: data.createdDoc.id,
+                documentName: data.createdDoc.documentName,
+                assignees: data.createdDoc.assignees,
+              },
+              ...(oldData.docs || []),
+            ],
+          };
+        },
+      );
     },
   });
 

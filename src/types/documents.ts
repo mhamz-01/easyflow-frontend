@@ -3,13 +3,21 @@ export type Doc = {
   id: number;
   documentName: string;
 };
+
+type contentTab = {
+  id: string;
+  title: string;
+  content: JSONContent;
+  subtabs: [] | contentTab[];
+};
+
 export type singleDoc = {
   documentName: string;
   id: number;
   createdBy: number;
   assignees: null | [string];
   createdDate: Date;
-  content: null | JSONContent;
+  content: null | contentTab[];
   isPrivate: boolean;
   projectId: number;
   workspaceId: number;
@@ -27,4 +35,9 @@ export type docsListResponse = {
     id: number;
     documentName: string;
   }[];
+};
+
+export type createdDocResponse = {
+  message: string;
+  createdDoc: singleDoc;
 };

@@ -3,6 +3,7 @@ import {
   docsListResponse,
   singleDocResponse,
   singleDoc,
+  createdDocResponse,
 } from "@/src/types/documents";
 import { api } from "../client";
 import { id } from "zod/v4/locales";
@@ -15,11 +16,11 @@ export const getSingleDoc = async (id: number) => {
   return response.data as singleDocResponse;
 };
 export const getAllDocs = async ({
-  projectId,
   workspaceId,
+  projectId,
 }: {
-  projectId: number;
   workspaceId: number;
+  projectId: number;
 }) => {
   const response = await api.get("/docs", {
     params: { projectId, workspaceId },
@@ -43,7 +44,7 @@ export const createDoc = async ({
     createdBy,
   });
 
-  return response.data;
+  return response.data as createdDocResponse;
 };
 
 // PUT Methods
@@ -54,7 +55,7 @@ export const updateDoc = async ({
 }: {
   id: number;
   columnName: keyof singleDoc;
-  value: singleDoc[keyof singleDoc];
+  value: any;
 }) => {
   const response = await api.put("/docs/update", { id, columnName, value });
   return response.data;

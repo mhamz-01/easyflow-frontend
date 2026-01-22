@@ -7,12 +7,10 @@ import { useParams } from "next/navigation";
 import "@mhamz.01/easyflow-texteditor/dist/index.css";
 import { useEffect } from "react";
 
-export default function EditorPage() {
-  const { id } = useParams<{ id: string }>();
+export default function DocEditor({ id }: { id: string }) {
   const { data, isLoading, isFetched, isError, refetch } = useQuery({
     queryKey: ["doc", id],
     queryFn: () => getSingleDoc(Number(id)),
-    enabled: !!id,
   });
 
   const mutation = useMutation({
@@ -30,7 +28,7 @@ export default function EditorPage() {
     return <div className="max-h-max rounded-xl bg-muted animate-pulse" />;
   }
   return (
-    <div className="easyflow-editor">
+    <div className="easyflow-editor h-full">
       <Editor
         initialTabs={data?.document.content ?? []}
         onChange={(payload) => {

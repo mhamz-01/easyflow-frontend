@@ -4,8 +4,9 @@ import { Button } from "@/src/components/shadcn/button";
 import { createDoc } from "@/src/lib/api/documents/services";
 import { useProjectStore } from "@/src/store/useProjectStore";
 import { useWorkspaceStore } from "@/src/store/workspace";
+import { createdDocResponse, docsListResponse } from "@/src/types/documents";
 import { useAuth } from "@clerk/nextjs";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 const DocsListingEmptyState = () => {
@@ -13,10 +14,28 @@ const DocsListingEmptyState = () => {
   const projectId = useProjectStore((s) => s.project?.id);
   const { userId } = useAuth();
   const router = useRouter();
+  const queryClient = useQueryClient();
+
   const mutation = useMutation({
     mutationFn: createDoc,
-    onSuccess: (data) => {
+    onSuccess: (data: createdDocResponse) => {
       router.push(`docs/${data.createdDoc.id}`);
+      queryClient.setQueryData(
+        ["docs", workspaceId, projectId],
+        (oldData: Partial<docsListResponse>) => {
+          return {
+            ...oldData,
+            docs: [
+              {
+                id: data.createdDoc.id,
+                documentName: data.createdDoc.documentName,
+                assignees: data.createdDoc.assignees,
+              },
+              ...(oldData.docs || []),
+            ],
+          };
+        },
+      );
     },
   });
 

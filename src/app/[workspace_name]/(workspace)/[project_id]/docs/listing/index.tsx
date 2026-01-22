@@ -19,10 +19,7 @@ const DocsListing = () => {
 
   // ----------- Fetching Docs from backend -------------- //
   const { data, isFetched, isLoading, error } = useQuery({
-    queryKey:
-      project?.id && workspace?.id
-        ? docsKeys.all(project.id, workspace.id)
-        : ["docs"],
+    queryKey: docsKeys.all(workspace!.id, project!.id),
     queryFn: () =>
       getAllDocs({ projectId: project!.id, workspaceId: workspace!.id }),
     enabled: !!project?.id && !!workspace?.id,

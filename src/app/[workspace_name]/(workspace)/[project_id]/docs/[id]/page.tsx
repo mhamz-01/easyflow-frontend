@@ -4,12 +4,14 @@ import { Button } from "@/src/components/shadcn/button";
 import { getSingleDoc } from "@/src/lib/api/documents/services";
 import { useDocumentStore } from "@/src/store/useDocumentStore";
 import { useQuery } from "@tanstack/react-query";
-import { RefreshCw } from "lucide-react";
-import { useParams } from "next/navigation";
+import { ArrowLeft, RefreshCw } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
+import DocEditor from "../editor";
 
 const Page = () => {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const setDocument = useDocumentStore((s) => s.setDocument);
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["doc", params.id],
@@ -24,16 +26,16 @@ const Page = () => {
   }, [data, setDocument]);
 
   return (
-    <div className="space-y-4 h-[calc(100vh-80px)] overflow-hidden">
+    <div className="space-y-4 h-screen overflow-hidden">
       {/* Back button stays static */}
-      {/* <Button onClick={() => router.back()} variant="ghost">
+      <Button onClick={() => router.back()} variant="ghost">
         <ArrowLeft />
         Back
-      </Button> */}
+      </Button>
 
       {/* Loading & Error states */}
       {isLoading && (
-        <div className="text-sm text-muted-foreground">Loading document…</div>
+        <div className="max-h-max rounded-xl bg-muted animate-pulse" />
       )}
 
       {isError && (
@@ -47,14 +49,7 @@ const Page = () => {
       )}
 
       {/* Editor iframe only when data is ready */}
-      {isLoading ? (
-        <div className="max-h-max rounded-xl bg-muted animate-pulse" />
-      ) : (
-        <iframe
-          src={`/editor/${params.id}`}
-          className="w-full max-h-screen h-full"
-        />
-      )}
+      <DocEditor id={params.id} />
     </div>
   );
 };
