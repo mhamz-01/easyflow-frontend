@@ -21,7 +21,7 @@ const DocsListing = () => {
   const { data, isFetched, isLoading, error } = useQuery({
     queryKey: docsKeys.all(workspace!.id, project!.id),
     queryFn: () =>
-      getAllDocs({ projectId: project!.id, workspaceId: workspace!.id }),
+      getAllDocs({ workspaceId: workspace!.id, projectId: project!.id }),
     enabled: !!project?.id && !!workspace?.id,
     staleTime: 1000 * 60,
   });

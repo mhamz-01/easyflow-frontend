@@ -21,3 +21,11 @@ export const checkUserRole = (userID: string, workspaceAdminID: string) => {
 export const isLong = (string: string) => {
   return string.length > 20;
 };
+
+export const normalizeUrl = (url: string) => {
+  const trimmed = url.trim();
+  if (!/^https?:\/\//i.test(trimmed)) {
+    return `https://${trimmed}`;
+  }
+  return trimmed;
+};

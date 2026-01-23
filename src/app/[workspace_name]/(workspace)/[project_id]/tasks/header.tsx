@@ -48,7 +48,7 @@ export function TasksHeader() {
         </div>
       ) : (
         <Dialog>
-          <DialogTrigger>
+          <DialogTrigger asChild>
             <Button variant={"primary"}>Create Task</Button>
           </DialogTrigger>
           <CreateTaskModal />
