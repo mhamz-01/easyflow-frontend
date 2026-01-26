@@ -2,7 +2,7 @@
 
 import { Button } from "@/src/components/shadcn/button";
 import { Input } from "@/src/components/shadcn/input";
-import { MinusIcon, PlusIcon, X } from "lucide-react";
+import { Link as LinkIcon, MinusIcon, PlusIcon, X } from "lucide-react";
 import {
   Controller,
   useFieldArray,
@@ -44,7 +44,7 @@ export default function TaskLinksInput() {
   };
 
   return (
-    <TaskCollapsibleButton title="Add links">
+    <TaskCollapsibleButton title="Add links" Icon={LinkIcon}>
       {/* Input */}
       <Controller
         name="linkName"

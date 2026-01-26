@@ -3,11 +3,16 @@ import { Field, FieldError } from "../../shadcn/field";
 import { Textarea } from "../../shadcn/textarea";
 
 import TaskCollapsibleButton from "./task-collapsible-button";
+import { BookText } from "lucide-react";
 
 const TaskDescriptionInput = () => {
   const form = useFormContext();
   return (
-    <TaskCollapsibleButton title="Add description">
+    <TaskCollapsibleButton
+      title="Add description"
+      Icon={BookText}
+      iconClassNames="text-orange-500"
+    >
       <Controller
         name="description"
         control={form.control}

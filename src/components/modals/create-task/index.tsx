@@ -7,6 +7,7 @@ import {
 import { Button } from "../../shadcn/button";
 import {
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -18,7 +19,10 @@ import { FieldGroup } from "@/src/components/shadcn/field";
 import TaskNameInput from "./task-name-input";
 import TaskDescriptionInput from "./task-description-textarea";
 import TaskLinksInput from "./task-links-input";
-import TaskDocumentCheckbox from "./task-documents-checkbox";
+import TaskDocumentCheckbox from "./task-documents";
+import TaskChecklist from "./task-checklist";
+import TaskDropdowns from "./task-dropdowns";
+import { Paperclip } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, "Task name should be more than 2 letters"),
@@ -26,6 +30,16 @@ const formSchema = z.object({
   linkName: z.string().or(z.literal("")).optional(),
   links: z.array(z.string()),
   documents: z.array(z.number()).optional(),
+  checklist: z.array(
+    z
+      .object({
+        name: z.string(),
+        items: z.array(z.string()),
+      })
+      .optional(),
+  ),
+  status: z.string(),
+  priority: z.string(),
 });
 
 const CreateTaskModal = () => {
@@ -35,6 +49,15 @@ const CreateTaskModal = () => {
       name: "",
       description: "",
       links: [],
+      documents: [],
+      checklist: [
+        {
+          name: "checklist",
+          items: [],
+        },
+      ],
+      status: "",
+      priority: "",
     },
   });
   function onSubmit(data: z.infer<typeof formSchema>) {
@@ -56,7 +79,7 @@ const CreateTaskModal = () => {
   }
 
   return (
-    <DialogContent>
+    <DialogContent className="w-full max-w-100">
       <DialogHeader>
         <DialogTitle>Create Task</DialogTitle>
       </DialogHeader>
@@ -67,11 +90,18 @@ const CreateTaskModal = () => {
             <TaskDescriptionInput />
             <TaskLinksInput />
             <TaskDocumentCheckbox />
-            <DialogFooter>
+            <TaskChecklist />
+            <TaskDropdowns />
+            <DialogFooter className="w-full sm:justify-between">
               {/* attach files button */}
-              <Button type="button">Attach files</Button>
+              <Button variant={"ghost"} type="button">
+                <Paperclip />
+                Attach files
+              </Button>
               {/* create task button */}
-              <Button type="submit">Create task</Button>
+              <Button variant={"primary"} type="submit">
+                Create task
+              </Button>
             </DialogFooter>
           </FieldGroup>
         </form>
