@@ -9,7 +9,7 @@ import StickyNotes from "./_sticky-notes";
 export default function Home() {
   return (
     <>
-      <SidebarTrigger />
+      <SidebarTrigger className="pl-4 pt-4" />
       <section className="grid place-content-center">
         <div>
           <div className="text-center">

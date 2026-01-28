@@ -28,7 +28,7 @@ const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
           const isLink = item.path && item.path !== "#";
 
           return (
-            <div key={index} className="flex items-center">
+            <div key={index} className="flex items-center gap-3">
               <BreadcrumbItem>
                 {isLink && !isLast ? (
                   <BreadcrumbLink asChild>

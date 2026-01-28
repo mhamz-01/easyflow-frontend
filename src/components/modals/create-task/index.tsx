@@ -77,7 +77,6 @@ const CreateTaskModal = () => {
     });
     // createTaskForm.reset();
   }
-
   return (
     <DialogContent className="sm:max-w-[800px]">
       <DialogHeader>

@@ -19,8 +19,8 @@ import { createdDocResponse, docsListResponse } from "@/src/types/documents";
 // This header will be used for docs, whiteboards and tasks page
 export function DocsHeader() {
   const { open } = useSidebar();
-  const workspaceId = useWorkspaceStore((s) => s.workspace?.id);
-  const projectId = useProjectStore((s) => s.project?.id);
+  const workspace = useWorkspaceStore((s) => s.workspace);
+  const project = useProjectStore((s) => s.project);
   const { userId } = useAuth();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -32,7 +32,7 @@ export function DocsHeader() {
     onSuccess: (data: createdDocResponse) => {
       router.push(`docs/${data.createdDoc.id}`);
       queryClient.setQueryData(
-        ["docs", workspaceId, projectId],
+        ["docs", workspace?.id, project?.id],
         (oldData: Partial<docsListResponse>) => {
           return {
             ...oldData,
@@ -53,21 +53,25 @@ export function DocsHeader() {
   // handle create
   const handleCreate = () => {
     // check for doc type
-    if (workspaceId && projectId && userId) {
-      mutationDocs.mutate({ workspaceId, projectId, createdBy: userId });
+    if (workspace?.id && project?.id && userId) {
+      mutationDocs.mutate({
+        workspaceId: workspace?.id,
+        projectId: project?.id,
+        createdBy: userId,
+      });
     }
   };
 
   return (
-    <section className="flex items-center justify-between py-4">
+    <section className="flex items-center justify-between p-4">
       <div className="flex items-center gap-3">
         {/* Only show the SidebarTrigger if the sidebar is closed && it is mobile view */}
         {<SidebarTrigger className={!open ? "" : "md:hidden"} />}
         <Breadcrumbs
           items={[
-            { label: "Home", path: "/" },
-            { label: "Project name", path: "/" },
-            { label: "Docs", path: "" },
+            { label: "Home", path: `/${workspace?.workspaceSlug ?? "/"}` },
+            { label: project?.projectName, path: "#" },
+            { label: "Task", path: "" },
           ]}
         />
       </div>

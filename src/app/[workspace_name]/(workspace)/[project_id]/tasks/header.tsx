@@ -16,8 +16,8 @@ import CreateTaskModal from "@/src/components/modals/create-task";
 // This header will be used for docs, whiteboards and tasks page
 export function TasksHeader() {
   const { open } = useSidebar();
-  const workspaceId = useWorkspaceStore((s) => s.workspace?.id);
-  const projectId = useProjectStore((s) => s.project?.id);
+  const workspace = useWorkspaceStore((s) => s.workspace);
+  const project = useProjectStore((s) => s.project);
   const { userId } = useAuth();
 
   // local states
@@ -30,8 +30,8 @@ export function TasksHeader() {
         {<SidebarTrigger className={!open ? "" : "md:hidden"} />}
         <Breadcrumbs
           items={[
-            { label: "Home", path: "/" },
-            { label: "Project name", path: "/" },
+            { label: "Home", path: `/${workspace?.workspaceSlug ?? "/"}` },
+            { label: project?.projectName, path: "#" },
             { label: "Task", path: "" },
           ]}
         />
