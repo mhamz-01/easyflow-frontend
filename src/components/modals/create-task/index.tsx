@@ -21,7 +21,7 @@ import TaskDescriptionInput from "./task-description-textarea";
 import TaskLinksInput from "./task-links-input";
 import TaskDocumentCheckbox from "./task-documents";
 import TaskChecklist from "./task-checklist";
-import TaskDropdowns from "./task-dropdowns";
+import TaskDropdowns from "./task-select";
 import { Paperclip } from "lucide-react";
 
 const formSchema = z.object({
@@ -75,13 +75,13 @@ const CreateTaskModal = () => {
         "--border-radius": "calc(var(--radius)  + 4px)",
       } as React.CSSProperties,
     });
-    createTaskForm.reset();
+    // createTaskForm.reset();
   }
 
   return (
-    <DialogContent className="w-full max-w-100">
+    <DialogContent className="sm:max-w-[800px]">
       <DialogHeader>
-        <DialogTitle>Create Task</DialogTitle>
+        <DialogTitle className="text-center">Create Task</DialogTitle>
       </DialogHeader>
       <FormProvider {...createTaskForm}>
         <form onSubmit={createTaskForm.handleSubmit(onSubmit)}>

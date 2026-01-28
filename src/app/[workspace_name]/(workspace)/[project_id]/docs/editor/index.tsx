@@ -143,8 +143,8 @@ export default function DocEditor({ id }: { id: string }) {
   return (
     <div className="easyflow-editor h-full">
       <Editor
-        initialTabs={dummyTabsFromDB}
-        // initialTabs={data?.document.content ?? []}
+        // initialTabs={dummyTabsFromDB}
+        initialTabs={data?.document.content ?? []}
         onChange={(payload) => {
           console.log("payload", payload);
           mutation.mutate({

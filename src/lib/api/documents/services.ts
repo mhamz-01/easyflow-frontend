@@ -6,7 +6,6 @@ import {
   createdDocResponse,
 } from "@/src/types/documents";
 import { api } from "../client";
-import { id } from "zod/v4/locales";
 
 // Get Methods
 export const getSingleDoc = async (id: number) => {

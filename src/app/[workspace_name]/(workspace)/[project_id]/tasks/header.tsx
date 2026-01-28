@@ -36,7 +36,6 @@ export function TasksHeader() {
           ]}
         />
       </div>
-      {docType !== "opened"}
       {/* actions when doc | whitboard | task is open */}
       {docType === "opened" ? (
         <div className="flex items-center gap-5 border-2 overflow-hidden p-3 rounded-2xl">

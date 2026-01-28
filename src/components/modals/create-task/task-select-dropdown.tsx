@@ -32,11 +32,11 @@ export default function TaskSelectDropdown({
       control={control}
       render={({ field }) => (
         <Select value={field.value} onValueChange={field.onChange}>
-          <SelectTrigger className="w-max max-w-48">
+          <SelectTrigger className="capitalize w-max max-w-48">
             {!field.value && Icon && (
               <Icon className={cn("h-4 w-4", iconClassName)} />
             )}
-            <SelectValue placeholder="Priority" />
+            <SelectValue placeholder={name} />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>

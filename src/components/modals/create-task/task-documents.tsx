@@ -9,10 +9,10 @@ import { getAllDocs } from "@/src/lib/api/documents/services";
 import { useProjectStore } from "@/src/store/useProjectStore";
 import { useWorkspaceStore } from "@/src/store/workspace";
 import { docsKeys } from "@/src/lib/api/documents/keys";
-import TaskDocumentsSearchInput from "./task-documents-search-input";
-import TaskDocumentDropdown from "./task-documents-dropdown";
 import { singleDoc } from "@/src/types/documents";
 import docsIcon from "@/public/icons/docs.svg";
+import TaskSearchInput from "./task-search-input";
+import TaskDropdown from "./task-dropdown";
 
 export default function TaskDocumentCheckbox() {
   const project = useProjectStore((s) => s.project);
@@ -37,29 +37,24 @@ export default function TaskDocumentCheckbox() {
     });
   }, [search, docs]);
 
-  useEffect(() => {
-    console.log("data0", data);
-  }, [data]);
-
-  useEffect(() => {
-    console.log("Docs input rendred");
-  }, []);
-
   return (
     <TaskCollapsibleButton title="Add documents" img={docsIcon}>
       <Field className="relative max-w-sm">
         {/* search input */}
-        <TaskDocumentsSearchInput
+        <TaskSearchInput
           search={search}
           setSearch={setSearch}
           setIsOpen={setIsOpen}
         />
 
         {/* dropdown */}
-        <TaskDocumentDropdown
-          filteredDocs={filteredDocs}
-          setSearch={setSearch}
+        <TaskDropdown
+          items={filteredDocs}
+          inputName="documents"
+          getId={(doc) => doc.id!}
+          getLabel={(doc) => doc.documentName!}
           isOpen={isOpen}
+          iconSrc={docsIcon}
           setIsOpen={setIsOpen}
         />
       </Field>

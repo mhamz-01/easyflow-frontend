@@ -22,7 +22,7 @@ const TaskDescriptionInput = () => {
               {...field}
               id="form-rhf-textarea-about"
               aria-invalid={fieldState.invalid}
-              placeholder="I'm a software engineer..."
+              placeholder="Describe your task here..."
               className="min-h-30"
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
