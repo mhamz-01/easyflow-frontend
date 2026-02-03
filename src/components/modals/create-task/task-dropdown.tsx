@@ -4,6 +4,7 @@ import { Checkbox } from "../../shadcn/checkbox";
 import { useFormContext } from "react-hook-form";
 import { X } from "lucide-react";
 import Image from "next/image";
+import Avatar from "../../custom/avatar";
 
 type TaskDropdownProps<T> = {
   items: T[];
@@ -16,6 +17,7 @@ type TaskDropdownProps<T> = {
   /** How to read values from item */
   getId: (item: T) => number;
   getLabel: (item: T) => string;
+  getImageSrc?: (item: T) => string;
 
   /** Optional icon */
   iconSrc?: string;
@@ -28,6 +30,7 @@ function TaskDropdown<T>({
   inputName,
   getId,
   getLabel,
+  getImageSrc,
   iconSrc,
 }: TaskDropdownProps<T>) {
   const { setValue, getValues, watch } = useFormContext();
@@ -68,8 +71,22 @@ function TaskDropdown<T>({
               <FieldGroup key={id} className="px-3 py-2 text-sm hover:bg-muted">
                 <Field orientation="horizontal">
                   <FieldLabel htmlFor={`${inputName}-${id}`}>
-                    {iconSrc && (
-                      <Image src={iconSrc} width={20} height={20} alt="icon" />
+                    {inputName === "assignees" && getImageSrc ? (
+                      <Avatar
+                        src={getImageSrc(item)}
+                        className="w-8 h-8"
+                        width={20}
+                        height={20}
+                      />
+                    ) : (
+                      iconSrc && (
+                        <Image
+                          src={iconSrc}
+                          width={20}
+                          height={20}
+                          alt="icon"
+                        />
+                      )
                     )}
                     {getLabel(item)}
                   </FieldLabel>
@@ -85,7 +102,9 @@ function TaskDropdown<T>({
           })}
         </div>
       ) : (
-        <p className="text-sm px-4 py-3">No result found</p>
+        <p className="text-sm px-4 py-3 text-muted-foreground">
+          No result found
+        </p>
       )}
     </div>
   );

@@ -41,7 +41,6 @@ export const getUserWorkspaceInvitesByEmail = async ({
 }: {
   email: string;
 }) => {
-  console.log("api cal triggered", email);
   const response = await api.get("/workspace/user/invites", {
     params: { email },
   });

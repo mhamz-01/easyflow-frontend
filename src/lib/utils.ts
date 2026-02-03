@@ -41,3 +41,21 @@ export function formatDate(
     ...options,
   }).format(new Date(date));
 }
+
+export const filterBySearch = <T>(
+  items: T[],
+  search: string,
+  key: keyof T,
+): T[] => {
+  if (!search.trim()) return items;
+
+  const query = search.toLowerCase();
+
+  return items.filter((item) => {
+    const value = item[key];
+
+    if (typeof value !== "string") return false;
+
+    return value.toLowerCase().includes(query);
+  });
+};

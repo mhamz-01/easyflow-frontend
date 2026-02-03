@@ -2,13 +2,8 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import TaskPopover from "./task-popover";
 import { useState } from "react";
 import { Calendar } from "../../shadcn/calendar";
-import { Field } from "@/src/components/shadcn/field";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/src/components/shadcn/input-group";
 import { Controller, useFormContext } from "react-hook-form";
+
 function formatDate(date: Date | undefined) {
   if (!date) {
     return "";
@@ -19,29 +14,20 @@ function formatDate(date: Date | undefined) {
     year: "numeric",
   });
 }
-function isValidDate(date: Date | undefined) {
-  if (!date) {
-    return false;
-  }
-  return !isNaN(date.getTime());
-}
 
 export default function TaskSelectDate() {
   const { control } = useFormContext();
-  const [open, setOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [month, setMonth] = useState<Date | undefined>(date);
-  const [value, setValue] = useState(formatDate(date));
-
-  console.log("date", value);
 
   return (
     <Controller
       name="date"
       control={control}
-      render={({ field, fieldState }) => (
+      render={({ field }) => (
         <TaskPopover
-          inputName="date"
+          inputName={field.name}
+          value={field.value}
           Icon={CalendarIcon}
           iconClassName="text-green-500"
         >
@@ -51,9 +37,8 @@ export default function TaskSelectDate() {
             month={month}
             onMonthChange={setMonth}
             onSelect={(date) => {
+              field.onChange(date);
               setDate(date);
-              setValue(formatDate(date));
-              setOpen(false);
             }}
           />
         </TaskPopover>

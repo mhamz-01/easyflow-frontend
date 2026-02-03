@@ -1,17 +1,5 @@
-import {
-  Controller,
-  createFormControl,
-  FormProvider,
-  useForm,
-} from "react-hook-form";
-import { Button } from "../../shadcn/button";
-import {
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../../shadcn/dialog";
+import { FormProvider, useForm } from "react-hook-form";
+import { DialogContent, DialogHeader, DialogTitle } from "../../shadcn/dialog";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -22,7 +10,8 @@ import TaskLinksInput from "./task-links-input";
 import TaskDocumentCheckbox from "./task-documents";
 import TaskChecklist from "./task-checklist";
 import TaskDropdowns from "./task-select";
-import { Paperclip } from "lucide-react";
+import TaskDialogFooter from "./task-dialog-footer";
+import TaskAttachedFilesList from "./task-attached-files-list";
 
 const formSchema = z.object({
   name: z.string().min(2, "Task name should be more than 2 letters"),
@@ -40,6 +29,9 @@ const formSchema = z.object({
   ),
   status: z.string(),
   priority: z.string(),
+  assignees: z.array(z.number()).optional(),
+  date: z.date().optional(),
+  attachments: z.array(z.instanceof(File)).optional(),
 });
 
 const CreateTaskModal = () => {
@@ -58,6 +50,8 @@ const CreateTaskModal = () => {
       ],
       status: "",
       priority: "",
+      assignees: [],
+      attachments: [],
     },
   });
   function onSubmit(data: z.infer<typeof formSchema>) {
@@ -78,7 +72,7 @@ const CreateTaskModal = () => {
     // createTaskForm.reset();
   }
   return (
-    <DialogContent className="sm:max-w-[800px]">
+    <DialogContent className="sm:max-w-200">
       <DialogHeader>
         <DialogTitle className="text-center">Create Task</DialogTitle>
       </DialogHeader>
@@ -91,17 +85,8 @@ const CreateTaskModal = () => {
             <TaskDocumentCheckbox />
             <TaskChecklist />
             <TaskDropdowns />
-            <DialogFooter className="w-full sm:justify-between">
-              {/* attach files button */}
-              <Button variant={"ghost"} type="button">
-                <Paperclip />
-                Attach files
-              </Button>
-              {/* create task button */}
-              <Button variant={"primary"} type="submit">
-                Create task
-              </Button>
-            </DialogFooter>
+            <TaskAttachedFilesList />
+            <TaskDialogFooter />
           </FieldGroup>
         </form>
       </FormProvider>

@@ -2,22 +2,26 @@ import Image, { StaticImageData } from "next/image";
 import { ElementType, ReactNode } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "../../shadcn/popover";
 import { ChevronDown } from "lucide-react";
-import { cn } from "@/src/lib/utils";
+import { cn, formatDate } from "@/src/lib/utils";
 
 type TaskPopoverProps = {
+  value?: string | Date;
   inputName: string;
   Icon?: ElementType;
   imgSrc?: StaticImageData;
   iconClassName?: string;
   children: ReactNode;
+  side?: "left" | "right" | "top" | "bottom";
 };
 
 export default function TaskPopover({
+  value,
   inputName,
   Icon,
   imgSrc,
   iconClassName,
   children,
+  side = "bottom",
 }: TaskPopoverProps) {
   return (
     <Popover>
@@ -26,10 +30,14 @@ export default function TaskPopover({
         {imgSrc && (
           <Image src={imgSrc} width={20} height={20} alt="popover icon" />
         )}
-        {inputName}
+        {value
+          ? value instanceof Date
+            ? formatDate(value)
+            : value
+          : inputName}
         <ChevronDown />
       </PopoverTrigger>
-      <PopoverContent>{children}</PopoverContent>
+      <PopoverContent side={side}>{children}</PopoverContent>
     </Popover>
   );
 }
