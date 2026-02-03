@@ -1,6 +1,12 @@
 "use client";
 
-import { ChevronDown, LogOutIcon, PlusCircle } from "lucide-react";
+import {
+  ChevronDown,
+  LogOut,
+  LogOutIcon,
+  Mails,
+  PlusCircle,
+} from "lucide-react";
 import { Button } from "../../shadcn/button";
 import { useEffect, useRef, useState } from "react";
 import { useOutsideClick } from "@/src/hooks/use-outside-click";
@@ -8,7 +14,7 @@ import { truncateWord } from "@/src/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { getWorkspaces } from "@/src/lib/api/workspace/services";
 import { workspaceKeys } from "@/src/lib/api/workspace/keys";
-import { useUser } from "@clerk/nextjs";
+import { useClerk, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useWorkspaceStore } from "@/src/store/workspace";
@@ -16,6 +22,7 @@ import { workspaceItemProps } from "@/src/types/workspace";
 import WorkspaceIcon from "./workspace-icon";
 import WorkspaceMenuItemSkeleton from "./workspace-menu-item-skeleton";
 import WorkspaceMenuItem from "./workspace-menu-item";
+import WorkspaceInvitationButton from "./workspace-invitation-button";
 
 // workspace dropdown
 const WorkspaceDrodownMenu = () => {
@@ -32,6 +39,7 @@ const WorkspaceDrodownMenu = () => {
     queryKey: workspaceKeys.list(),
     queryFn: getWorkspaces,
   });
+  const { signOut } = useClerk();
 
   // determine current workspace slug from URL
   const currentWorkspaceSlug = pathname?.split("/").filter(Boolean)[0] || "";
@@ -41,7 +49,7 @@ const WorkspaceDrodownMenu = () => {
     const currentWorkspace =
       workspaces?.data?.find(
         (workspace: workspaceItemProps) =>
-          workspace.workspaceSlug === currentWorkspaceSlug
+          workspace.workspaceSlug === currentWorkspaceSlug,
       ) || null;
 
     // if current workspace exists
@@ -86,7 +94,7 @@ const WorkspaceDrodownMenu = () => {
         <h1 className="text-nowrap select-none text-sm capitalize">
           {truncateWord(
             currentWorkspace?.workspaceName || "Fetching workspace...",
-            15
+            15,
           )}
         </h1>
         <ChevronDown size={14} className="min-w-4" />
@@ -114,16 +122,26 @@ const WorkspaceDrodownMenu = () => {
                 workspace={workspace}
               />
             ))}
-        {/* create workspace button */}
-        <Link href={"/create-workspace"}>
-          <Button size={"sm"} className="mx-4 my-3" variant={"outline"}>
-            <PlusCircle /> Create workspace
+        {/* buttons */}
+        <div className="mx-4 my-3">
+          {/* create workspace button */}
+          <Link className="cursor-pointer" href={"/create-workspace"}>
+            <Button size={"sm"} className="" variant={"ghost"}>
+              <PlusCircle /> Create workspace
+            </Button>
+          </Link>
+          {/* Worskapce Invitations button */}
+          <WorkspaceInvitationButton />
+          {/* sign out button */}
+          <Button
+            variant={"ghost"}
+            onClick={() => signOut({ redirectUrl: "/sign-in" })}
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-sm text-red-600"
+          >
+            <LogOut size={18} />
+            Logout
           </Button>
-        </Link>
-        {/* sign out button */}
-        <Button size={"sm"} className="mx-4" variant={"destructive"}>
-          <LogOutIcon /> Sign out
-        </Button>
+        </div>
       </div>
     </div>
   );

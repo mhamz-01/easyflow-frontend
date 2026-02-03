@@ -37,16 +37,18 @@ const WorkspaceMenuItem = ({
 
   return (
     <div
-      onClick={() => {
-        updateWorkspace({ workspaceSlug: workspace.workspaceSlug });
-        router.push("/" + workspace.workspaceSlug);
-      }}
       className={`flex gap-3 items-center py-2 px-4 cursor-pointer ${
         workspace.workspaceSlug === currentWorkspaceSlug ? "bg-gray-50" : ""
       }`}
     >
       <div>
-        <div className="flex gap-2">
+        <div
+          onClick={() => {
+            updateWorkspace({ workspaceSlug: workspace.workspaceSlug });
+            router.push("/" + workspace.workspaceSlug);
+          }}
+          className="flex gap-2"
+        >
           <WorkspaceIcon character={workspace.workspaceName[0]} />
           <div>
             <TooltipProvider>

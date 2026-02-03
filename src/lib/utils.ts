@@ -29,3 +29,15 @@ export const normalizeUrl = (url: string) => {
   }
   return trimmed;
 };
+
+export function formatDate(
+  date: string | Date,
+  options?: Intl.DateTimeFormatOptions,
+) {
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    ...options,
+  }).format(new Date(date));
+}

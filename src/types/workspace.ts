@@ -18,3 +18,61 @@ export type workspaceItemProps = {
   admin: string;
   isSelected: boolean;
 };
+
+export type WorkspaceInvite = {
+  id: number;
+  email: string;
+  role: string;
+  token: string;
+  workspaceId: number;
+  createdAt: string;
+  User: {
+    username: string;
+  };
+  Workspace: {
+    workspaceName: string;
+  };
+};
+
+export type WorkspaceMembers = {
+  id: number;
+  role: string;
+  User: {
+    id: number;
+    imageUrl?: string;
+    createdAt: string;
+    email: string;
+    username: string;
+  };
+};
+
+export type WorkspaceInvitesResponse = {
+  success: boolean;
+  invites: WorkspaceInvite[];
+};
+
+export type workspaceMembersResponse = {
+  success: boolean;
+  members: WorkspaceMembers[];
+};
+
+export interface AcceptInvitationPayload {
+  token: string; // or number if you use number IDs
+}
+
+export interface AcceptInvitationResponse {
+  success: boolean;
+  message: string;
+  workspaceId?: number; // returned workspace ID if accepted
+}
+
+export interface deleteInvitationResponse {
+  success: boolean;
+  message: string;
+  invitationId: number;
+}
+
+export interface UserWorkspaceInvitesResponse {
+  success: boolean;
+  invitations: WorkspaceInvite[];
+}
