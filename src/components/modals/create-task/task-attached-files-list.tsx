@@ -6,10 +6,13 @@ import { useFileDialog } from "@mantine/hooks";
 import { useCallback } from "react";
 import { Label } from "../../shadcn/label";
 import { Button } from "../../shadcn/button";
+import { toast } from "sonner";
+import { deleteFile } from "@/src/lib/api/files/service";
 
 function TaskAttachedFilesList() {
-  const { control, setValue, watch } = useFormContext<{
+  const { control, getValues, setValue, watch } = useFormContext<{
     attachments: File[];
+    attachedFilesId: number[];
   }>();
   const attachments = watch("attachments") || [];
   const fileDialog = useFileDialog({
@@ -26,12 +29,29 @@ function TaskAttachedFilesList() {
 
   // Handle removing a file
   const handleRemoveFile = useCallback(
-    (index: number) => {
-      const updated = [...attachments];
-      updated.splice(index, 1);
-      setValue("attachments", updated);
+    async (index: number) => {
+      const fileId = getValues("attachedFilesId")?.[index];
+
+      try {
+        // 🗑️ delete from backend (R2 + DB)
+        if (fileId) {
+          await deleteFile(fileId);
+        }
+
+        // ✅ update UI state
+        const updatedAttachments = [...attachments];
+        updatedAttachments.splice(index, 1);
+        setValue("attachments", updatedAttachments);
+
+        const updatedFileIds = [...(getValues("attachedFilesId") ?? [])];
+        updatedFileIds.splice(index, 1);
+        setValue("attachedFilesId", updatedFileIds);
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to remove file. Please try again.");
+      }
     },
-    [attachments, setValue],
+    [attachments, setValue, getValues],
   );
 
   return (

@@ -22,7 +22,7 @@ export default function TaskSelectDate() {
 
   return (
     <Controller
-      name="date"
+      name="startDate"
       control={control}
       render={({ field }) => (
         <TaskPopover

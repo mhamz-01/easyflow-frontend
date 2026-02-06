@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/src/components/shadcn/button";
 import { AcceptInvitationPayload } from "@/src/types/workspace";
@@ -10,20 +10,18 @@ import {
 } from "@/src/lib/api/workspace/invites/services";
 import { toast } from "sonner";
 import { Spinner } from "@/src/components/shadcn/spinner";
-import { useWorkspaceStore } from "@/src/store/workspace";
 
 export default function AcceptInvitation() {
   const params = useParams<{ token: string }>();
-  const workspace = useWorkspaceStore((s) => s.workspace);
   const searchParams = useSearchParams();
   const router = useRouter();
-  const queryClient = useQueryClient();
 
   const token = params.token;
 
   const workspaceName = searchParams.get("workspaceName");
   const inviterName = searchParams.get("invitedBy");
   const role = searchParams.get("role");
+  const workspaceSlug = searchParams.get("workspaceSlug");
 
   const mutation = useMutation({
     mutationFn: (payload: AcceptInvitationPayload) => acceptInvitation(payload),
@@ -32,7 +30,7 @@ export default function AcceptInvitation() {
         toast("Invitation Accepted", {
           description: "You joined the workspace successfully!",
         });
-        router.push(`/${data.workspaceId}`);
+        router.push(`/${workspaceSlug}`);
       } else {
         toast("Failed", {
           description: data.message,
@@ -50,7 +48,7 @@ export default function AcceptInvitation() {
   const rejectMutation = useMutation({
     mutationFn: deleteInvitation,
     onSuccess: () => {
-      router.push(`/${workspace?.workspaceSlug}`);
+      router.push(`/`);
     },
   });
 

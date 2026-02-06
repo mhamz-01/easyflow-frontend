@@ -35,6 +35,8 @@ const WorkspaceDrodownMenu = () => {
   const pathname = usePathname(); // get current path
   const [currentWorkspace, setCurrentWorkspace] =
     useState<workspaceItemProps | null>();
+
+  // fetch workspaces
   const { data: workspaces, isLoading } = useQuery({
     queryKey: workspaceKeys.list(),
     queryFn: getWorkspaces,

@@ -6,7 +6,7 @@ import TaskSelectDropdown from "./task-select-dropdown";
 export default function TaskSelectStatus() {
   return (
     <TaskSelectDropdown
-      name="status"
+      name="state"
       Icon={CircleDashed}
       iconClassName="text-primary-blue"
       options={[

@@ -10,7 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../../shadcn/tooltip";
-import { checkUserRole, isLong, truncateWord } from "@/src/lib/utils";
+import { isAdmin, isLong, truncateWord } from "@/src/lib/utils";
 import { Check, Dot, Settings, UserRoundPlus } from "lucide-react";
 import { workspaceItemProps } from "@/src/types/workspace";
 
@@ -69,7 +69,11 @@ const WorkspaceMenuItem = ({
 
             {/* role & members count */}
             <div className="flex items-center text-xs">
-              <p>{userId && checkUserRole(userId, workspace.admin)}</p>
+              <p>
+                {userId && isAdmin(userId, workspace.admin)
+                  ? "Admin"
+                  : "Member"}
+              </p>
               <Dot />
               <p className="text-nowrap">
                 {workspace.members === null ? 0 : workspace.members.length}{" "}
@@ -80,24 +84,26 @@ const WorkspaceMenuItem = ({
         </div>
 
         {/* setting and invite members button */}
-        {workspace.workspaceSlug === currentWorkspaceSlug && (
-          <div className="flex gap-1 mt-1">
-            <Link
-              href={`/${currentWorkspaceSlug}/settings/general?tab=workspace`}
-              className="flex gap-2 items-center bg-black text-xs py-2 px-2 rounded"
-            >
-              <Settings size={16} />
-              Settings
-            </Link>
-            <Link
-              href={`/${currentWorkspaceSlug}/settings/members?tab=workspace`}
-              className="flex gap-2 items-center bg-black text-xs py-2 px-2 rounded"
-            >
-              <UserRoundPlus size={16} />
-              Invite members
-            </Link>
-          </div>
-        )}
+        {userId &&
+          workspace.workspaceSlug === currentWorkspaceSlug &&
+          isAdmin(userId, workspace.admin) && (
+            <div className="flex gap-1 mt-1">
+              <Link
+                href={`/${currentWorkspaceSlug}/settings/general?tab=workspace`}
+                className="flex gap-2 items-center bg-black text-xs py-2 px-2 rounded"
+              >
+                <Settings size={16} />
+                Settings
+              </Link>
+              <Link
+                href={`/${currentWorkspaceSlug}/settings/members?tab=workspace`}
+                className="flex gap-2 items-center bg-black text-xs py-2 px-2 rounded"
+              >
+                <UserRoundPlus size={16} />
+                Invite members
+              </Link>
+            </div>
+          )}
       </div>
       {workspace.workspaceSlug === currentWorkspaceSlug && <Check size={20} />}
     </div>

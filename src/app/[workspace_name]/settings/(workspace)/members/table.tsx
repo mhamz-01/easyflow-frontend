@@ -157,20 +157,21 @@ export default function WorkspaceMembersPage() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={member.User.imageUrl} />
+                        <AvatarImage src={member.User?.imageUrl ?? ""} />
                         <AvatarFallback>
-                          {member.User.username.charAt(0)}
+                          {member.User?.username?.charAt(0) ?? "?"}
                         </AvatarFallback>
                       </Avatar>
+
                       <span className="font-medium">
-                        {member.User.username}
+                        {member.User?.username ?? "Unknown user"}
                       </span>
                     </div>
                   </TableCell>
 
                   {/* Email */}
                   <TableCell className="text-muted-foreground">
-                    {member.User.email}
+                    {member.User?.email ?? "—"}
                   </TableCell>
 
                   {/* Role */}
@@ -192,7 +193,9 @@ export default function WorkspaceMembersPage() {
 
                   {/* Joined date */}
                   <TableCell className="text-muted-foreground">
-                    {formatDate(member.User.createdAt)}
+                    {member.User?.createdAt
+                      ? formatDate(member.User.createdAt)
+                      : "—"}
                   </TableCell>
 
                   {/* Actions */}

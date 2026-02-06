@@ -12,49 +12,59 @@ import TaskChecklist from "./task-checklist";
 import TaskDropdowns from "./task-select";
 import TaskDialogFooter from "./task-dialog-footer";
 import TaskAttachedFilesList from "./task-attached-files-list";
-
-const formSchema = z.object({
-  name: z.string().min(2, "Task name should be more than 2 letters"),
-  description: z.string().optional(),
-  linkName: z.string().or(z.literal("")).optional(),
-  links: z.array(z.string()),
-  documents: z.array(z.number()).optional(),
-  checklist: z.array(
-    z
-      .object({
-        name: z.string(),
-        items: z.array(z.string()),
-      })
-      .optional(),
-  ),
-  status: z.string(),
-  priority: z.string(),
-  assignees: z.array(z.number()).optional(),
-  date: z.date().optional(),
-  attachments: z.array(z.instanceof(File)).optional(),
-});
+import { useCreateTask } from "@/src/hooks/tasks";
+import {
+  CreateTaskFormDataType,
+  createTaskFormSchema,
+} from "@/src/validations/tasks";
+import { useWorkspaceStore } from "@/src/store/workspace";
+import { useProjectStore } from "@/src/store/useProjectStore";
 
 const CreateTaskModal = () => {
-  const createTaskForm = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const createTask = useCreateTask();
+  const workspaceId = useWorkspaceStore((s) => s.workspace?.id);
+  const projectId = useProjectStore((s) => s.project?.id);
+  const form = useForm<CreateTaskFormDataType>({
+    resolver: zodResolver(createTaskFormSchema),
     defaultValues: {
       name: "",
       description: "",
       links: [],
-      documents: [],
       checklist: [
         {
-          name: "checklist",
-          items: [],
+          name: "",
+          items: [""],
         },
       ],
-      status: "",
-      priority: "",
+      documents: [],
+      state: "todo",
+      priority: "medium",
       assignees: [],
       attachments: [],
+      attachedFilesId: [],
     },
   });
-  function onSubmit(data: z.infer<typeof formSchema>) {
+
+  async function onSubmit(data: CreateTaskFormDataType) {
+    // ✅ Use FormDataType here
+    console.log("Submit triggered");
+    try {
+      if (workspaceId && projectId) {
+        const { attachments, linkName, ...apiData } = data; // Remove form-only fields
+
+        showSubmissionToast(apiData);
+        await createTask.mutateAsync({
+          ...apiData,
+          workspaceId: workspaceId,
+          projectId: projectId,
+        });
+      }
+      form.reset();
+    } catch (error) {
+      console.error("Error creating task:", error);
+    }
+  }
+  const showSubmissionToast = (data: CreateTaskFormDataType) => {
     toast("You submitted the following values:", {
       description: (
         <pre className="bg-code text-code-foreground mt-2 w-[320px] overflow-x-auto rounded-md p-4">
@@ -69,15 +79,14 @@ const CreateTaskModal = () => {
         "--border-radius": "calc(var(--radius)  + 4px)",
       } as React.CSSProperties,
     });
-    // createTaskForm.reset();
-  }
+  };
   return (
     <DialogContent className="sm:max-w-200">
       <DialogHeader>
         <DialogTitle className="text-center">Create Task</DialogTitle>
       </DialogHeader>
-      <FormProvider {...createTaskForm}>
-        <form onSubmit={createTaskForm.handleSubmit(onSubmit)}>
+      <FormProvider {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <TaskNameInput />
             <TaskDescriptionInput />

@@ -67,7 +67,7 @@ function Button({
       {isLoading ? (
         <span className="flex items-center justify-center gap-2">
           <Loader2 className="w-4 h-4 animate-spin" />
-          {children && <span className="opacity-0">{children}</span>}
+          {children && <span>{children}</span>}
         </span>
       ) : (
         children

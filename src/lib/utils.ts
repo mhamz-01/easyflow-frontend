@@ -13,8 +13,8 @@ export const truncateWord = (word: string, limit: number = 20): string => {
 
 // check user role
 // return as string
-export const checkUserRole = (userID: string, workspaceAdminID: string) => {
-  return userID === workspaceAdminID ? "Admin" : "Member";
+export const isAdmin = (userID: string, workspaceAdminID: string): boolean => {
+  return userID === workspaceAdminID;
 };
 
 // if string exceeds 15 characters,
