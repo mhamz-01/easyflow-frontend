@@ -50,7 +50,7 @@ const CreateTaskModal = () => {
     console.log("Submit triggered");
     try {
       if (workspaceId && projectId) {
-        const { attachments, linkName, ...apiData } = data; // Remove form-only fields
+        const { attachments, assignees, linkName, ...apiData } = data; // Remove form-only fields
 
         showSubmissionToast(apiData);
         await createTask.mutateAsync({
