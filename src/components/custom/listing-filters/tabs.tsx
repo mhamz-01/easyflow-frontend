@@ -2,7 +2,7 @@ import { Tabs, TabsList, TabsTrigger } from "../../shadcn/tabs";
 
 const ListingFilterTabs = () => {
   return (
-    <Tabs defaultValue="public" className="w-full max-w-[400px]">
+    <Tabs defaultValue="public" className="w-full max-w-100">
       <TabsList className="bg-transparent gap-5">
         <TabsTrigger
           value="public"

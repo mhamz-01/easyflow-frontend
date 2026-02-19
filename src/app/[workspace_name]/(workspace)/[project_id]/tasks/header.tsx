@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import {
   SidebarTrigger,
   useSidebar,
@@ -7,8 +6,6 @@ import {
 import Breadcrumbs from "../../../../../components/custom/breadcrumbs";
 import { useWorkspaceStore } from "@/src/store/workspace";
 import { useProjectStore } from "@/src/store/useProjectStore";
-import { useAuth } from "@clerk/nextjs";
-import { Ellipsis, Maximize, Users, X } from "lucide-react";
 import { Dialog, DialogTrigger } from "@/src/components/shadcn/dialog";
 import { Button } from "@/src/components/shadcn/button";
 import CreateTaskModal from "@/src/components/modals/create-task";
@@ -18,10 +15,6 @@ export function TasksHeader() {
   const { open } = useSidebar();
   const workspace = useWorkspaceStore((s) => s.workspace);
   const project = useProjectStore((s) => s.project);
-  const { userId } = useAuth();
-
-  // local states
-  const [docType, setDocType] = useState("");
 
   return (
     <section className="flex items-center justify-between py-4">
@@ -36,23 +29,12 @@ export function TasksHeader() {
           ]}
         />
       </div>
-      {/* actions when doc | whitboard | task is open */}
-      {docType === "opened" ? (
-        <div className="flex items-center gap-5 border-2 overflow-hidden p-3 rounded-2xl">
-          <Users size={18} />
-          <span>share</span>
-          <Ellipsis size={18} />
-          <Maximize size={18} />
-          <X size={18} />
-        </div>
-      ) : (
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant={"primary"}>Create Task</Button>
-          </DialogTrigger>
-          <CreateTaskModal />
-        </Dialog>
-      )}
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant={"primary"}>Create Task</Button>
+        </DialogTrigger>
+        <CreateTaskModal />
+      </Dialog>
     </section>
   );
 }
