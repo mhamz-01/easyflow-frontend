@@ -64,7 +64,7 @@ export default function TaskLinksInput() {
                 aria-invalid={fieldState.invalid}
               />
               <Button type="button" onClick={addLink}>
-                <PlusIcon />
+                Add link <PlusIcon />
               </Button>
             </div>
 

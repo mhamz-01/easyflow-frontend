@@ -1,6 +1,5 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { DialogContent, DialogHeader, DialogTitle } from "../../shadcn/dialog";
-import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { FieldGroup } from "@/src/components/shadcn/field";
@@ -47,7 +46,7 @@ const CreateTaskModal = () => {
 
   async function onSubmit(data: CreateTaskFormDataType) {
     // ✅ Use FormDataType here
-    console.log("Submit triggered");
+    console.log("Submit triggered", data);
     try {
       if (workspaceId && projectId) {
         const { attachments, linkName, ...apiData } = data; // Remove form-only fields

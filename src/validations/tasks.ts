@@ -16,10 +16,10 @@ export const createTaskFormSchema = z.object({
   links: z.array(z.string()).optional(),
   documents: z.array(z.number()).optional(),
   checklist: z.array(checklistItemSchema).optional(),
-  state: z.enum(["todo", "in progress", "done"]),
-  priority: z.enum(["low", "medium", "high"]),
+  state: z.string().optional(),
+  priority: z.string().optional(),
   assignees: z.array(z.number()).optional(),
-  startDate: z.string().optional(),
+  dueDate: z.date().optional(),
   attachments: z.array(z.instanceof(File)).optional(),
   attachedFilesId: z.array(z.number()).optional(),
 });

@@ -1,3 +1,4 @@
+import TaskDetailsDrawer from "./components/task-details-drawer";
 import TaskManagerBody from "./task-manager-body";
 import TaskManagerHeader from "./task-manager-header";
 
@@ -6,6 +7,7 @@ const TaskManager = () => {
     <div>
       <TaskManagerHeader />
       <TaskManagerBody />
+      <TaskDetailsDrawer />
     </div>
   );
 };

@@ -38,8 +38,8 @@ export interface Task {
   description?: string | null;
   attachments: number[];
   links: Link[];
-  state: TaskState;
-  priority: TaskPriority;
+  state: string;
+  priority: string;
   createdBy: number;
   startDate?: string | null;
   checklist?: ChecklistItem[];
@@ -58,8 +58,8 @@ export interface CreateTask {
   description?: string | null;
   attachments?: number[];
   links?: string[];
-  state?: TaskState;
-  priority?: TaskPriority;
+  state?: string;
+  priority?: string;
   startDate?: string | null;
   checklist?: ChecklistItem[];
   assigneeIds?: number[];

@@ -59,3 +59,23 @@ export const filterBySearch = <T>(
     return value.toLowerCase().includes(query);
   });
 };
+
+// return a random color
+const RANDOM_COLORS = [
+  "#1A8FE8", // brighter blue
+  "#803232", // brighter maroon
+  "#D4A92F", // brighter gold
+  "#28A57B", // brighter green
+  "#7150A0", // brighter purple
+  "#B34727", // brighter reddish-brown
+];
+export const getColorFromGroup = (group: string) => {
+  let hash = 0;
+
+  for (let i = 0; i < group.length; i++) {
+    hash = group.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  const index = Math.abs(hash) % RANDOM_COLORS.length;
+  return RANDOM_COLORS[index];
+};
