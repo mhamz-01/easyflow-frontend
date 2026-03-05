@@ -31,7 +31,7 @@ const TaskManagerHeader = () => {
   } = useTaskStore();
 
   return (
-    <div className="flex items-center justify-between flex-wrap gap-4 my-5 border-b px-3 pb-3">
+    <div className="flex items-center justify-between flex-wrap gap-4 my-5 px-3 pb-3">
       {/* View Switcher */}
       <div className="bg-muted rounded-lg p-1 flex">
         <Button

@@ -2,18 +2,13 @@
 
 import { Button } from "@/src/components/shadcn/button";
 import { Input } from "@/src/components/shadcn/input";
-import { Link as LinkIcon, MinusIcon, PlusIcon, X } from "lucide-react";
+import { Link as LinkIcon, PlusIcon, X } from "lucide-react";
 import {
   Controller,
   useFieldArray,
   useFormContext,
   useWatch,
 } from "react-hook-form";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "../../shadcn/collapsible";
 import { Field, FieldError } from "../../shadcn/field";
 import { normalizeUrl } from "@/src/lib/utils";
 import Link from "next/link";
