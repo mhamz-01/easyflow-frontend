@@ -1,13 +1,13 @@
 import TaskPopover from "./task-popover";
 import whiteboardIcon from "@/public/icons/whiteboard.svg";
-import TaskSearchInput from "./task-search-input";
 import { useState } from "react";
+import DropdownSearchInput from "../../dropdown-search-input";
 export default function TaskSelectWhiteboard() {
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(true);
   return (
     <TaskPopover inputName="whiteboards" imgSrc={whiteboardIcon}>
-      <TaskSearchInput
+      <DropdownSearchInput
         search={search}
         setSearch={setSearch}
         setIsOpen={setIsOpen}

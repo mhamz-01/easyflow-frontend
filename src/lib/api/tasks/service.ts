@@ -4,6 +4,7 @@ import type {
   CreateTask,
   UpdateTaskDto,
   ApiResponse,
+  TaskViewList,
 } from "../../../types/tasks";
 import { api } from "../client";
 
@@ -12,7 +13,10 @@ export const taskService = {
    * Create a new task
    */
   createTask: async (taskData: CreateTask): Promise<Task> => {
-    const response = await api.post<ApiResponse<Task>>("/tasks", taskData);
+    const response = await api.post<ApiResponse<Task>>(
+      `/projects/${7}/tasks`,
+      taskData,
+    );
     return response.data.data;
   },
 
@@ -46,29 +50,10 @@ export const taskService = {
   },
 
   /**
-   * Get tasks by workspace
-   */
-  getTasksByWorkspace: async (
-    workspaceId: number,
-    params?: {
-      projectId?: number;
-      state?: string;
-      priority?: string;
-      assigneeId?: number;
-    },
-  ): Promise<Task[]> => {
-    const response = await api.get<ApiResponse<Task[]>>(
-      `/workspaces/${workspaceId}/tasks`,
-      { params },
-    );
-    return response.data.data;
-  },
-
-  /**
    * Get tasks by project
    */
-  getTasksByProject: async (projectId: number): Promise<Task[]> => {
-    const response = await api.get<ApiResponse<Task[]>>(
+  getTasksByProject: async (projectId: number): Promise<TaskViewList[]> => {
+    const response = await api.get<ApiResponse<TaskViewList[]>>(
       `/projects/${projectId}/tasks`,
     );
     return response.data.data;

@@ -1,9 +1,11 @@
+// search input used in dropdowns
+
 import { SearchIcon } from "lucide-react";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-} from "../../shadcn/input-group";
+} from "../shadcn/input-group";
 import { Dispatch, SetStateAction } from "react";
 
 type propsType = {
@@ -11,7 +13,7 @@ type propsType = {
   setSearch: Dispatch<SetStateAction<string>>;
   setIsOpen?: Dispatch<SetStateAction<boolean>>;
 };
-export default function TaskSearchInput({
+export default function DropdownSearchInput({
   search,
   setSearch,
   setIsOpen,

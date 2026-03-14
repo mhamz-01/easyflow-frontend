@@ -97,6 +97,7 @@ export default function InviteMemberDialog({
               <SelectContent>
                 <SelectItem value="admin">Admin</SelectItem>
                 <SelectItem value="member">Member</SelectItem>
+                <SelectItem value="viewer">Viewer</SelectItem>
               </SelectContent>
             </Select>
           </div>

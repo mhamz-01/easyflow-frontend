@@ -1,110 +1,18 @@
 import Avatar from "@/src/components/custom/avatar";
 import { useTaskStore } from "../../store/useTaskStore";
 import { Maximize2 } from "lucide-react";
-import { getColorFromGroup } from "@/src/lib/utils";
-const dummyTasks = [
-  {
-    id: 1,
-    name: "Build UI Components",
-    assignee: "Afaq",
-    priority: "High",
-    state: "In Progress",
-    dueDate: "2026-02-25",
-  },
-  {
-    id: 2,
-    name: "Fix Login Bug",
-    assignee: "Ali",
-    priority: "medium",
-    state: "Todo",
-    dueDate: "2026-02-28",
-  },
-  {
-    id: 3,
-    name: "Deploy Backend",
-    assignee: "Ahmed",
-    priority: "Low",
-    state: "Done",
-    dueDate: "2026-03-05",
-  },
-  {
-    id: 4,
-    name: "Design Landing Page",
-    assignee: "Sara",
-    priority: "High",
-    state: "In Progress",
-    dueDate: "2026-03-01",
-  },
-  {
-    id: 5,
-    name: "Integrate Payment Gateway",
-    assignee: "Bilal",
-    priority: "High",
-    state: "Todo",
-    dueDate: "2026-03-03",
-  },
-  {
-    id: 6,
-    name: "Write Unit Tests",
-    assignee: "Afaq",
-    priority: "Medium",
-    state: "In Progress",
-    dueDate: "2026-03-04",
-  },
-  {
-    id: 7,
-    name: "Fix CSS Issues",
-    assignee: "Sara",
-    priority: "Low",
-    state: "Todo",
-    dueDate: "2026-03-02",
-  },
-  {
-    id: 8,
-    name: "Optimize Database Queries",
-    assignee: "Ahmed",
-    priority: "High",
-    state: "In Progress",
-    dueDate: "2026-03-06",
-  },
-  {
-    id: 9,
-    name: "Set Up CI/CD Pipeline",
-    assignee: "Bilal",
-    priority: "Medium",
-    state: "Todo",
-    dueDate: "2026-03-07",
-  },
-  {
-    id: 10,
-    name: "Update Documentation",
-    assignee: "Afaq",
-    priority: "Low",
-    state: "Done",
-    dueDate: "2026-03-01",
-  },
-  {
-    id: 11,
-    name: "Conduct User Testing",
-    assignee: "Sara",
-    priority: "Medium",
-    state: "Todo",
-    dueDate: "2026-03-08",
-  },
-  {
-    id: 12,
-    name: "Bug Fix: Profile Page",
-    assignee: "Ali",
-    priority: "High",
-    state: "In Progress",
-    dueDate: "2026-03-05",
-  },
-];
+import { formatDate, getColorFromGroup } from "@/src/lib/utils";
+import { TaskViewList } from "@/src/types/tasks";
+import { RowCell } from "../../components/row-cell";
+import { EditableTaskNameInput } from "../../components/editable-taskname-input";
+import SelectAssignees from "@/src/components/dropdown-select/select-assignees";
 
 const TaskTableBody = ({
+  tasks = [],
   columnWidths,
   hasHorizontalScroll,
 }: {
+  tasks: TaskViewList[];
   columnWidths: number[];
   hasHorizontalScroll: boolean;
 }) => {
@@ -112,8 +20,6 @@ const TaskTableBody = ({
     useTaskStore();
 
   const visible = visibleColumns.filter((c) => !c.isHidden);
-
-  let tasks = [...dummyTasks];
 
   // Sorting
   if (sortBy !== "none") {
@@ -159,7 +65,7 @@ const TaskTableBody = ({
               })()}
             </div>
           )}
-          {(tasks as any[]).map((task) => (
+          {(tasks as TaskViewList[]).map((task) => (
             <div
               key={task.id}
               className={`grid h-10 font-bold group ${hasHorizontalScroll ? "" : "border-l-0 border-r border "} hover:bg-gray-50`}
@@ -179,52 +85,54 @@ const TaskTableBody = ({
                 switch (column.label) {
                   case "Name":
                     return (
-                      <div
-                        key={column.id}
-                        className={`${commonClass} justify-between`}
-                      >
-                        <span className="truncate">{task.name}</span>
-
-                        <Maximize2
-                          className="h-3 w-3 opacity-0 group-hover:opacity-100 cursor-pointer "
-                          onClick={() => {
-                            setIsOpen(true);
-                            setSelectedTask(task);
-                          }}
+                      <RowCell key={column.id} commonClass={commonClass}>
+                        <EditableTaskNameInput
+                          task={task}
+                          role="admin"
+                          onOpen={() => setIsOpen(true)}
                         />
-                      </div>
+                      </RowCell>
                     );
 
                   case "Assignee":
                     return (
-                      <div key={column.id} className={`${commonClass} gap-2`}>
-                        <Avatar
-                          src="https://avatars.githubusercontent.com/u/96257586?v=4&size=64"
-                          className="min-w-6.5 min-h-6.5"
+                      <RowCell key={column.id} commonClass={commonClass}>
+                        <SelectAssignees
+                          selectedIds={task.assignees.map(
+                            (assignee) => assignee.id,
+                          )}
+                          onChange={() => console.log("Clicked")}
                         />
-                        {task.assignee}
-                      </div>
+                        {/* {task.assignees.length > 0 &&
+                          task.assignees.map((assignee) => (
+                            <div key={column.id}>
+                              <Avatar
+                                src={assignee.imageUrl}
+                                className="min-w-6.5 min-h-6.5"
+                              />
+                            </div>
+                          ))} */}
+                      </RowCell>
                     );
-
                   case "Priority":
                     return (
-                      <div key={column.id} className={commonClass}>
+                      <RowCell key={column.id} commonClass={commonClass}>
                         {task.priority}
-                      </div>
+                      </RowCell>
                     );
 
                   case "State":
                     return (
-                      <div key={column.id} className={commonClass}>
+                      <RowCell key={column.id} commonClass={commonClass}>
                         {task.state}
-                      </div>
+                      </RowCell>
                     );
 
                   case "Due Date":
                     return (
-                      <div key={column.id} className={commonClass}>
-                        {task.dueDate}
-                      </div>
+                      <RowCell key={column.id} commonClass={commonClass}>
+                        {task.dueDate && formatDate(task.dueDate)}
+                      </RowCell>
                     );
 
                   default:

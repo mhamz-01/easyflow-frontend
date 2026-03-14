@@ -1,12 +1,12 @@
 import { UserRoundSearch } from "lucide-react";
 import { Field } from "../../shadcn/field";
-import TaskSearchInput from "./task-search-input";
 import { useWorkspaceStore } from "@/src/store/workspace";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import TaskPopover from "./task-popover";
 import TaskDropdown from "./task-dropdown";
 import { getWorkspaceMembers } from "@/src/lib/api/workspace/members/services";
+import DropdownSearchInput from "../../dropdown-search-input";
 
 /* ---------------------------------- */
 /* Loading Skeleton */
@@ -58,7 +58,7 @@ const TaskSelectAssignees = () => {
       side="top"
     >
       <Field className="relative">
-        <TaskSearchInput
+        <DropdownSearchInput
           search={search}
           setSearch={setSearch}
           setIsOpen={setIsOpen}
@@ -72,28 +72,15 @@ const TaskSelectAssignees = () => {
           <div className="p-3 text-sm text-red-500">Failed to load members</div>
         )}
 
-        {/* ⚠️ EMPTY STATE */}
-        {!isMembersLoading &&
-          !isMembersError &&
-          isOpen &&
-          filteredMembers.length === 0 && (
-            <div className="p-3 text-sm text-muted-foreground">
-              No members found
-            </div>
-          )}
-
-        {/* ✅ DROPDOWN */}
-        {!isMembersLoading && !isMembersError && filteredMembers.length > 0 && (
-          <TaskDropdown
-            items={filteredMembers}
-            isOpen={isOpen}
-            setIsOpen={setIsOpen}
-            inputName="assignees"
-            getImageSrc={(item) => item.User.imageUrl ?? ""}
-            getId={(item) => item.User.id}
-            getLabel={(item) => item.User.username}
-          />
-        )}
+        <TaskDropdown
+          items={filteredMembers}
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          inputName="assignees"
+          getImageSrc={(item) => item.User.imageUrl ?? ""}
+          getId={(item) => item.User.id}
+          getLabel={(item) => item.User.username}
+        />
       </Field>
     </TaskPopover>
   );

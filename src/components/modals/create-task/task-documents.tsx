@@ -11,8 +11,8 @@ import { useWorkspaceStore } from "@/src/store/workspace";
 import { docsKeys } from "@/src/lib/api/documents/keys";
 import { singleDoc } from "@/src/types/documents";
 import docsIcon from "@/public/icons/docs.svg";
-import TaskSearchInput from "./task-search-input";
 import TaskDropdown from "./task-dropdown";
+import DropdownSearchInput from "../../dropdown-search-input";
 
 export default function TaskDocumentCheckbox() {
   const project = useProjectStore((s) => s.project);
@@ -41,7 +41,7 @@ export default function TaskDocumentCheckbox() {
     <TaskCollapsibleButton title="Add documents" img={docsIcon}>
       <Field className="relative max-w-sm">
         {/* search input */}
-        <TaskSearchInput
+        <DropdownSearchInput
           search={search}
           setSearch={setSearch}
           setIsOpen={setIsOpen}

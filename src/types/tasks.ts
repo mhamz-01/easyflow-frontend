@@ -30,6 +30,19 @@ export interface Project {
   name: string;
 }
 
+interface assignee {
+  id: number;
+  username: string;
+  imageUrl: string;
+}
+export interface TaskViewList {
+  id: number;
+  name: string;
+  assignees: assignee[];
+  dueDate: string;
+  priority: string;
+  state: string;
+}
 export interface Task {
   id: number;
   workspaceId: number;
