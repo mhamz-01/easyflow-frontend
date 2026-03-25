@@ -78,7 +78,17 @@ export interface CreateTask {
   assigneeIds?: number[];
 }
 
-export interface UpdateTaskDto extends Partial<CreateTask> {}
+export interface UpdateTaskPayload {
+  name?: string;
+  description?: string;
+  state?: string;
+  priority?: string;
+  projectId?: number;
+  dueDate?: string;
+  assigneeIds?: number[];
+  checklist?: ChecklistItem[];
+  links?: string[];
+}
 
 export interface ApiResponse<T> {
   success: boolean;

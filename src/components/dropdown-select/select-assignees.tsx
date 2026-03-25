@@ -25,7 +25,7 @@ type SelectAssigneesProps = {
   /** Controlled: selected user IDs owned by parent */
   selectedIds: number[];
   /** Called when an assignee is toggled */
-  onChange: (updatedIds: number[]) => void;
+  onSelect: (updatedIds: number[]) => void;
   /** Max avatars to show before showing +N overflow */
   maxVisible?: number;
 };
@@ -34,7 +34,7 @@ const MAX_VISIBLE_DEFAULT = 3;
 
 function SelectAssignees({
   selectedIds,
-  onChange,
+  onSelect,
   maxVisible = MAX_VISIBLE_DEFAULT,
 }: SelectAssigneesProps) {
   const workspace = useWorkspaceStore((s) => s.workspace);
@@ -69,7 +69,7 @@ function SelectAssignees({
     const updated = selectedIds.includes(id)
       ? selectedIds.filter((v) => v !== id)
       : [...selectedIds, id];
-    onChange(updated);
+    onSelect(updated);
   };
 
   return (

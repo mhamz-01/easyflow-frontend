@@ -101,17 +101,8 @@ const TaskTableBody = ({
                           selectedIds={task.assignees.map(
                             (assignee) => assignee.id,
                           )}
-                          onChange={() => console.log("Clicked")}
+                          onSelect={() => {}}
                         />
-                        {/* {task.assignees.length > 0 &&
-                          task.assignees.map((assignee) => (
-                            <div key={column.id}>
-                              <Avatar
-                                src={assignee.imageUrl}
-                                className="min-w-6.5 min-h-6.5"
-                              />
-                            </div>
-                          ))} */}
                       </RowCell>
                     );
                   case "Priority":
