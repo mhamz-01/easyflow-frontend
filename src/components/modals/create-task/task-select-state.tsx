@@ -1,11 +1,11 @@
 "use client";
 
 import { CircleDashed } from "lucide-react";
-import TaskSelectDropdown from "./task-select-dropdown";
+import { SelectDropdownForm } from "../../single-select-dropdown/SelectDropdownForm";
 
 export default function TaskSelectStatus() {
   return (
-    <TaskSelectDropdown
+    <SelectDropdownForm
       name="state"
       Icon={CircleDashed}
       iconClassName="text-primary-blue"

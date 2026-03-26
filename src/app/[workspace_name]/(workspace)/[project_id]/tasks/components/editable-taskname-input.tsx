@@ -21,7 +21,7 @@ export const EditableTaskNameInput = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const isViewer = role === "viewer";
 
-  const { mutate, isPending } = useUpdateTask(task.id, {
+  const { mutate, isPending } = useUpdateTask({
     onSuccess: () => setIsEditing(false),
     onError: () => {
       setValue(task.name);
@@ -48,7 +48,7 @@ export const EditableTaskNameInput = ({
       setIsEditing(false);
       return;
     }
-    mutate({ name: trimmed });
+    mutate({ taskId: task.id, payload: { name: trimmed } });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

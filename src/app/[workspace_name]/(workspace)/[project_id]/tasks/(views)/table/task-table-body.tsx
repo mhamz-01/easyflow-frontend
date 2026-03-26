@@ -6,6 +6,10 @@ import { TaskViewList } from "@/src/types/tasks";
 import { RowCell } from "../../components/row-cell";
 import { EditableTaskNameInput } from "../../components/editable-taskname-input";
 import SelectAssignees from "@/src/components/dropdown-select/select-assignees";
+import { useUpdateTask } from "@/src/hooks/tasks";
+import { useState } from "react";
+import PriorityCell from "../../components/priority-cell";
+import StateCell from "../../components/state-cell";
 
 const TaskTableBody = ({
   tasks = [],
@@ -16,6 +20,9 @@ const TaskTableBody = ({
   columnWidths: number[];
   hasHorizontalScroll: boolean;
 }) => {
+  const [selectedTaskId, setSelectedTaskId] = useState<number>(0);
+  // update assigned user
+  const { mutate, isPending } = useUpdateTask();
   const { visibleColumns, sortBy, groupBy, setSelectedTask, setIsOpen } =
     useTaskStore();
 
@@ -68,7 +75,7 @@ const TaskTableBody = ({
           {(tasks as TaskViewList[]).map((task) => (
             <div
               key={task.id}
-              className={`grid h-10 font-bold group ${hasHorizontalScroll ? "" : "border-l-0 border-r border "} hover:bg-gray-50`}
+              className={`grid h-12 font-bold group ${hasHorizontalScroll ? "" : "border-l-0 border-r border "} hover:bg-gray-50`}
               style={{
                 gridTemplateColumns: columnWidths
                   .slice(0, visible.length)
@@ -101,21 +108,29 @@ const TaskTableBody = ({
                           selectedIds={task.assignees.map(
                             (assignee) => assignee.id,
                           )}
-                          onSelect={() => {}}
+                          onSelect={(selectedIds) => {
+                            mutate({
+                              taskId: task.id,
+                              payload: { assigneeIds: selectedIds },
+                            });
+                          }}
                         />
                       </RowCell>
                     );
                   case "Priority":
                     return (
                       <RowCell key={column.id} commonClass={commonClass}>
-                        {task.priority}
+                        <PriorityCell
+                          taskId={task.id}
+                          priority={task.priority}
+                        />
                       </RowCell>
                     );
 
                   case "State":
                     return (
                       <RowCell key={column.id} commonClass={commonClass}>
-                        {task.state}
+                        <StateCell taskId={task.id} state={task.state} />
                       </RowCell>
                     );
 

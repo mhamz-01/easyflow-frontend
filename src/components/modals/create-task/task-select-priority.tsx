@@ -1,14 +1,14 @@
 "use client";
 
 import { Pyramid } from "lucide-react";
-import TaskSelectDropdown from "./task-select-dropdown";
+import { SelectDropdownForm } from "../../single-select-dropdown/SelectDropdownForm";
 
 export default function TaskSelectPriority() {
   return (
-    <TaskSelectDropdown
+    <SelectDropdownForm
       name="priority"
       Icon={Pyramid}
-      iconClassName="text-primary-yellow"
+      iconClassName="text-primary-yelow"
       options={[
         { value: "high", label: "🔴 High" },
         { value: "medium", label: "🟡 Medium" },

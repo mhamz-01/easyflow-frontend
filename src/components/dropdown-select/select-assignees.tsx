@@ -39,6 +39,10 @@ function SelectAssignees({
 }: SelectAssigneesProps) {
   const workspace = useWorkspaceStore((s) => s.workspace);
   const [search, setSearch] = useState("");
+  const [isOpen, setIsOpen] = useState(true);
+
+  // ─── Optimistic local state ───────────────────────────────────────────────
+  const [optimisticIds, setOptimisticIds] = useState<number[]>(selectedIds);
 
   const {
     data: membersData,
@@ -52,23 +56,31 @@ function SelectAssignees({
 
   const members: WorkspaceMember[] = membersData?.members ?? [];
 
-  const filteredMembers = useMemo(() => {
-    return members.filter((member) =>
-      member.User.username?.toLowerCase().includes(search.toLowerCase()),
-    );
-  }, [search, members]);
+  const filteredMembers = useMemo(
+    () =>
+      members.filter((m) =>
+        m.User.username?.toLowerCase().includes(search.toLowerCase()),
+      ),
+    [search, members],
+  );
 
-  const selectedMembers = useMemo(() => {
-    return members.filter((m) => selectedIds.includes(m.User.id));
-  }, [members, selectedIds]);
+  const optimisticSet = useMemo(() => new Set(optimisticIds), [optimisticIds]);
 
+  const selectedMembers = useMemo(
+    () => members.filter((m) => optimisticSet.has(m.User.id)),
+    [members, optimisticSet],
+  );
   const visibleMembers = selectedMembers.slice(0, maxVisible);
   const overflowCount = selectedMembers.length - visibleMembers.length;
 
   const handleSelect = (id: number) => {
-    const updated = selectedIds.includes(id)
-      ? selectedIds.filter((v) => v !== id)
-      : [...selectedIds, id];
+    // 1. Update UI instantly
+    const updated = optimisticIds.includes(id)
+      ? optimisticIds.filter((v) => v !== id)
+      : [...optimisticIds, id];
+
+    setOptimisticIds(updated);
+
     onSelect(updated);
   };
 
@@ -77,7 +89,7 @@ function SelectAssignees({
       <PopoverTrigger asChild className="border-0">
         <Button
           type="button"
-          variant={"ghost"}
+          variant="ghost"
           className="p-0"
           aria-label="Assign members"
         >
@@ -110,7 +122,11 @@ function SelectAssignees({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-56 p-0" align="start">
-        <DropdownSearchInput search={search} setSearch={setSearch} />
+        <DropdownSearchInput
+          search={search}
+          setSearch={setSearch}
+          setIsOpen={setIsOpen}
+        />
         {isMembersLoading ? (
           <p className="text-sm px-4 py-3 text-muted-foreground">Loading...</p>
         ) : isMembersError ? (
@@ -120,10 +136,10 @@ function SelectAssignees({
         ) : (
           <DropdownSelect<WorkspaceMember>
             items={filteredMembers}
-            isOpen={true}
-            setIsOpen={() => {}}
-            selectedValues={selectedIds}
-            onSelect={(id) => handleSelect(id)}
+            isOpen={isOpen}
+            setIsOpen={() => setIsOpen(false)}
+            selectedValues={optimisticIds}
+            onSelect={handleSelect}
             getId={(m) => m.User.id}
             getLabel={(m) => m.User.username}
             getImageSrc={(m) => m.User.imageUrl ?? ""}
@@ -134,5 +150,4 @@ function SelectAssignees({
     </Popover>
   );
 }
-
 export default SelectAssignees;

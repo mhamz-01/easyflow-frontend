@@ -53,12 +53,17 @@ export const useCreateTask = () => {
   });
 };
 
-export const useUpdateTask = (taskId: number, options?: MutationOptions) => {
+export const useUpdateTask = (options?: MutationOptions) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: UpdateTaskPayload) =>
-      taskService.updateTask(taskId, payload),
+    mutationFn: ({
+      taskId,
+      payload,
+    }: {
+      taskId: number;
+      payload: UpdateTaskPayload;
+    }) => taskService.updateTask(taskId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: taskKeys.all() });
       options?.onSuccess?.();
