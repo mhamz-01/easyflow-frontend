@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import "@/src/app/globals.css";
 import {
   SidebarProvider,
   SidebarTrigger,
@@ -21,7 +20,7 @@ export default function SettingsLayout({
   return (
     <SidebarProvider>
       <SettingsSidebar />
-      <main className="w-full p-4">
+      <main className="w-full min-[768px]:w-[calc(100%-16rem)]">
         <SidebarTrigger className="inline-flex md:hidden text-gray-200 mb-2" />
         <SettingsHeaderBreadcrums />
         {children}

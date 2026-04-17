@@ -44,14 +44,7 @@ const TaskTableHeader = ({
     document.removeEventListener("mouseup", handleMouseUp);
     columnIndex.current = null;
   };
-  // main border
-  // border-b-0
-  // each
-  // border-r
 
-  // when overflows
-  // main no border classname
-  // for each cell border-r0 and no border classname for last element
   return (
     <div
       style={{

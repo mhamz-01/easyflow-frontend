@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import "@/src/app/globals.css";
 import { SidebarProvider } from "@/src/components/shadcn/sidebar";
 import { AppSidebar } from "@/src/components/sidebar/app-sidebar";
 
@@ -17,7 +16,9 @@ export default function WorkspaceLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="w-full">{children}</main>
+      <main className="w-full min-[768px]:w-[calc(100%-16rem)]">
+        {children}
+      </main>
     </SidebarProvider>
   );
 }

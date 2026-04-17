@@ -50,7 +50,7 @@ const RecentActivities = () => {
   }, [data]);
 
   return (
-    <div className="border-t-2 mt-5 pt-5">
+    <div className="border-t-2 mt-5 pt-5 px-5">
       <div>
         <h1 className="text-h1">Recent</h1>
         {/* dropdwon */}

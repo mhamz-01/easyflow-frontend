@@ -1,15 +1,14 @@
-import Avatar from "@/src/components/custom/avatar";
 import { useTaskStore } from "../../store/useTaskStore";
-import { Maximize2 } from "lucide-react";
-import { formatDate, getColorFromGroup } from "@/src/lib/utils";
+import { getColorFromGroup } from "@/src/lib/utils";
 import { TaskViewList } from "@/src/types/tasks";
 import { RowCell } from "../../components/row-cell";
 import { EditableTaskNameInput } from "../../components/editable-taskname-input";
 import SelectAssignees from "@/src/components/dropdown-select/select-assignees";
 import { useUpdateTask } from "@/src/hooks/tasks";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import PriorityCell from "../../components/priority-cell";
 import StateCell from "../../components/state-cell";
+import DateCell from "../../components/date-cell";
 
 const TaskTableBody = ({
   tasks = [],
@@ -34,15 +33,29 @@ const TaskTableBody = ({
   }
 
   // Grouping
-  const grouped =
-    groupBy !== "none"
-      ? tasks.reduce((acc: any, task: any) => {
-          const key = task[groupBy];
+  const grouped = useMemo(() => {
+    if (groupBy === "none") return { All: tasks };
+
+    return tasks.reduce((acc: any, task: any) => {
+      if (groupBy === "assignee") {
+        const assignees = task.assignees?.length
+          ? task.assignees
+          : [{ username: "unassigned" }];
+
+        assignees.forEach((a: any) => {
+          const key = a.username ?? "unassigned";
           if (!acc[key]) acc[key] = [];
           acc[key].push(task);
-          return acc;
-        }, {})
-      : { All: tasks };
+        });
+      } else {
+        const key = task[groupBy] ?? "unknown";
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(task);
+      }
+
+      return acc;
+    }, {});
+  }, [tasks, groupBy]);
 
   return (
     <div className="text-[#D5D6D7]">
@@ -52,7 +65,6 @@ const TaskTableBody = ({
             <div className="px-4 py-4">
               {(() => {
                 const color = getColorFromGroup(group);
-
                 return (
                   <div className="flex items-center gap-3">
                     <div
@@ -137,7 +149,7 @@ const TaskTableBody = ({
                   case "Due Date":
                     return (
                       <RowCell key={column.id} commonClass={commonClass}>
-                        {task.dueDate && formatDate(task.dueDate)}
+                        <DateCell taskId={task.id} date={task.dueDate} />
                       </RowCell>
                     );
 

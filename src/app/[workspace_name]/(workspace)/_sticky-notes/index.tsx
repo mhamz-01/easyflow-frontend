@@ -39,7 +39,7 @@ const StickyNotes = () => {
   }
 
   return (
-    <div className="border-t-2 mt-5 pt-5">
+    <div className="border-t-2 mt-5 pt-5 px-5">
       <StickyNotesHeader />
       {isLoading ? (
         <StickyNotesLoadingState />

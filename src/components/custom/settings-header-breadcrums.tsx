@@ -12,7 +12,7 @@ import Link from "next/link";
 
 const SettingsHeaderBreadcrums = () => {
   return (
-    <Breadcrumb>
+    <Breadcrumb className="px-5 py-2">
       <BreadcrumbList>
         <BreadcrumbItem>
           <Home size={18} />

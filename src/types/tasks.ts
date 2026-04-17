@@ -84,7 +84,7 @@ export interface UpdateTaskPayload {
   state?: string;
   priority?: string;
   projectId?: number;
-  dueDate?: string;
+  dueDate?: Date;
   assigneeIds?: number[];
   checklist?: ChecklistItem[];
   links?: string[];

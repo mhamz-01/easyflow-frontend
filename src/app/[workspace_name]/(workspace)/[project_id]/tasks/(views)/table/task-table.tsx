@@ -61,6 +61,18 @@ const TaskTable = () => {
     return () => observer.disconnect();
   }, [handleIntersection]);
 
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new ResizeObserver(() => {
+      setHasHorizontalScroll(container.scrollWidth > container.clientWidth);
+    });
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
   if (isLoading) return <TaskLoadingSkeleton />;
   if (!tasks?.length) return <TaskEmptyState />;
 
