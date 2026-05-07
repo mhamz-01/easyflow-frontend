@@ -18,7 +18,6 @@ const TaskTable = () => {
   const [columnWidths, setColumnWidths] = useState<number[]>(
     Array(visibleColumns.length).fill(213),
   );
-
   const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useInfiniteQuery({
       queryKey: ["tasks", project_id],
@@ -52,7 +51,7 @@ const TaskTable = () => {
     if (!sentinel) return;
 
     const observer = new IntersectionObserver(handleIntersection, {
-      root: null, // ← use viewport instead of container (avoids always-visible bug)
+      root: null,
       rootMargin: "100px",
       threshold: 0,
     });

@@ -45,7 +45,7 @@ function DropdownSelect<T>({
   if (!isOpen) return null;
 
   return (
-    <div className="absolute z-50 top-10 mt-1 w-full rounded-md border bg-background shadow">
+    <div className="absolute z-auto top-10 pt-1 w-full rounded-md border dark:bg-background shadow">
       {/* Header */}
       <div className="flex justify-between px-3 py-2 border-b">
         <p className="text-sm font-medium">

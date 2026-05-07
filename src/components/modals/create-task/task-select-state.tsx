@@ -11,7 +11,7 @@ export default function TaskSelectStatus() {
       iconClassName="text-primary-blue"
       options={[
         { value: "todo", label: "🟠 Todo" },
-        { value: "in-progress", label: "🔵 In Progress" },
+        { value: "in progress", label: "🔵 In Progress" },
         { value: "done", label: "🟢 Done" },
       ]}
     />

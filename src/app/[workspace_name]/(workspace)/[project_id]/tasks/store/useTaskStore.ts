@@ -1,3 +1,4 @@
+import { Task } from "@/src/types/tasks";
 import { create } from "zustand";
 
 type Checklist = {
@@ -16,29 +17,6 @@ export type User = {
   avatar?: string;
 };
 
-export type Task = {
-  id: number;
-  code?: string; // TRI-TH-1
-  name: string;
-  description: string;
-
-  state: "todo" | "in-progress" | "done" | "to-be-done";
-  priority: "low" | "medium" | "high";
-
-  startDate?: string;
-  dueDate: string;
-  endDate?: string;
-
-  assignees: User[];
-  createdBy: User;
-
-  checklist: Checklist[];
-  links: string[];
-  attachments: Attachement[];
-
-  createdAt?: string;
-  updatedAt?: string;
-};
 type VisibleColumn = {
   id: number;
   label: string;
@@ -47,12 +25,14 @@ type VisibleColumn = {
 
 type TaskStore = {
   isOpen: boolean;
+  taskId: number | null;
   view: "table" | "board";
   groupBy: string;
   sortBy: string;
   visibleColumns: VisibleColumn[];
 
-  setIsOpen: (value: boolean) => void;
+  setIsOpen: (value: boolean, taskId: number | null) => void;
+  setTaskId: (taskId: number | null) => void;
   setView: (view: "table" | "board") => void;
   setGroupBy: (value: string) => void;
   setSortBy: (value: string) => void;
@@ -64,6 +44,7 @@ type TaskStore = {
 
 export const useTaskStore = create<TaskStore>((set) => ({
   isOpen: false,
+  taskId: null,
   view: "table",
   groupBy: "none",
   sortBy: "none",
@@ -76,7 +57,9 @@ export const useTaskStore = create<TaskStore>((set) => ({
     { id: 5, label: "Due Date", isHidden: false },
   ],
 
-  setIsOpen: (value) => set({ isOpen: value, selectedTask: null }),
+  setIsOpen: (value, taskId) =>
+    set({ isOpen: value, taskId, selectedTask: null }),
+  setTaskId: (taskId) => set({ taskId }),
   setView: (view) => set({ view }),
   setGroupBy: (value) => set({ groupBy: value }),
   setSortBy: (value) => set({ sortBy: value }),

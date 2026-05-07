@@ -79,3 +79,12 @@ export const getColorFromGroup = (group: string) => {
   const index = Math.abs(hash) % RANDOM_COLORS.length;
   return RANDOM_COLORS[index];
 };
+
+// convert r3 file key into a previewable URL
+export const getFileUrl = (fileKey: string) => {
+  return `${process.env.NEXT_PUBLIC_FILE_BASE_URL}/${fileKey}`;
+};
+
+export const getDocPreviewUrl = (fileUrl: string) => {
+  return `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(fileUrl)}`;
+};

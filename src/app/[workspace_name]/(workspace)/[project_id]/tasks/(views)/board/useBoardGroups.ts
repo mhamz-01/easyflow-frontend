@@ -1,13 +1,12 @@
-// useBoardGroups.ts
 import { useMemo } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { taskService } from "@/src/lib/api/tasks/service";
 import { groupBy } from "lodash";
 import { TaskViewList } from "@/src/types/tasks";
 
-export type GroupByField = "state" | "assignees" | "priority";
+const STATE_ORDER = ["todo", "in progress", "done"];
 
-export function useBoardGroups(projectId: number, groupByField: GroupByField) {
+export function useBoardGroups(projectId: number, groupByField: string) {
   const { data, ...rest } = useInfiniteQuery({
     queryKey: ["tasks", projectId], // ← same key as table view
     queryFn: ({ pageParam }) =>
@@ -22,8 +21,7 @@ export function useBoardGroups(projectId: number, groupByField: GroupByField) {
   const groups = useMemo(() => {
     const tasks = data?.pages.flatMap((p) => p.tasks) ?? [];
 
-    if (groupByField === "assignees") {
-      // A task with multiple assignees appears in each of their columns
+    if (groupByField === "assignee") {
       const grouped: Record<string, TaskViewList[]> = {};
       for (const task of tasks) {
         if (!task.assignees.length) {
@@ -37,10 +35,25 @@ export function useBoardGroups(projectId: number, groupByField: GroupByField) {
       return Object.entries(grouped).map(([key, tasks]) => ({ key, tasks }));
     }
 
-    // All other fields are flat strings — group directly
-    const grouped = groupBy(tasks, (t) => t[groupByField] ?? "none");
+    type TaskGroupByField = keyof TaskViewList | "none";
+
+    const grouped = groupBy(tasks, (t) => {
+      return (groupByField as TaskGroupByField) === "none"
+        ? t["state"]
+        : t[groupByField as keyof TaskViewList];
+    });
+
+    // ✅ enforce stable column order
+    if (groupByField === "none" || groupByField === "state") {
+      return STATE_ORDER.map((key) => ({
+        key,
+        tasks: grouped[key] ?? [],
+      }));
+    }
+
+    // fallback for other grouping types
     return Object.entries(grouped).map(([key, tasks]) => ({ key, tasks }));
-  }, [data, groupByField]); // ← re-groups instantly, no fetch
+  }, [data, groupByField]);
 
   return { groups, ...rest };
 }

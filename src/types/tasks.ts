@@ -7,17 +7,18 @@ export interface ChecklistItem {
   items: string[];
 }
 
-export interface Link {
-  id?: string;
-  title?: string;
-  url: string;
+interface Attachment {
+  id: number;
+  fileKey: string;
+  originalName: string;
+  mimeType: string;
 }
 
 export interface User {
   id: number;
   email: string;
-  firstName: string;
-  lastName: string;
+  username: string;
+  imageUrl?: string;
 }
 
 export interface Workspace {
@@ -49,8 +50,8 @@ export interface Task {
   projectId: number;
   name: string;
   description?: string | null;
-  attachments: number[];
-  links: Link[];
+  attachments: Attachment[];
+  links: string[];
   state: string;
   priority: string;
   createdBy: number;
@@ -62,6 +63,7 @@ export interface Task {
   assignees: User[];
   workspace: Workspace;
   project?: Project | null;
+  dueDate: string;
 }
 
 export interface CreateTask {

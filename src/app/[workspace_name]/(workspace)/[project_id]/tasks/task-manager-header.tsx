@@ -90,53 +90,57 @@ const TaskManagerHeader = () => {
         </DropdownMenu>
 
         {/* Sort By */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
-              <ArrowUpDown className="h-4 w-4" />
-              Sort by: {sortBy}
-              <ChevronDown className="h-4 w-4 ml-2" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => setSortBy("none")}>
-              No Sorting
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSortBy("priority")}>
-              Priority
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSortBy("dueDate")}>
-              Due Date
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSortBy("state")}>
-              State
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {view === "table" && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <ArrowUpDown className="h-4 w-4" />
+                Sort by: {sortBy}
+                <ChevronDown className="h-4 w-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => setSortBy("none")}>
+                No Sorting
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("priority")}>
+                Priority
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("dueDate")}>
+                Due Date
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("state")}>
+                State
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
 
         {/* Visible Fields */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
-              <SlidersHorizontal className="h-4 w-4" />
-              Fields
-              <ChevronDown className="h-4 w-4 ml-2" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
-            <DropdownMenuLabel>Visible Fields</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {visibleColumns.map((col) => (
-              <DropdownMenuItem
-                key={col.id}
-                onClick={() => toggleColumn(col.id)}
-              >
-                {col.label}
-                {col.isHidden ? " (Hidden)" : ""}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {view === "table" && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <SlidersHorizontal className="h-4 w-4" />
+                Fields
+                <ChevronDown className="h-4 w-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuLabel>Visible Fields</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {visibleColumns.map((col) => (
+                <DropdownMenuItem
+                  key={col.id}
+                  onClick={() => toggleColumn(col.id)}
+                >
+                  {col.label}
+                  {col.isHidden ? " (Hidden)" : ""}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     </div>
   );

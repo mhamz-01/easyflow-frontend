@@ -5,10 +5,11 @@ import { RowCell } from "../../components/row-cell";
 import { EditableTaskNameInput } from "../../components/editable-taskname-input";
 import SelectAssignees from "@/src/components/dropdown-select/select-assignees";
 import { useUpdateTask } from "@/src/hooks/tasks";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import PriorityCell from "../../components/priority-cell";
 import StateCell from "../../components/state-cell";
 import DateCell from "../../components/date-cell";
+import { COMPARATORS } from "../../utils";
 
 const TaskTableBody = ({
   tasks = [],
@@ -19,24 +20,28 @@ const TaskTableBody = ({
   columnWidths: number[];
   hasHorizontalScroll: boolean;
 }) => {
-  const [selectedTaskId, setSelectedTaskId] = useState<number>(0);
   // update assigned user
-  const { mutate, isPending } = useUpdateTask();
+  const { mutate } = useUpdateTask();
   const { visibleColumns, sortBy, groupBy, setSelectedTask, setIsOpen } =
     useTaskStore();
 
   const visible = visibleColumns.filter((c) => !c.isHidden);
 
   // Sorting
-  if (sortBy !== "none") {
-    tasks.sort((a: any, b: any) => (a[sortBy] > b[sortBy] ? 1 : -1));
-  }
+  const sortedTasks = useMemo(() => {
+    if (sortBy === "none") return tasks;
+
+    const comparator = COMPARATORS[sortBy];
+    if (!comparator) return tasks;
+
+    return [...tasks].sort(comparator); // ✅ no mutation
+  }, [tasks, sortBy]);
 
   // Grouping
   const grouped = useMemo(() => {
-    if (groupBy === "none") return { All: tasks };
+    if (groupBy === "none") return { All: sortedTasks };
 
-    return tasks.reduce((acc: any, task: any) => {
+    return sortedTasks.reduce((acc: any, task: any) => {
       if (groupBy === "assignee") {
         const assignees = task.assignees?.length
           ? task.assignees
@@ -55,7 +60,7 @@ const TaskTableBody = ({
 
       return acc;
     }, {});
-  }, [tasks, groupBy]);
+  }, [sortedTasks, groupBy]);
 
   return (
     <div className="text-[#D5D6D7]">
@@ -108,7 +113,7 @@ const TaskTableBody = ({
                         <EditableTaskNameInput
                           task={task}
                           role="admin"
-                          onOpen={() => setIsOpen(true)}
+                          onOpen={() => setIsOpen(true, task.id)}
                         />
                       </RowCell>
                     );

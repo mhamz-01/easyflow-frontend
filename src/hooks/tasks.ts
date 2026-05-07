@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { taskService } from "../lib/api/tasks/service";
 import type { CreateTask, UpdateTaskPayload } from "@/src/types/tasks";
+import { useTaskStore } from "../app/[workspace_name]/(workspace)/[project_id]/tasks/store/useTaskStore";
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────
 
@@ -32,13 +33,13 @@ const handleMutationError = (error: any) => {
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
 
-export const useTask = (taskId: number) =>
-  useQuery({
-    queryKey: taskKeys.detail(taskId),
-    queryFn: () => taskService.getTaskById(taskId),
+export const useTask = (taskId: number) => {
+  return useQuery({
+    queryKey: taskKeys.detail(taskId as number),
+    queryFn: () => taskService.getTaskById(taskId as number),
     enabled: !!taskId,
   });
-
+};
 export const useCreateTask = () => {
   const queryClient = useQueryClient();
 
