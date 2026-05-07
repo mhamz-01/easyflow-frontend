@@ -3,7 +3,7 @@ import WhiteboardsListing from "./listing";
 
 const page = () => {
   return (
-    <section>
+    <section className="px-4">
       {/* filters */}
       <ListingFilters />
       {/* Whiteboards Listing */}
