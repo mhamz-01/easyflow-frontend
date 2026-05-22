@@ -1,118 +1,105 @@
 "use client";
 
 import { getSingleWhiteboard, updateWhiteboard } from "@/src/lib/api/whiteboards/services";
+import { getAllDocs } from "@/src/lib/api/documents/services";
+import { taskService } from "@/src/lib/api/tasks/service";
 import { EasyflowWhiteboard } from "@mhamz.01/easyflow-whiteboard";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import '@mhamz.01/easyflow-whiteboard/dist/styles.css'; 
-
-
-const mocktasks = [
-  {
-    id: "task-1",
-    title: "Design landasdasdasdding page mockups",
-    status: "in-progress" as const,
-    assignee: "Sarah Chen",
-    project: "Website Redesign",
-    priority: "high" as const,
-    dueDate: "Feb 15",
-  },
-  {
-    id: "task-2",
-    title: "Implement user authentication",
-    status: "todo" as const,
-    assignee: "John Doe",
-    project: "Backend API",
-    priority: "high" as const,
-    dueDate: "Feb 18",
-  },
-  {
-    id: "task-3",
-    title: "Write API documentation",
-    status: "done" as const,
-    assignee: "Mike Wilson",
-    project: "Documentation",
-    priority: "medium" as const ,
-    dueDate: "Feb 10",
-  },
-  {
-    id: "task-4",
-    title: "Setup CI/CD pipeline",
-    status: "todo" as const,
-    assignee: "Alex Turner",
-    project: "DevOps",
-    priority: "low" as const,
-    dueDate: "Feb 20",
-  },
-  {
-    id: "task-5",
-    title: "Database schema optimization",
-    status: "todo" as const,
-    assignee: "Emma Davis",
-    project: "Backend API",
-    priority: "medium" as const,
-    dueDate: "Feb 22",
-  },
-  {
-    id: "task-6",
-    title: "Mobile responsive testing",
-    status: "in-progress" as const,
-    assignee: "Sarah Chen",
-    project: "Website Redesign",
-    priority: "high" as const,
-    dueDate: "Feb 16",
-  },
-];
-
-
-const MOCK_DB_DOCUMENTS = [
-  {
-    id: "db-doc-101",
-    title: "Project Alpha Strategy",
-    project: "EasyFlow Core",
-    breadcrumb: ["Strategic", "Planning"],
-    preview: "High-level overview of the 2026 roadmap and market positioning.",
-    updatedAt: "Just now",
-  },
-  {
-    id: "db-doc-102",
-    title: "User Interview Insights",
-    project: "Research",
-    breadcrumb: ["Q1", "Feedback"],
-    preview: "Analysis of 20 user sessions focusing on the node-syncing experience.",
-    updatedAt: "15 mins ago",
-  },
-  {
-    id: "db-doc-103",
-    title: "Technical Architecture",
-    project: "Engineering",
-    breadcrumb: ["Docs", "System"],
-    preview: "Deep dive into the Fabric.js and React overlay synchronization logic.",
-    updatedAt: "2 hours ago",
-  }
-];
-
+import type { TaskNodeData, DocumentNodeData } from "@mhamz.01/easyflow-whiteboard";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import '@mhamz.01/easyflow-whiteboard/dist/styles.css';
+import { useWorkspaceStore } from "@/src/store/workspace";
+import { useProjectStore } from "@/src/store/useProjectStore";
 
 export default function WhiteboardEditor({ id }: { id: string }) {
+  const workspace = useWorkspaceStore((s) => s.workspace);
+  const project = useProjectStore((s) => s.project);
+  const queryClient = useQueryClient(); // ✅
+
+  // ── Fetch whiteboard ──────────────────────────────────────────────
   const { data, isLoading } = useQuery({
     queryKey: ["whiteboard", id],
     queryFn: () => getSingleWhiteboard(Number(id)),
+    staleTime: 0,         // ✅ always refetch
+    refetchOnMount: true, // ✅ refetch every time component mounts
   });
 
+  // ── Fetch docs ────────────────────────────────────────────────────
+  const { data: docsData } = useQuery({
+    queryKey: ["docs", workspace?.id, project?.id],
+    queryFn: () =>
+      getAllDocs({ workspaceId: workspace!.id, projectId: project!.id }),
+    enabled: !!workspace?.id && !!project?.id,
+    staleTime: 1000 * 60,
+  });
+
+  // ── Fetch tasks ───────────────────────────────────────────────────
+  const { data: tasksData } = useQuery({
+    queryKey: ["tasks", "project", project?.id],
+    queryFn: () => taskService.getTasksByProject(project!.id),
+    enabled: !!project?.id,
+    staleTime: 1000 * 60,
+  });
+
+  // ── Mutation ──────────────────────────────────────────────────────
   const mutation = useMutation({
     mutationFn: updateWhiteboard,
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: () => {
+      // ✅ bust cache so next mount always fetches fresh
+      queryClient.invalidateQueries({ queryKey: ["whiteboard", id] });
+      console.log("✅ Whiteboard saved");
+    },
+    onError: (err) => {
+      console.error("❌ Whiteboard save failed:", err);
     },
   });
+
+  // ── Transform docs → DocumentNodeData ────────────────────────────
+  const availableDocuments: DocumentNodeData[] =
+    docsData?.docs.map((doc) => ({
+      id: String(doc.id),
+      type: "document" as const,
+      title: doc.documentName,
+      project: project?.projectName ?? "",
+      breadcrumb: [project?.projectName ?? ""],
+      preview: doc.preview,
+      updatedAt: doc.createdDate
+        ? new Date(doc.createdDate).toLocaleDateString()
+        : "",
+      x: 0,
+      y: 0,
+    })) ?? [];
+
+  // ── Transform tasks → TaskNodeData ───────────────────────────────
+  const availableTasks: TaskNodeData[] =
+    tasksData?.tasks.map((task) => ({
+      id: String(task.id),
+      type: "task" as const,
+      title: task.name,
+      status: (task.state === "in progress"
+        ? "in-progress"
+        : task.state) as TaskNodeData["status"],
+      assignee: task.assignees?.[0]?.username ?? "",
+      project: project?.projectName ?? "",
+      priority: task.priority as TaskNodeData["priority"],
+      dueDate: task.dueDate
+        ? new Date(task.dueDate).toLocaleDateString()
+        : "",
+      x: 0,
+      y: 0,
+    })) ?? [];
 
   if (isLoading) {
     return <div className="max-h-max rounded-xl bg-muted animate-pulse" />;
   }
 
   return (
-    <div className="w-screen h-screen ">
+    <div className="w-screen h-screen">
       <EasyflowWhiteboard
-        initialData={data?.whiteboard.content ?? { canvas: "", tasks: [], documents: [] }}
+        initialData={data?.whiteboard.content ?? {
+          canvas: "",
+          tasks: [],
+          documents: [],
+        }}
         onSave={(payload) => {
           mutation.mutate({
             id: Number(id),
@@ -121,10 +108,8 @@ export default function WhiteboardEditor({ id }: { id: string }) {
           });
         }}
         saveDebounceMs={2000}
-        // availableTasks={data?.whiteboard.availableTasks ?? []}
-        // availableDocuments={data?.whiteboard.availableDocuments ?? []}
-        availableDocuments={MOCK_DB_DOCUMENTS}
-        availableTasks={mocktasks}
+        availableDocuments={availableDocuments}
+        availableTasks={availableTasks}
       />
     </div>
   );

@@ -1,7 +1,7 @@
 export const whiteboardKeys = {
-  all: (projectId: number, workspaceId: number) => [
+  all: (workspaceId: number , projectId: number) => [
     "whiteboards",
-    projectId,
     workspaceId,
+    projectId,
   ],
 };

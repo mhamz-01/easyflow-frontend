@@ -70,7 +70,19 @@ const DocsList = ({ docsListData }: { docsListData: Doc[] }) => {
 
               {/* RIGHT: creator + separator + actions */}
               <div className="flex items-center gap-3">
-                <Avatar width={24} height={24} />
+              <div className="flex items-center -space-x-2">
+    <Avatar width={24} height={24} />
+    {/* ✅ assignee avatars */}
+    {doc.assignees?.map((assignee) => (
+      <div
+        key={assignee.id}
+        title={assignee.username}
+        className="rounded-full border-2 border-background"
+      >
+        <Avatar width={24} height={24} />
+      </div>
+    ))}
+  </div>
                 <span className="h-5 w-px bg-border" />
 
                 <button className="p-1 hover:bg-muted rounded">

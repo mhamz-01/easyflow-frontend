@@ -9,14 +9,20 @@ import type {
 } from "../../../types/tasks";
 import { api } from "../client";
 
-// get project id
-const projectId = useProjectStore.getState().project?.id;
+const getProjectId = () => {
+  const projectId = useProjectStore.getState().project?.id;
+  if (projectId == null) {
+    throw new Error("Project id is missing in store");
+  }
+  return projectId;
+};
 
 export const taskService = {
   /**
    * Get task by ID
    */
   getTaskById: async (taskId: number): Promise<Task> => {
+    const projectId = getProjectId();
     const response = await api.get<ApiResponse<Task>>(
       `/projects/${projectId}/tasks/${taskId}`,
     );
@@ -58,6 +64,7 @@ export const taskService = {
    * Create a new task
    */
   createTask: async (taskData: CreateTask): Promise<Task> => {
+    const projectId = getProjectId();
     const response = await api.post<ApiResponse<Task>>(
       `/projects/${projectId}/tasks`,
       taskData,
@@ -72,6 +79,7 @@ export const taskService = {
     taskId: number,
     taskData: UpdateTaskPayload,
   ): Promise<Task> => {
+    const projectId = getProjectId();
     const response = await api.patch<ApiResponse<Task>>(
       `/projects/${projectId}/tasks/${taskId}`,
       taskData,
@@ -83,6 +91,7 @@ export const taskService = {
    * Delete task
    */
   deleteTask: async (taskId: number): Promise<void> => {
+    const projectId = getProjectId();
     await api.delete(`/projects/${projectId}/tasks/${taskId}`);
   },
 };

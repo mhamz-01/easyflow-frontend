@@ -75,11 +75,12 @@ export const useUpdateTask = (options?: MutationOptions) => {
   });
 };
 
-export const useDeleteTask = (taskId: number, options?: MutationOptions) => {
+
+export const useDeleteTask = (options?: MutationOptions) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => taskService.deleteTask(taskId),
+    mutationFn: (taskId: number) => taskService.deleteTask(taskId), // ✅ receives taskId here
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: taskKeys.all() });
       toast.success("Task deleted");

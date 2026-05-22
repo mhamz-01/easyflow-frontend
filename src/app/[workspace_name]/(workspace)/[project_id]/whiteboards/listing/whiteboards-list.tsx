@@ -23,7 +23,7 @@ import { useProjectStore } from "@/src/store/useProjectStore";
 import { Whiteboard, whiteboardsListResponse } from "@/src/types/whiteboard";
 import { useState } from "react";
 
-const WhiteboardsList = ({ data }: { data: Whiteboard[] }) => {
+const WhiteboardsList = ({ whiteboardsListData }: { whiteboardsListData: Whiteboard[] }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const workspaceId = useWorkspaceStore((s) => s.workspace?.id);
@@ -56,7 +56,7 @@ const WhiteboardsList = ({ data }: { data: Whiteboard[] }) => {
     <div className="space-y-4">
       <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
         <ul className="space-y-2">
-          {data.map((whiteboard: Whiteboard) => (
+          {whiteboardsListData.map((whiteboard: Whiteboard) => (
             <li
               key={whiteboard.id}
               className="flex items-center justify-between rounded-md border px-4 py-3"
@@ -72,7 +72,19 @@ const WhiteboardsList = ({ data }: { data: Whiteboard[] }) => {
 
               {/* RIGHT: creator + separator + actions */}
               <div className="flex items-center gap-3">
-                <Avatar width={24} height={24} />
+              <div className="flex items-center -space-x-2">
+    <Avatar width={24} height={24} />
+    {/* ✅ assignee avatars */}
+    {whiteboard.assignees?.map((assignee) => (
+      <div
+        key={assignee.id}
+        title={assignee.username}
+        className="rounded-full border-2 border-background"
+      >
+        <Avatar width={24} height={24} />
+      </div>
+    ))}
+  </div>
                 <span className="h-5 w-px bg-border" />
 
                 <button className="p-1 hover:bg-muted rounded">

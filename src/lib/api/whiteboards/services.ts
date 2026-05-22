@@ -30,15 +30,21 @@ export const createWhiteboard = async ({
   workspaceId,
   projectId,
   createdBy,
+  whiteboardName,
+  isPrivate
 }: {
   workspaceId: number;
   projectId: number;
   createdBy: string;
+  whiteboardName:string;
+  isPrivate: boolean;
 }) => {
   const response = await api.post("/whiteboards/create", {
     workspaceId,
     projectId,
     createdBy,
+    whiteboardName,
+    isPrivate
   });
   return response.data as createdWhiteboardResponse;
 };
@@ -63,4 +69,15 @@ export const deleteWhiteboard = async ({ id }: { id: number }) => {
     params: { id },
   });
   return response.data as { success: boolean; message: string; id: number };
+};
+
+export const assignWhiteboard = async ({
+  whiteboardId,
+  memberIds,
+}: {
+  whiteboardId: number;
+  memberIds: number[];
+}) => {
+  const response = await api.post("/whiteboards/assign", { whiteboardId, memberIds });
+  return response.data as { success: boolean; assignees: number[] };
 };

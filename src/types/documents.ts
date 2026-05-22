@@ -1,7 +1,18 @@
 import { JSONContent } from "@tiptap/react";
+export type DocAssignee = {
+  id: number;
+  username: string;
+  imageUrl?: string;
+};
+
 export type Doc = {
   id: number;
   documentName: string;
+  isPrivate: boolean;
+  createdBy: number;
+  createdDate: string;
+  assignees: DocAssignee[];
+  preview: string; 
 };
 
 type contentTab = {
@@ -15,7 +26,7 @@ export type singleDoc = {
   documentName: string;
   id: number;
   createdBy: number;
-  assignees: null | [string];
+  assignees: number[] | null;
   createdDate: Date;
   content: null | contentTab[];
   isPrivate: boolean;
@@ -23,6 +34,7 @@ export type singleDoc = {
   workspaceId: number;
   updatedAt: Date;
   lastEdited: Date;
+
 };
 
 export type singleDocResponse = {
@@ -31,13 +43,15 @@ export type singleDocResponse = {
 };
 export type docsListResponse = {
   success: boolean;
-  docs: {
-    id: number;
-    documentName: string;
-  }[];
+  // docs: {
+  //   id: number;
+  //   documentName: string;
+  // }[];
+  docs: Doc[];
 };
 
 export type createdDocResponse = {
   message: string;
   createdDoc: singleDoc;
 };
+

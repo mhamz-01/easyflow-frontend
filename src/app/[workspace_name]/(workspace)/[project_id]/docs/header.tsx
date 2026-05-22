@@ -1,5 +1,7 @@
 "use client";
 import { useState } from "react";
+import { Dialog, DialogTrigger } from "@/src/components/shadcn/dialog";
+import CreateItemModal from "@/src/components/modals/create-item-modal";
 import { Button } from "../../../../../components/shadcn/button";
 import {
   SidebarTrigger,
@@ -15,6 +17,9 @@ import { createDoc } from "@/src/lib/api/documents/services";
 import { Spinner } from "../../../../../components/shadcn/spinner";
 import { Ellipsis, Maximize, Users, X, ArrowLeft, Plus } from "lucide-react";
 import { createdDocResponse, docsListResponse } from "@/src/types/documents";
+import ShareDocModal from "@/src/components/modals/share-doc-modal";
+import { useQuery } from "@tanstack/react-query";
+import { getSingleDoc } from "@/src/lib/api/documents/services";
 
 export function DocsHeader() {
   const { open } = useSidebar();
@@ -25,10 +30,23 @@ export function DocsHeader() {
   const { userId } = useAuth();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [isOpen, setIsOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
+const docId = params?.id ? Number(params.id) : null;
+
+
+
+
+const { data: docData } = useQuery({
+  queryKey: ["doc", docId],
+  queryFn: () => getSingleDoc(docId!),
+  enabled: !!docId,
+});
 
   const mutationDocs = useMutation({
     mutationFn: createDoc,
     onSuccess: (data: createdDocResponse) => {
+      setIsOpen(false); // ✅ close modal on success
       router.push(`docs/${data.createdDoc.id}`);
       queryClient.setQueryData(
         ["docs", workspace?.id, project?.id],
@@ -39,6 +57,7 @@ export function DocsHeader() {
               id: data.createdDoc.id,
               documentName: data.createdDoc.documentName,
               assignees: data.createdDoc.assignees,
+              isPrivate: data.createdDoc.isPrivate, 
             },
             ...(oldData.docs || []),
           ],
@@ -47,12 +66,15 @@ export function DocsHeader() {
     },
   });
 
-  const handleCreate = () => {
+
+  const handleCreate = (name: string, isPrivate:boolean) => {
     if (workspace?.id && project?.id && userId) {
       mutationDocs.mutate({
-        workspaceId: workspace?.id,
-        projectId: project?.id,
+        workspaceId: workspace.id,
+        projectId: project.id,
         createdBy: userId,
+        documentName: name, 
+        isPrivate, 
       });
     }
   };
@@ -77,30 +99,30 @@ export function DocsHeader() {
 
         {/* Right */}
         <div className="flex items-center gap-2 shrink-0">
-          {/* Hidden on mobile */}
-          <div className="max-sm:hidden sm:flex items-center gap-3 border-2 overflow-hidden p-3 rounded-2xl">
-            <Users size={18} />
-            <span>share</span>
-            <Ellipsis size={18} />
-            <Maximize size={18} />
-            <X size={18} />
-          </div>
 
-          <Button
-            onClick={handleCreate}
-            variant="primary"
-            className="relative"
-            disabled={mutationDocs.isPending}
-          >
-            {mutationDocs.isPending ? (
-              <Spinner />
-            ) : (
-              <>
-                <span className="max-sm:hidden">Create Document</span>
-                <Plus size={18} className="inline sm:hidden" />
-              </>
-            )}
-          </Button>
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+  <DialogTrigger asChild>
+    <Button variant="primary" disabled={mutationDocs.isPending}>
+      {mutationDocs.isPending ? (
+        <Spinner />
+      ) : (
+        <>
+          <span className="max-sm:hidden">Create Document</span>
+          <Plus size={18} className="inline sm:hidden" />
+        </>
+      )}
+    </Button>
+  </DialogTrigger>
+  <CreateItemModal
+    title="Create Document"
+    description="Enter a name for your new document."
+    label="Document Name"
+    placeholder="e.g. Meeting Notes"
+    buttonText="Create Document"
+    isPending={mutationDocs.isPending}
+    onSubmit={handleCreate}
+  />
+</Dialog>
         </div>
       </section>
     );
@@ -145,9 +167,23 @@ export function DocsHeader() {
             <Users size={15} />
           </button>
           <span className="max-sm:hidden h-3.5 w-px bg-border" />
-          <button className="max-sm:hidden hover:text-foreground transition-colors" title="Share">
-            <span className="text-xs font-medium">Share</span>
-          </button>
+          <Dialog open={isShareOpen} onOpenChange={setIsShareOpen}>
+  <button
+    onClick={() => setIsShareOpen(true)}
+    className="max-sm:hidden hover:text-foreground transition-colors"
+    title="Share"
+  >
+    <span className="text-xs font-medium">Share</span>
+  </button>
+  {isShareOpen && docId && (
+    <ShareDocModal
+      docId={docId}
+      documentName={docData?.document.documentName ?? ""}
+      existingAssignees={docData?.document.assignees ?? []}
+      onClose={() => setIsShareOpen(false)}
+    />
+  )}
+</Dialog>
           <span className="h-3.5 w-px bg-border" />
           <button className="hover:text-foreground transition-colors" title="More options">
             <Ellipsis size={15} />
@@ -158,7 +194,7 @@ export function DocsHeader() {
           </button>
         </div>
 
-        <Button
+        {/* <Button
           onClick={handleCreate}
           variant="primary"
           size="sm"
@@ -172,7 +208,30 @@ export function DocsHeader() {
               <Plus size={16} className="inline sm:hidden" />
             </>
           )}
-        </Button>
+        </Button> */}
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+  <DialogTrigger asChild>
+    <Button variant="primary" disabled={mutationDocs.isPending}>
+      {mutationDocs.isPending ? (
+        <Spinner />
+      ) : (
+        <>
+          <span className="max-sm:hidden">Create Document</span>
+          <Plus size={18} className="inline sm:hidden" />
+        </>
+      )}
+    </Button>
+  </DialogTrigger>
+  <CreateItemModal
+    title="Create Document"
+    description="Enter a name for your new document."
+    label="Document Name"
+    placeholder="e.g. Meeting Notes"
+    buttonText="Create Document"
+    isPending={mutationDocs.isPending}
+    onSubmit={handleCreate}
+  />
+</Dialog>
       </div>
     </section>
   );

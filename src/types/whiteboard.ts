@@ -1,49 +1,52 @@
 // ─── Internal Content Structures ─────────────────────────────────────────────
 
 export interface WhiteboardTask {
-    id: string;
-    title: string;
-    status: string;
-    assignee: string;
-    project: string;
-    priority: string;
-    dueDate: string;
-    x: number;
-    y: number;
-  }
+  id: string;
+  title: string;
+  status: "todo" | "in-progress" | "done"; // ✅ was: string
+  assignee: string;
+  project: string;
+  priority: "low" | "medium" | "high";     // ✅ was: string
+  dueDate: string;
+  x: number;
+  y: number;
+}
   
-  export interface WhiteboardDocument {
-    id: string;
-    title: string;
-    project: string;
-    breadcrumb: string[];
-    preview: string;
-    updatedAt: string;
-    x: number;
-    y: number;
-  }
+export interface WhiteboardDocument {
+  id: string;
+  title: string;
+  project: string;
+  breadcrumb: string[];
+  preview: string;
+  updatedAt: string;
+  x: number;
+  y: number;
+}
   
   /**
    * Based on your payload, this is what lives inside 'content'
    */
   export interface WhiteboardContent {
-    canvas: string; 
+    canvas: string;
     tasks: WhiteboardTask[];
     documents: WhiteboardDocument[];
   }
-  
   // ────────────────────────────────────────────
   
   export type Whiteboard = {
       id: number;
       whiteboardName: string;
+      isPrivate: boolean; 
+      assignees?: any[];
+      createdBy:number;
+      createdDate:string;
   }
   
   export type singleWhiteboard = {
       whiteboardName: string;
       id: number;
       createdBy: number;
-      assignees: null | [string];
+      assignees: number[] | null;
       createdDate: Date;
       content: WhiteboardContent; 
       isPrivate: boolean;
@@ -60,10 +63,11 @@ export interface WhiteboardTask {
   
   export type whiteboardsListResponse = {
       success: boolean;
-      whiteboards: {
-          id: number;
-          whiteboardName: string;
-      }[];
+      // whiteboards: {
+      //     id: number;
+      //     whiteboardName: string;
+      // }[];
+      whiteboards:Whiteboard[];
   }
   
   export type createdWhiteboardResponse = {

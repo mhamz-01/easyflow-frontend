@@ -1,8 +1,19 @@
+"use client";
+
 import { Tabs, TabsList, TabsTrigger } from "../../shadcn/tabs";
 
-const ListingFilterTabs = () => {
+interface ListingFilterTabsProps {
+  value: "public" | "private";
+  onChange: (value: "public" | "private") => void;
+}
+
+const ListingFilterTabs = ({ value, onChange }: ListingFilterTabsProps) => {
   return (
-    <Tabs defaultValue="public" className="w-full max-w-100">
+    <Tabs
+      value={value}
+      onValueChange={(v) => onChange(v as "public" | "private")}
+      className="w-full max-w-100"
+    >
       <TabsList className="bg-transparent gap-5">
         <TabsTrigger
           value="public"
@@ -14,7 +25,6 @@ const ListingFilterTabs = () => {
         >
           Public
         </TabsTrigger>
-
         <TabsTrigger
           value="private"
           className="rounded-none border-0 pb-5 font-bold text-white
