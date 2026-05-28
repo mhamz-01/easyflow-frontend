@@ -18,6 +18,7 @@ import {
 } from "@/src/validations/tasks";
 import { useWorkspaceStore } from "@/src/store/workspace";
 import { useProjectStore } from "@/src/store/useProjectStore";
+import TaskSelectWhiteboard from "./task-select-whiteboard";
 
 const CreateTaskModal = () => {
   const createTask = useCreateTask();
@@ -36,6 +37,7 @@ const CreateTaskModal = () => {
         },
       ],
       documents: [],
+      whiteboards: [],   
       state: "todo",
       priority: "medium",
       assignees: [],
@@ -49,13 +51,15 @@ const CreateTaskModal = () => {
     console.log("Submit triggered", data);
     try {
       if (workspaceId && projectId) {
-        const { attachments, linkName, ...apiData } = data; // Remove form-only fields
+        const { attachments, linkName,documents,whiteboards, ...apiData } = data; // Remove form-only fields
 
         showSubmissionToast(apiData);
         await createTask.mutateAsync({
           ...apiData,
           workspaceId: workspaceId,
           projectId: projectId,
+          attachedDocs: documents ?? [],        // ✅ map documents → attachedDocs
+        attachedWhiteboards: whiteboards ?? [], // ✅ map whiteboards → attachedWhiteboards
         });
       }
       form.reset();
@@ -91,6 +95,7 @@ const CreateTaskModal = () => {
             <TaskDescriptionInput />
             <TaskLinksInput />
             <TaskDocumentCheckbox />
+            <TaskSelectWhiteboard/>
             <TaskChecklist />
             <TaskDropdowns />
             <TaskAttachedFilesList />

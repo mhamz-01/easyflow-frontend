@@ -20,6 +20,7 @@ import { createdDocResponse, docsListResponse } from "@/src/types/documents";
 import ShareDocModal from "@/src/components/modals/share-doc-modal";
 import { useQuery } from "@tanstack/react-query";
 import { getSingleDoc } from "@/src/lib/api/documents/services";
+import { trackActivity } from "@/src/lib/api/recent-activities/track";
 
 export function DocsHeader() {
   const { open } = useSidebar();
@@ -43,29 +44,43 @@ const { data: docData } = useQuery({
   enabled: !!docId,
 });
 
-  const mutationDocs = useMutation({
-    mutationFn: createDoc,
-    onSuccess: (data: createdDocResponse) => {
-      setIsOpen(false); // ✅ close modal on success
-      router.push(`docs/${data.createdDoc.id}`);
-      queryClient.setQueryData(
-        ["docs", workspace?.id, project?.id],
-        (oldData: Partial<docsListResponse>) => ({
-          ...oldData,
-          docs: [
-            {
-              id: data.createdDoc.id,
-              documentName: data.createdDoc.documentName,
-              assignees: data.createdDoc.assignees,
-              isPrivate: data.createdDoc.isPrivate, 
-            },
-            ...(oldData.docs || []),
-          ],
-        }),
-      );
-    },
-  });
 
+const mutationDocs = useMutation({
+  mutationFn: createDoc,
+  onSuccess: (data: createdDocResponse) => {
+    setIsOpen(false);
+    router.push(`docs/${data.createdDoc.id}`);
+
+    // ✅ track activity
+    if (workspace?.id && project?.id && userId) {
+      trackActivity({
+        workspaceId: workspace.id,
+        userId,
+        title: data.createdDoc.documentName,
+        type: "DOC",
+        typeID: data.createdDoc.id,
+        projectID: project.id,
+        lastEditedBy: userId,
+      });
+    }
+
+    queryClient.setQueryData(
+      ["docs", workspace?.id, project?.id],
+      (oldData: Partial<docsListResponse>) => ({
+        ...oldData,
+        docs: [
+          {
+            id: data.createdDoc.id,
+            documentName: data.createdDoc.documentName,
+            assignees: data.createdDoc.assignees,
+            isPrivate: data.createdDoc.isPrivate,
+          },
+          ...(oldData.docs || []),
+        ],
+      }),
+    );
+  },
+});
 
   const handleCreate = (name: string, isPrivate:boolean) => {
     if (workspace?.id && project?.id && userId) {

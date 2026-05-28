@@ -18,6 +18,7 @@ import { Ellipsis, Maximize, Users, X, ArrowLeft, GripHorizontal, Plus } from "l
 import { createdWhiteboardResponse, whiteboardsListResponse } from "@/src/types/whiteboard";
 import { useState } from "react";
 import ShareWhiteboardModal from "@/src/components/modals/share-whiteboard-modal";
+import { trackActivity } from "@/src/lib/api/recent-activities/track";
 
 export function WhiteboardHeader() {
   const { open } = useSidebar();
@@ -41,11 +42,27 @@ export function WhiteboardHeader() {
     enabled: !!whiteboardId,
   });
 
+
+
   const mutationWhiteboard = useMutation({
     mutationFn: createWhiteboard,
     onSuccess: (data: createdWhiteboardResponse) => {
       setIsOpen(false);
       router.push(`whiteboards/${data.createdDoc.id}`);
+  
+      // ✅ track activity
+      if (workspace?.id && project?.id && userId) {
+        trackActivity({
+          workspaceId: workspace.id,
+          userId,
+          title: data.createdDoc.whiteboardName,
+          type: "WHITEBOARD",
+          typeID: data.createdDoc.id,
+          projectID: project.id,
+          lastEditedBy: userId,
+        });
+      }
+  
       queryClient.setQueryData(
         ["whiteboards", workspace?.id, project?.id],
         (oldData: Partial<whiteboardsListResponse>) => ({
@@ -55,7 +72,7 @@ export function WhiteboardHeader() {
               id: data.createdDoc.id,
               whiteboardName: data.createdDoc.whiteboardName,
               assignees: data.createdDoc.assignees,
-              isPrivate:data.createdDoc.isPrivate
+              isPrivate: data.createdDoc.isPrivate,
             },
             ...(oldData.whiteboards || []),
           ],

@@ -53,13 +53,19 @@ const RecentActivities = () => {
     <div className="border-t-2 mt-5 pt-5 px-5">
       <div>
         <h1 className="text-h1">Recent</h1>
-        {/* dropdwon */}
       </div>
-      {/* list of recent activities */}
       <div>
-        {dummyData.map((item) => (
-          <RecentActivityList key={item.name} name={item.name} />
-        ))}
+        {isLoading && <p className="text-sm text-gray-400">Loading...</p>}
+        {isError && <p className="text-sm text-red-400">Failed to load activities</p>}
+        {data?.data.map((item) => (
+  <RecentActivityList
+    key={item.id}
+    name={item.title}
+    type={item.type}
+    updatedAt={item.updatedAt}
+    editor={item.editor}
+  />
+))}
       </div>
     </div>
   );

@@ -64,6 +64,10 @@ export interface Task {
   workspace: Workspace;
   project?: Project | null;
   dueDate: string;
+  attachedDocs: number[];        
+  attachedWhiteboards: number[]; 
+  documents: { id: number; documentName: string }[];
+  whiteboards: { id: number; whiteboardName: string }[]; // ✅ was "name"
 }
 
 export interface CreateTask {
@@ -78,6 +82,8 @@ export interface CreateTask {
   startDate?: string | null;
   checklist?: ChecklistItem[];
   assigneeIds?: number[];
+  attachedDocs?: number[];        
+  attachedWhiteboards?: number[]; 
 }
 
 export interface UpdateTaskPayload {
@@ -90,6 +96,8 @@ export interface UpdateTaskPayload {
   assigneeIds?: number[];
   checklist?: ChecklistItem[];
   links?: string[];
+  attachedDocs?: number[];        
+  attachedWhiteboards?: number[]; 
 }
 
 export interface ApiResponse<T> {

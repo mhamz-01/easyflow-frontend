@@ -7,14 +7,12 @@ const checklistItemSchema = z.object({
 });
 
 export const createTaskFormSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Title is required")
-    .max(255, "Title must be 255 characters or less"),
+  name: z.string().min(1, "Title is required").max(255, "Title must be 255 characters or less"),
   description: z.string().optional().nullable(),
   linkName: z.string().or(z.literal("")).optional(),
   links: z.array(z.string()).optional(),
-  documents: z.array(z.number()).optional(),
+  documents: z.array(z.number()).optional(),      
+  whiteboards: z.array(z.number()).optional(),    
   checklist: z.array(checklistItemSchema).optional(),
   state: z.string().optional(),
   priority: z.string().optional(),
@@ -23,7 +21,6 @@ export const createTaskFormSchema = z.object({
   attachments: z.array(z.instanceof(File)).optional(),
   attachedFilesId: z.array(z.number()).optional(),
 });
-
 // For API submission - transform to remove attachments
 export const createTaskApiSchema = createTaskFormSchema
   .omit({ attachments: true })

@@ -21,9 +21,10 @@ export interface CreateRecentActivityResponse {
 // Success response for getAll
 export interface GetAllRecentActivitiesResponse {
   success: true;
-  data: CreateRecentActivityResponse["recentActivity"][];
+  data: (CreateRecentActivityResponse["recentActivity"] & {
+    editor: { username: string; imageUrl?: string } | null;
+  })[];
 }
-
 export const createRecentActivity = async ({
   workspaceId,
   userId,
