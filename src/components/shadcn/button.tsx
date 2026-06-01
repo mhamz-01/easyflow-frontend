@@ -39,41 +39,50 @@ const buttonVariants = cva(
 );
 
 interface ButtonProps
-  extends
-    React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   isLoading?: boolean;
 }
 
-function Button({
-  className,
-  variant,
-  size,
-  isLoading = false,
-  asChild = false,
-  disabled,
-  children,
-  ...props
-}: ButtonProps) {
-  const Comp = asChild ? Slot : "button";
+// ✅ wrap with forwardRef
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      className,
+      variant,
+      size,
+      isLoading = false,
+      asChild = false,
+      disabled,
+      children,
+      ...props
+    },
+    ref, // ✅ receive ref
+  ) => {
+    const Comp = asChild ? Slot : "button";
 
-  return (
-    <Comp
-      className={cn(buttonVariants({ variant, size, className }))}
-      disabled={isLoading || disabled}
-      {...props}
-    >
-      {isLoading ? (
-        <span className="flex items-center justify-center gap-2">
-          <Loader2 className="w-4 h-4 animate-spin" />
-          {children && <span>{children}</span>}
-        </span>
-      ) : (
-        children
-      )}
-    </Comp>
-  );
-}
+    return (
+      <Comp
+        ref={ref} // ✅ forward ref
+        className={cn(buttonVariants({ variant, size, className }))}
+        disabled={isLoading || disabled}
+        {...props}
+      >
+        {isLoading ? (
+          <span className="flex items-center justify-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            {children && <span>{children}</span>}
+          </span>
+        ) : (
+          children
+        )}
+      </Comp>
+    );
+  },
+);
+
+Button.displayName = "Button"; // ✅ required for forwardRef components
 
 export { Button, buttonVariants };
+export type { ButtonProps };

@@ -9,7 +9,8 @@ import { getAllDocs } from "@/src/lib/api/documents/services";
 import { useProjectStore } from "@/src/store/useProjectStore";
 import { useWorkspaceStore } from "@/src/store/workspace";
 import { docsKeys } from "@/src/lib/api/documents/keys";
-import { singleDoc } from "@/src/types/documents";
+
+import { singleDoc,Doc } from "@/src/types/documents";
 import docsIcon from "@/public/icons/docs.svg";
 import TaskDropdown from "./task-dropdown";
 import DropdownSearchInput from "../../dropdown-search-input";
@@ -26,7 +27,7 @@ export default function TaskDocumentCheckbox() {
       getAllDocs({ workspaceId: workspace!.id, projectId: project!.id }),
   });
 
-  const docs: Partial<singleDoc>[] = data?.docs ?? [];
+  const docs: Doc[] = data?.docs ?? [];
 
   // 2️⃣ Local filtering
   const filteredDocs = useMemo(() => {

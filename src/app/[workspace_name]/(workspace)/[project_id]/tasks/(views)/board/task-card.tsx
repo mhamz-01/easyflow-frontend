@@ -41,7 +41,7 @@ function TaskCard({ task }: { task: TaskViewList }) {
     <div className="mx-2 mb-2 rounded-lg border bg-background p-3 text-xs shadow-sm">
       {/* Header — name + priority */}
       <div
-        onClick={() => setIsOpen(true)}
+        onClick={() => setIsOpen(true,task.id)}
         className="flex items-start justify-between gap-2 cursor-pointer group"
       >
         <p className="text-sm font-medium leading-snug group-hover:text-white">

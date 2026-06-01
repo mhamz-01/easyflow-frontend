@@ -1,7 +1,7 @@
 import { Calendar as CalendarIcon } from "lucide-react";
-import TaskPopover from "./task-popover";
+import TaskPopover from "../modals/create-task/task-popover";
 import { useState } from "react";
-import { Calendar } from "../../shadcn/calendar";
+import { Calendar } from "../shadcn/calendar";
 import { Controller, useFormContext } from "react-hook-form";
 
 export default function SelectDateForm() {
