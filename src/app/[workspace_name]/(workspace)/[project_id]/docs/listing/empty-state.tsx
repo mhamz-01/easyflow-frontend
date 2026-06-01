@@ -1,6 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/src/components/shadcn/button";
+import { Dialog, DialogTrigger } from "@/src/components/shadcn/dialog";
+import CreateItemModal from "@/src/components/modals/create-item-modal";
 import { createDoc } from "@/src/lib/api/documents/services";
 import { useProjectStore } from "@/src/store/useProjectStore";
 import { useWorkspaceStore } from "@/src/store/workspace";
@@ -10,6 +13,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 const DocsListingEmptyState = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const workspaceId = useWorkspaceStore((s) => s.workspace?.id);
   const projectId = useProjectStore((s) => s.project?.id);
   const { userId } = useAuth();
@@ -19,29 +23,36 @@ const DocsListingEmptyState = () => {
   const mutation = useMutation({
     mutationFn: createDoc,
     onSuccess: (data: createdDocResponse) => {
+      setIsOpen(false);
       router.push(`docs/${data.createdDoc.id}`);
       queryClient.setQueryData(
         ["docs", workspaceId, projectId],
-        (oldData: Partial<docsListResponse>) => {
-          return {
-            ...oldData,
-            docs: [
-              {
-                id: data.createdDoc.id,
-                documentName: data.createdDoc.documentName,
-                assignees: data.createdDoc.assignees,
-              },
-              ...(oldData.docs || []),
-            ],
-          };
-        },
+        (oldData: Partial<docsListResponse>) => ({
+          ...oldData,
+          docs: [
+            {
+              id: data.createdDoc.id,
+              documentName: data.createdDoc.documentName,
+              assignees: data.createdDoc.assignees,
+              isPrivate: data.createdDoc.isPrivate, // ✅
+            },
+            ...(oldData.docs || []),
+          ],
+        }),
       );
     },
   });
 
-  const handleCreateDoc = () => {
-    if (workspaceId && projectId && userId)
-      mutation.mutate({ workspaceId, projectId, createdBy: userId });
+  const handleCreate = (name: string, isPrivate: boolean) => {
+    if (workspaceId && projectId && userId) {
+      mutation.mutate({
+        workspaceId,
+        projectId,
+        createdBy: userId,
+        documentName: name,    // ✅
+        isPrivate,             // ✅
+      });
+    }
   };
 
   return (
@@ -50,9 +61,20 @@ const DocsListingEmptyState = () => {
       <p className="text-sm mb-4">
         Create your first document and share it with your team
       </p>
-      <Button onClick={handleCreateDoc} variant={"primary"}>
-        Create New Doc
-      </Button>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
+          <Button variant="primary">Create New Doc</Button>
+        </DialogTrigger>
+        <CreateItemModal
+          title="Create Document"
+          description="Enter a name for your new document."
+          label="Document Name"
+          placeholder="e.g. Meeting Notes"
+          buttonText="Create Document"
+          isPending={mutation.isPending}
+          onSubmit={handleCreate}
+        />
+      </Dialog>
     </div>
   );
 };
