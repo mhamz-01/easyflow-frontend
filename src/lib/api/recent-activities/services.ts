@@ -60,11 +60,9 @@ export const createRecentActivity = async ({
 
 export const getAllRecentActivities = async ({
   workspaceId,
-  userId,
   limit = 5,
 }: {
   workspaceId: number;
-  userId: string;
   limit?: number;
 }) => {
   const response = await api.get<GetAllRecentActivitiesResponse>(
@@ -72,7 +70,6 @@ export const getAllRecentActivities = async ({
     {
       params: {
         workspaceId,
-        userId,
         limit,
       },
     }
