@@ -62,20 +62,17 @@ const SidebarProjects = () => {
   // delete project logic
   const { mutate, isPending } = useMutation({
     mutationFn: deleteProject,
-    onSuccess: () => {
-      // refetch projects list
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["projects", workspace?.workspaceSlug],
       });
-
-      // show toast message
+      // ✅ remove cached data tied to the deleted project
+      queryClient.removeQueries({ queryKey: ["docs", workspace?.id, variables.projectId] });
+      queryClient.removeQueries({ queryKey: ["whiteboards", workspace?.id, variables.projectId] });
+      queryClient.removeQueries({ queryKey: ["tasks", "project", variables.projectId] });
+  
       toast.success("Project deleted!");
-
-      //close alert dialog
       closeModal("isAlertProjectModalOpen");
-    },
-    onError: (error) => {
-      console.error("Failed to delete project:", error);
     },
   });
 

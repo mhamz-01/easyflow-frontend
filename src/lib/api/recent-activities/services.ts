@@ -23,6 +23,7 @@ export interface GetAllRecentActivitiesResponse {
   success: true;
   data: (CreateRecentActivityResponse["recentActivity"] & {
     editor: { username: string; imageUrl?: string } | null;
+    projectName: string | null; // ✅ add this
   })[];
 }
 export const createRecentActivity = async ({

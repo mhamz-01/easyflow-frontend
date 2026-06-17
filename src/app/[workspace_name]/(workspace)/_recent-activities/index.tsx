@@ -88,6 +88,7 @@ const RecentActivities = () => {
             type={item.type}
             updatedAt={item.updatedAt}
             editor={item.editor}
+            projectName={item.projectName}
           />
         ))}
       </div>

@@ -1,4 +1,5 @@
 export type newProjectProps = {
+  [x: string]: any;
   projectName: string;
 };
 export type CreateProjectVariables = {
