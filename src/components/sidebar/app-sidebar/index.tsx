@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Home, Inbox } from "lucide-react";
 
 import {
@@ -17,22 +20,27 @@ import Link from "next/link";
 import SidebarProjects from "./sidebar-projects";
 import WorkspaceDrodownMenu from "../../modals/workspace-dropdown-menu";
 import UserAccountMenu from "../../modals/user-account-menu";
+import ComingSoonModal from "../../modals/coming-soon-modal";
+import { useWorkspaceStore } from "@/src/store/workspace";
 
 // main menu items
 const mainItems = [
   {
-    title: "home",
+    title: "Home",
     icon: Home,
-    url: "#",
+    type: "link",
   },
   {
     title: "Inbox",
-    url: "#",
     icon: Inbox,
+    type: "modal",
   },
-];
+] as const;
 
 export function AppSidebar() {
+  const workspace = useWorkspaceStore((state) => state.workspace);
+  const [comingSoonOpen, setComingSoonOpen] = useState(false);
+
   return (
     <Sidebar>
       {/* sidebar header */}
@@ -51,16 +59,25 @@ export function AppSidebar() {
           <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url}>
+              {mainItems.map((item) =>
+                item.type === "modal" ? (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton onClick={() => setComingSoonOpen(true)}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ) : (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <Link href={`/${workspace?.workspaceSlug ?? "/"}`}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -74,6 +91,13 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+
+      <ComingSoonModal
+        open={comingSoonOpen}
+        onOpenChange={setComingSoonOpen}
+        title="Inbox Coming Soon"
+        body="We're building Inbox right now so you can get notified on task updates, mentions, and project activity in one place."
+      />
     </Sidebar>
   );
 }

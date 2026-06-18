@@ -11,7 +11,6 @@ export default function TaskSelect() {
       <TaskSelectPriority />
       <TaskSelectAssignees />
       <TaskSelectDate />
-      <TaskSelectWhiteboard />
     </div>
   );
 }

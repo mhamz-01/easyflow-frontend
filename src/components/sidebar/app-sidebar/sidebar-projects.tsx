@@ -1,5 +1,5 @@
 "use client";
-import { ChevronDown, MoreHorizontal, Plus } from "lucide-react";
+import { ChevronRight, MoreHorizontal, Plus } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupAction,
@@ -124,9 +124,11 @@ const SidebarProjects = () => {
                 <SidebarMenuItem>
                   {/* collapsible trigger */}
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuButton className="flex justify-between">
+                    <SidebarMenuButton className="group flex justify-between">
                       <span>{truncateWord(project.name)}</span>
-                      <ChevronDown size={18} />
+                      <ChevronRight size={18} 
+                       className="shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90"
+                       />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
 
@@ -169,7 +171,7 @@ const SidebarProjects = () => {
                   </DropdownMenu>
 
                   {/* collapsible content */}
-                  <CollapsibleContent>
+                  <CollapsibleContent className="overflow-hidden data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up">
                     <SidebarMenuSub>
                       {projectSubItems.map((projectSubItem) => (
                         <SidebarMenuSubItem

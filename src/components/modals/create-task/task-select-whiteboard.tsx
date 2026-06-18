@@ -10,12 +10,16 @@ import { useWorkspaceStore } from "@/src/store/workspace";
 import whiteboardIcon from "@/public/icons/whiteboard.svg";
 import TaskDropdown from "./task-dropdown";
 import DropdownSearchInput from "../../dropdown-search-input";
+import { useFormContext, useWatch } from "react-hook-form";
 
 export default function TaskSelectWhiteboard() {
   const project = useProjectStore((s) => s.project);
   const workspace = useWorkspaceStore((s) => s.workspace);
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(true);
+  const { control } = useFormContext();
+  const selectedWhiteboard: (string | number)[] = useWatch({ control, name: "whiteboards" }) || [];
+
 
   const { data } = useQuery({
     queryKey: ["whiteboards", workspace?.id, project?.id],
@@ -33,7 +37,9 @@ export default function TaskSelectWhiteboard() {
   }, [search, whiteboards]);
 
   return (
-    <TaskCollapsibleButton title="Add whiteboards" img={whiteboardIcon}>
+    <TaskCollapsibleButton title="Add whiteboards" img={whiteboardIcon}
+  
+    badgeCount={selectedWhiteboard.length}>
       <Field className="relative max-w-sm">
         <DropdownSearchInput
           search={search}

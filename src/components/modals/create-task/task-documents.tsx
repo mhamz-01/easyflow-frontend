@@ -14,12 +14,16 @@ import { singleDoc,Doc } from "@/src/types/documents";
 import docsIcon from "@/public/icons/docs.svg";
 import TaskDropdown from "./task-dropdown";
 import DropdownSearchInput from "../../dropdown-search-input";
+import { useFormContext, useWatch } from "react-hook-form";
 
 export default function TaskDocumentCheckbox() {
   const project = useProjectStore((s) => s.project);
   const workspace = useWorkspaceStore((s) => s.workspace);
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(true);
+  const { control } = useFormContext();
+  const selectedDocs: (string | number)[] = useWatch({ control, name: "documents" }) || [];
+
 
   const { data } = useQuery({
     queryKey: docsKeys.all(workspace!.id, project!.id),
@@ -39,7 +43,11 @@ export default function TaskDocumentCheckbox() {
   }, [search, docs]);
 
   return (
-    <TaskCollapsibleButton title="Add documents" img={docsIcon}>
+    <TaskCollapsibleButton
+    title="Add documents"
+    img={docsIcon}
+    badgeCount={selectedDocs.length}
+  >
       <Field className="relative max-w-sm">
         {/* search input */}
         <DropdownSearchInput
