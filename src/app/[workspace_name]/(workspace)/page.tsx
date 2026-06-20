@@ -56,7 +56,7 @@ const greeting = getGreeting();
                   if (action.name === "Brain") return;
                   setSelectedAction(action);
                 }}
-                className="group relative flex flex-col items-center text-center bg-[linear-gradient(to_bottom,#1C1C1C_0%,#1C1C1C_60%,#0F0F0F_100%)] p-6 rounded-2xl border border-white/[0.04] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:border-[#2563eb]/30 hover:shadow-[0_12px_40px_-8px_rgba(37,99,235,0.25)] hover:cursor-pointer min-w-[205px]"
+                className="group relative flex flex-col items-center text-center bg-[linear-gradient(to_bottom,#1C1C1C_0%,#1C1C1C_60%,#0F0F0F_100%)] p-6 rounded-2xl border border-white/[0.04] transition-all duration-300 ease-out  hover:border-[#2563eb]/30 hover:shadow-[0_12px_40px_-8px_rgba(37,99,235,0.25)] hover:cursor-pointer min-w-[205px]"
               >
                 <span className="absolute inset-0 rounded-2xl bg-[#2563eb]/0 group-hover:bg-[#2563eb]/[0.04] transition-colors duration-300 pointer-events-none" />
 

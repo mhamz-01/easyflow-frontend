@@ -11,6 +11,11 @@ export interface WhiteboardTask {
   x: number;
   y: number;
 }
+export type UserSummary = {
+  id: number;
+  username: string;
+  imageUrl?: string;
+};
   
 export interface WhiteboardDocument {
   id: string;
@@ -34,13 +39,14 @@ export interface WhiteboardDocument {
   // ────────────────────────────────────────────
   
   export type Whiteboard = {
-      id: number;
-      whiteboardName: string;
-      isPrivate: boolean; 
-      assignees?: any[];
-      createdBy:number;
-      createdDate:string;
-  }
+    id: number;
+    whiteboardName: string;
+    isPrivate: boolean;
+    assignees?: UserSummary[];
+    creator?: UserSummary;
+    createdBy: number;
+    createdDate: string;
+  };
   
   export type singleWhiteboard = {
       whiteboardName: string;

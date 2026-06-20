@@ -73,26 +73,30 @@ const WhiteboardsList = ({ whiteboardsListData }: { whiteboardsListData: Whitebo
               {/* RIGHT: creator + separator + actions */}
               <div className="flex items-center gap-3">
               <div className="flex items-center -space-x-2">
-    <Avatar width={24} height={24} />
-    {/* ✅ assignee avatars */}
-    {whiteboard.assignees?.map((assignee) => (
-      <div
-        key={assignee.id}
-        title={assignee.username}
-        className="rounded-full border-2 border-background"
-      >
-        <Avatar width={24} height={24} />
-      </div>
-    ))}
+  <div
+    title={whiteboard.creator?.username}
+    className="relative z-10 rounded-full border-2 border-background"
+  >
+    <Avatar src={whiteboard.creator?.imageUrl} width={24} height={24} />
   </div>
+  {whiteboard.assignees?.map((assignee) => (
+    <div
+      key={assignee.id}
+      title={assignee.username}
+      className="rounded-full border-2 border-background"
+    >
+      <Avatar src={assignee.imageUrl} width={24} height={24} />
+    </div>
+  ))}
+</div>
                 <span className="h-5 w-px bg-border" />
 
-                <button className="p-1 hover:bg-muted rounded">
+                {/* <button className="p-1 hover:bg-muted rounded">
                   <Info className="h-4 w-4" />
                 </button>
                 <button className="p-1 hover:bg-muted rounded">
                   <Pin className="h-4 w-4" />
-                </button>
+                </button> */}
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

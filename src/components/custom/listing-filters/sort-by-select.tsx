@@ -120,7 +120,7 @@ const SortBySelect = ({
                     checked={dateFilter.preset === preset.id}
                     onCheckedChange={() => handlePresetToggle(preset.id)}
                   />
-                  <Label htmlFor={preset.id} className="cursor-pointer">
+                  <Label htmlFor={preset.id} className="cursor-pointer"  onClick={(e) => e.stopPropagation()}>
                     {preset.label}
                   </Label>
                 </CommandItem>
@@ -133,7 +133,7 @@ const SortBySelect = ({
                   checked={dateFilter.range !== null}
                   onCheckedChange={() => setShowCalendar((prev) => !prev)}
                 />
-                <Label htmlFor="custom" className="cursor-pointer">
+                <Label htmlFor="custom" className="cursor-pointer" >
                   Custom range
                 </Label>
               </CommandItem>

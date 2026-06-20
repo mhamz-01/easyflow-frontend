@@ -36,6 +36,7 @@ import AddLinkModal from "@/src/components/custom/task-drawer-buttons-popovers-d
 import AddChecklistModal from "@/src/components/custom/task-drawer-buttons-popovers-dialogs/add-checklist-modal";
 import AddDocPopover from "@/src/components/custom/task-drawer-buttons-popovers-dialogs/add-doc-popover";
 import AddWhiteboardPopover from "@/src/components/custom/task-drawer-buttons-popovers-dialogs/add-whiteboard-popover";
+import DrawerCollapsibleSection from "./drawer-collapsible-section";
 
 const TaskDetailsDrawer = () => {
   const { isOpen, taskId, setIsOpen } = useTaskStore();
@@ -50,12 +51,15 @@ const TaskDetailsDrawer = () => {
   const { mutate: updateTask, isPending: isUpdating } = useUpdateTask();
 
 
+ const [pendingAction, setPendingAction] = useState
+  <"link" | "checklist" | "doc" | "whiteboard" | null
+>(null);
 
   const {
     links = [],
     assignees = [],
     attachments = [],
-    checklist = [],
+    checklist: rawChecklist = [],
     description = "",
     documents = [],
     whiteboards = [],
@@ -63,52 +67,91 @@ const TaskDetailsDrawer = () => {
     attachedWhiteboards = [],
   } = task || {};
 
+  const checklist = rawChecklist.filter(
+    (group) => group.name.trim() !== "" || group.items.some((item) => item.trim() !== "")
+  );
   // ── Handlers ─────────────────────────────────────────────────────
+ 
 
-  const handleAddLink = (url: string) => {
-    if (!taskId || !task) return;
-    updateTask(
-      { taskId, payload: { 
+const handleAddLink = (url: string) => {
+  if (!taskId || !task) return;
+  setPendingAction("link");
+  updateTask(
+    {
+      taskId,
+      payload: {
         links: [...(task.links ?? []), url],
-        attachedDocs: task.attachedDocs ?? [],         
-        attachedWhiteboards: task.attachedWhiteboards ?? [], 
-      }},
-      { onSuccess: () => setIsLinkModalOpen(false) },
-    );
-  };
-  
-  const handleAddChecklist = (group: { name: string; items: string[] }) => {
-    if (!taskId || !task) return;
-    updateTask(
-      { taskId, payload: { 
+        attachedDocs: task.attachedDocs ?? [],
+        attachedWhiteboards: task.attachedWhiteboards ?? [],
+      },
+    },
+    {
+      onSuccess: () => {
+        setIsLinkModalOpen(false);
+        setPendingAction(null);
+      },
+      onError: () => setPendingAction(null),
+    },
+  );
+};
+
+const handleAddChecklist = (group: { name: string; items: string[] }) => {
+  if (!taskId || !task) return;
+  setPendingAction("checklist");
+  updateTask(
+    {
+      taskId,
+      payload: {
         checklist: [...(task.checklist ?? []), group],
-        attachedDocs: task.attachedDocs ?? [],         
-        attachedWhiteboards: task.attachedWhiteboards ?? [], 
-      }},
-      { onSuccess: () => setIsChecklistModalOpen(false) },
-    );
-  };
-  const handleAddDoc = (docId: number) => {
-    if (!taskId || !task) return;
-    updateTask({
+        attachedDocs: task.attachedDocs ?? [],
+        attachedWhiteboards: task.attachedWhiteboards ?? [],
+      },
+    },
+    {
+      onSuccess: () => {
+        setIsChecklistModalOpen(false);
+        setPendingAction(null);
+      },
+      onError: () => setPendingAction(null),
+    },
+  );
+};
+
+const handleAddDoc = (docId: number) => {
+  if (!taskId || !task) return;
+  setPendingAction("doc");
+  updateTask(
+    {
       taskId,
-      payload: { 
+      payload: {
         attachedDocs: [...(task.attachedDocs ?? []), docId],
-        attachedWhiteboards: task.attachedWhiteboards ?? [],  
+        attachedWhiteboards: task.attachedWhiteboards ?? [],
       },
-    });
-  };
-  
-  const handleAddWhiteboard = (whiteboardId: number) => {
-    if (!taskId || !task) return;
-    updateTask({
+    },
+    {
+      onSuccess: () => setPendingAction(null),
+      onError: () => setPendingAction(null),
+    },
+  );
+};
+
+const handleAddWhiteboard = (whiteboardId: number) => {
+  if (!taskId || !task) return;
+  setPendingAction("whiteboard");
+  updateTask(
+    {
       taskId,
-      payload: { 
+      payload: {
         attachedWhiteboards: [...(task.attachedWhiteboards ?? []), whiteboardId],
-        attachedDocs: task.attachedDocs ?? [],  
+        attachedDocs: task.attachedDocs ?? [],
       },
-    });
-  };
+    },
+    {
+      onSuccess: () => setPendingAction(null),
+      onError: () => setPendingAction(null),
+    },
+  );
+};
   return (
     <Sheet open={isOpen} onOpenChange={() => setIsOpen(!isOpen, null)}>
       <SheetContent
@@ -138,14 +181,14 @@ const TaskDetailsDrawer = () => {
               {/* Add Document */}
               <AddDocPopover
                 existingDocIds={attachedDocs}
-                isPending={isUpdating}
+                isPending={pendingAction === "doc"}
                 onSelect={handleAddDoc}
               />
 
               {/* Add Whiteboard */}
               <AddWhiteboardPopover
                 existingWhiteboardIds={attachedWhiteboards}
-                isPending={isUpdating}
+                isPending={pendingAction === "whiteboard"}
                 onSelect={handleAddWhiteboard}
               />
 
@@ -155,7 +198,7 @@ const TaskDetailsDrawer = () => {
                   <Button size="sm" variant="outline">Add link</Button>
                 </DialogTrigger>
                 <AddLinkModal
-                  isPending={isUpdating}
+                  isPending={pendingAction === "link"}
                   onSubmit={handleAddLink}
                 />
               </Dialog>
@@ -166,7 +209,7 @@ const TaskDetailsDrawer = () => {
                   <Button size="sm" variant="outline">Create checklist</Button>
                 </DialogTrigger>
                 <AddChecklistModal
-                  isPending={isUpdating}
+                    isPending={pendingAction === "checklist"}
                   onSubmit={handleAddChecklist}
                 />
               </Dialog>
@@ -174,128 +217,135 @@ const TaskDetailsDrawer = () => {
 
             <Separator className="bg-neutral-800" />
 
-            {/* Attached Documents */}
-            {documents.length > 0 && (
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-neutral-300">
-                  Attached Documents
-                </h3>
-                {documents.map((doc) => (
-                  <div
-                    key={doc.id}
-                    className="flex items-center gap-2 bg-neutral-900 px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-neutral-800 transition-colors"
-                    onClick={() => router.push(`docs/${doc.id}`)}
-                  >
-                    <Image src={docsIcon} alt="docs icon" width={16} height={16} />
-                    <span>{doc.documentName}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+{/* Attached Documents */}
+<DrawerCollapsibleSection title="Attached Documents" count={documents.length}>
+  {documents.length > 0 ? (
+    documents.map((doc) => (
+      <div
+        key={doc.id}
+        className="flex items-center gap-2 bg-neutral-900 px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-neutral-800 transition-colors"
+        onClick={() => router.push(`docs/${doc.id}`)}
+      >
+        <Image src={docsIcon} alt="docs icon" width={16} height={16} />
+        <span>{doc.documentName}</span>
+      </div>
+    ))
+  ) : (
+    <div
+    className="flex items-center gap-2 bg-neutral-900 px-3 py-2 rounded-lg"
+  >
+    <p className="text-sm text-neutral-500 italic">
+      No documents attached yet.  
+    </p>
+    </div>
+  )}
+</DrawerCollapsibleSection>
 
-            {/* Attached Whiteboards */}
-            {whiteboards.length > 0 && (
-              <>
-                {/* <Separator className="bg-neutral-800" /> */}
-                <div className="space-y-3">
-                  <h3 className="text-sm font-medium text-neutral-300">
-                    Attached Whiteboards
-                  </h3>
-                  {whiteboards.map((wb) => (
-                    <div
-                      key={wb.id}
-                      className="flex items-center gap-2 bg-neutral-900 px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-neutral-800 transition-colors"
-                      onClick={() => router.push(`whiteboards/${wb.id}`)}
-                    >
-                      <Image src={whiteboardIcon} alt="whiteboard icon" width={16} height={16} />
-                      <span>{wb.whiteboardName}</span>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
 
+{/* Attached Whiteboards */}
+<DrawerCollapsibleSection title="Attached Whiteboards" count={whiteboards.length}>
+  {whiteboards.length > 0 ? (
+    whiteboards.map((wb) => (
+      <div
+        key={wb.id}
+        className="flex items-center gap-2 bg-neutral-900 px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-neutral-800 transition-colors"
+        onClick={() => router.push(`whiteboards/${wb.id}`)}
+      >
+        <Image src={whiteboardIcon} alt="whiteboard icon" width={16} height={16} />
+        <span>{wb.whiteboardName}</span>
+      </div>
+    ))
+  ) : (
+    <div
+    className="flex items-center gap-2 bg-neutral-900 px-3 py-2 rounded-lg"
+  >
+    <p className="text-sm text-neutral-500 italic">
+      No whiteboards attached yet. 
+    </p>
+    </div>
+  )}
+</DrawerCollapsibleSection>
             <Separator className="bg-neutral-800" />
 
-            {/* Checklist */}
-            {checklist.length >= 0 && (
-  <>
-    {/* <Separator className="bg-neutral-800" /> */}
-    <div className="space-y-4">
-      <h3 className="text-sm font-medium text-neutral-300">Checklist</h3>
-      {checklist.map((group, index) => (
-        <div key={index} className="space-y-2">
-          <p className="text-xs text-neutral-400">{group.name}</p>
-          {group.items.map((item, idx) => (
+      {/* Checklist */}
+<DrawerCollapsibleSection title="Checklist" count={checklist.length}>
+  {checklist.length > 0 ? (
+    checklist.map((group, index) => (
+      <div key={index} className="space-y-2">
+        <p className="text-xs text-neutral-400">{group.name}</p>
+        {group.items
+          .filter((item) => item.trim() !== "")
+          .map((item, idx) => (
             <div key={idx} className="flex items-center gap-3">
               <Checkbox />
               <span className="text-sm">{item}</span>
             </div>
           ))}
-        </div>
-      ))}
-    </div>
-  </>
-)}
+      </div>
+    ))
+  ) : (
+    <div
+    className="flex items-center gap-2 bg-neutral-900 px-3 py-2 rounded-lg text-sm "
+  >
+    <p className="text-neutral-500 italic">
+      No checklist created yet. 
+    </p>
+  </div>
+  )}
+</DrawerCollapsibleSection>
 
             {/* <Separator className="bg-neutral-800" /> */}
 
-            {/* Attachments */}
-            {attachments.length > 0 && (
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-neutral-300">
-                  Attachments
-                </h3>
-                {attachments.map((file) => {
-                  const fileUrl = getFileUrl(file.fileKey);
-                  const isImage = file.mimeType.startsWith("image/");
-                  return (
-                    <div
-                      key={file.id}
-                      className="flex items-center justify-between bg-neutral-900 px-3 py-2 rounded-lg"
-                    >
-                      <div className="flex items-center gap-3 text-sm">
-                        {isImage ? (
-                          <img
-                            src={fileUrl}
-                            alt={file.originalName}
-                            className="w-10 h-10 object-cover rounded"
-                          />
-                        ) : (
-                          <File size={16} />
-                        )}
-                        <span className="truncate max-w-50">
-                          {file.originalName}
-                        </span>
-                      </div>
-                      <a href={fileUrl} download target="_blank" rel="noopener noreferrer">
-                        <Expand size={16} className="text-neutral-400 cursor-pointer" />
-                      </a>
-                    </div>
-                  );
-                })}
-              </div>
+          {/* Attachments */}
+{attachments.length > 0 && (
+  <DrawerCollapsibleSection title="Attachments" count={attachments.length}>
+    {attachments.map((file) => {
+      const fileUrl = getFileUrl(file.fileKey);
+      const isImage = file.mimeType.startsWith("image/");
+      return (
+        <div
+          key={file.id}
+          className="flex items-center justify-between bg-neutral-900 px-3 py-2 rounded-lg"
+        >
+          <div className="flex items-center gap-3 text-sm">
+            {isImage ? (
+              <img
+                src={fileUrl}
+                alt={file.originalName}
+                className="w-10 h-10 object-cover rounded"
+              />
+            ) : (
+              <File size={16} />
             )}
+            <span className="truncate max-w-50">{file.originalName}</span>
+          </div>
+          <a href={fileUrl} download target="_blank" rel="noopener noreferrer">
+            <Expand size={16} className="text-neutral-400 cursor-pointer" />
+          </a>
+        </div>
+      );
+    })}
+  </DrawerCollapsibleSection>
+)}
 
             <Separator className="bg-neutral-800" />
 
-            {/* Links */}
-            {links.length > 0 && (
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-neutral-300">Links</h3>
-                {links.map((link, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-2 bg-neutral-900 px-3 py-2 rounded-lg text-sm"
-                  >
-                    <Link2 size={16} />
-                    <a href={link} target="_blank" className="hover:underline truncate">
-                      {link}
-                    </a>
-                  </div>
-                ))}
-              </div>
-            )}
+         {/* Links */}
+{links.length > 0 && (
+  <DrawerCollapsibleSection title="Links" count={links.length}>
+    {links.map((link, index) => (
+      <div
+        key={index}
+        className="flex items-center gap-2 bg-neutral-900 px-3 py-2 rounded-lg text-sm"
+      >
+        <Link2 size={16} />
+        <a href={link} target="_blank" className="hover:underline truncate">
+          {link}
+        </a>
+      </div>
+    ))}
+  </DrawerCollapsibleSection>
+)}
 
             {/* Meta Card */}
             <Card className="bg-neutral-900 border-neutral-800 rounded-2xl mt-8">
@@ -339,15 +389,18 @@ const TaskDetailsDrawer = () => {
                 </div>
 
                 <div className="flex justify-between">
-                  <span className="text-neutral-400">Start Date</span>
-                </div>
+  <span className="text-neutral-400">Start Date</span>
+  <span className={task?.startDate ? "" : "text-neutral-500 italic"}>
+    {task?.startDate ? formatDate(task.startDate) : "Not mentioned"}
+  </span>
+</div>
 
-                <div className="flex justify-between">
-                  <span className="text-neutral-400">End Date</span>
-                  <span className="text-red-500">
-                    {task?.dueDate && formatDate(task.dueDate)}
-                  </span>
-                </div>
+<div className="flex justify-between">
+  <span className="text-neutral-400">End Date</span>
+  <span className={task?.dueDate ? "text-red-500" : "text-neutral-500 italic"}>
+    {task?.dueDate ? formatDate(task.dueDate) : "Not mentioned"}
+  </span>
+</div>
               </CardContent>
             </Card>
           </div>

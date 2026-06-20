@@ -20,7 +20,7 @@ export default function SettingsLayout({
   return (
     <SidebarProvider>
       <SettingsSidebar />
-      <main className="w-full min-[768px]:w-[calc(100%-16rem)]">
+      <main className="w-full min-[768px]:w-[calc(100%-16rem)] px-5 py-4">
         <SidebarTrigger className="inline-flex md:hidden text-gray-200 mb-2" />
         <SettingsHeaderBreadcrums />
         {children}

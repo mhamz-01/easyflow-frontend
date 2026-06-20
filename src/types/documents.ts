@@ -10,9 +10,10 @@ export type Doc = {
   documentName: string;
   isPrivate: boolean;
   createdBy: number;
+  creator?: DocAssignee;
   createdDate: string;
   assignees: DocAssignee[];
-  preview: string; 
+  preview: string;
 };
 
 type contentTab = {

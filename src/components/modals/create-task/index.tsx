@@ -47,19 +47,25 @@ const CreateTaskModal = () => {
   });
 
   async function onSubmit(data: CreateTaskFormDataType) {
-    // ✅ Use FormDataType here
-    console.log("Submit triggered", data);
     try {
       if (workspaceId && projectId) {
-        const { attachments, linkName,documents,whiteboards, ...apiData } = data; // Remove form-only fields
-
+        const { attachments, linkName, documents, whiteboards, ...apiData } = data;
+  
+        // drop the default empty checklist placeholder if the user never filled one in
+        const cleanedChecklist = (apiData.checklist ?? []).filter(
+          (group) =>
+            group.name.trim() !== "" ||
+            group.items.some((item) => item.trim() !== "")
+        );
+  
         showSubmissionToast(apiData);
         await createTask.mutateAsync({
           ...apiData,
+          checklist: cleanedChecklist,
           workspaceId: workspaceId,
           projectId: projectId,
-          attachedDocs: documents ?? [],        // ✅ map documents → attachedDocs
-        attachedWhiteboards: whiteboards ?? [], // ✅ map whiteboards → attachedWhiteboards
+          attachedDocs: documents ?? [],
+          attachedWhiteboards: whiteboards ?? [],
         });
       }
       form.reset();
