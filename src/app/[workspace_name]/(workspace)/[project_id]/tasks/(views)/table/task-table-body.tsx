@@ -10,22 +10,25 @@ import PriorityCell from "../../components/priority-cell";
 import StateCell from "../../components/state-cell";
 import DateCell from "../../components/date-cell";
 import { COMPARATORS } from "../../utils";
-import { useUserStore } from "@/src/store/useUserStore";
-import DeleteTaskButton from "../../components/delete-task-button";
+import { Checkbox } from "@/src/components/shadcn/checkbox";
+import { CHECKBOX_COLUMN_WIDTH } from "./task-table-header";
 
 const TaskTableBody = ({
   tasks = [],
   columnWidths,
   hasHorizontalScroll,
+  selectedIds,
+  onToggleSelect,
 }: {
   tasks: TaskViewList[];
   columnWidths: number[];
   hasHorizontalScroll: boolean;
+  selectedIds: Set<number>;
+  onToggleSelect: (taskId: number) => void;
 }) => {
-  const { isAdmin } = useUserStore();
   const { mutate } = useUpdateTask();
   const { visibleColumns, sortBy, groupBy, setIsOpen } = useTaskStore();
-  
+
 
   const visible = visibleColumns.filter((c) => !c.isHidden);
 
@@ -97,6 +100,7 @@ const TaskTableBody = ({
               } hover:bg-gray-50`}
               style={{
                 gridTemplateColumns: [
+                  `${CHECKBOX_COLUMN_WIDTH}px`,
                   ...columnWidths
                     .slice(0, visible.length)
                     .map((w) => `${w}px`),
@@ -105,6 +109,13 @@ const TaskTableBody = ({
                   .join(" "),
               }}
             >
+              <div className="flex items-center justify-center px-2">
+                <Checkbox
+                  checked={selectedIds.has(task.id)}
+                  onCheckedChange={() => onToggleSelect(task.id)}
+                  aria-label={`Select ${task.name}`}
+                />
+              </div>
               {visible.map((column, index) => {
                 const isLast = index === visible.length - 1;
                 const commonClass = `px-4 flex items-center truncate ${
@@ -117,17 +128,11 @@ const TaskTableBody = ({
                   case "Name":
                     return (
                       <RowCell key={column.id} commonClass={commonClass}>
-                        <div className="flex items-center justify-between w-full">
-                          <EditableTaskNameInput
-                            task={task}
-                            role="admin"
-                            onOpen={() => setIsOpen(true, task.id)}
-                          />
-                          
-                          {!isAdmin && (
-                            <DeleteTaskButton taskId={task.id} taskName={task.name} />
-                          )}
-                        </div>
+                        <EditableTaskNameInput
+                          task={task}
+                          role="admin"
+                          onOpen={() => setIsOpen(true, task.id)}
+                        />
                       </RowCell>
                     );
 

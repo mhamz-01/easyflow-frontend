@@ -1,4 +1,6 @@
 "use client";
+import { useState } from "react";
+import { useIsMutating } from "@tanstack/react-query";
 import {
   SidebarTrigger,
   useSidebar,
@@ -15,6 +17,8 @@ export function TasksHeader() {
   const { open } = useSidebar();
   const workspace = useWorkspaceStore((s) => s.workspace);
   const project = useProjectStore((s) => s.project);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const isCreating = useIsMutating({ mutationKey: ["createTask"] }) > 0;
 
   return (
     <section className="flex items-center justify-between py-4">
@@ -29,11 +33,13 @@ export function TasksHeader() {
           ]}
         />
       </div>
-      <Dialog>
+      <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogTrigger asChild>
-          <Button variant={"primary"}>Create Task</Button>
+          <Button variant={"primary"} disabled={isCreating}>
+            {isCreating ? "Creating..." : "Create Task"}
+          </Button>
         </DialogTrigger>
-        <CreateTaskModal />
+        <CreateTaskModal onClose={() => setIsCreateOpen(false)} />
       </Dialog>
     </section>
   );

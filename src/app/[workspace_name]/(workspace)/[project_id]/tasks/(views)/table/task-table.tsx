@@ -8,6 +8,7 @@ import { useTaskStore } from "../../store/useTaskStore";
 import { taskService } from "@/src/lib/api/tasks/service";
 import TaskLoadingSkeleton from "../../components/task-loading-skeleton";
 import TaskEmptyState from "../../components/task-empty-state";
+import BulkDeleteBar from "../../components/bulk-delete-bar";
 
 const TaskTable = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -18,6 +19,7 @@ const TaskTable = () => {
   const [columnWidths, setColumnWidths] = useState<number[]>(
     Array(visibleColumns.length).fill(213),
   );
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useInfiniteQuery({
       queryKey: ["tasks", project_id],
@@ -34,6 +36,23 @@ const TaskTable = () => {
     });
 
   const tasks = data?.pages.flatMap((page) => page.tasks);
+
+  const toggleSelect = useCallback((taskId: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(taskId)) next.delete(taskId);
+      else next.add(taskId);
+      return next;
+    });
+  }, []);
+
+  const toggleSelectAll = useCallback(() => {
+    setSelectedIds((prev) =>
+      tasks?.length && prev.size === tasks.length
+        ? new Set()
+        : new Set(tasks?.map((t) => t.id)),
+    );
+  }, [tasks]);
 
   const handleIntersection = useCallback(
     (entries: IntersectionObserverEntry[]) => {
@@ -75,18 +94,32 @@ const TaskTable = () => {
   if (isLoading) return <TaskLoadingSkeleton />;
   if (!tasks?.length) return <TaskEmptyState />;
 
+  const allSelected = selectedIds.size === tasks.length;
+  const someSelected = selectedIds.size > 0 && !allSelected;
+
   return (
     <div ref={containerRef} className="overflow-x-auto text-xs">
+      {selectedIds.size > 0 && (
+        <BulkDeleteBar
+          selectedIds={Array.from(selectedIds)}
+          onClear={() => setSelectedIds(new Set())}
+        />
+      )}
       <TaskTableHeader
         columnWidths={columnWidths}
         setColumnWidths={setColumnWidths}
         visibleColumns={visibleColumns.filter((c) => !c.isHidden)}
         hasHorizontalScroll={hasHorizontalScroll}
+        allSelected={allSelected}
+        someSelected={someSelected}
+        onToggleSelectAll={toggleSelectAll}
       />
       <TaskTableBody
         tasks={tasks}
         columnWidths={columnWidths}
         hasHorizontalScroll={hasHorizontalScroll}
+        selectedIds={selectedIds}
+        onToggleSelect={toggleSelect}
       />
 
       {/* Sentinel — IntersectionObserver watches this to trigger next page */}

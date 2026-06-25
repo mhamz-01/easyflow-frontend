@@ -1,17 +1,25 @@
 import { Dispatch, SetStateAction, useRef } from "react";
+import { Checkbox } from "@/src/components/shadcn/checkbox";
 
 const MIN_WIDTH = 100;
+export const CHECKBOX_COLUMN_WIDTH = 40;
 
 const TaskTableHeader = ({
   visibleColumns,
   columnWidths,
   setColumnWidths,
   hasHorizontalScroll,
+  allSelected,
+  someSelected,
+  onToggleSelectAll,
 }: {
   visibleColumns: { id: number; label: string; isHidden: boolean }[];
   columnWidths: number[];
   setColumnWidths: Dispatch<SetStateAction<number[]>>;
   hasHorizontalScroll: boolean;
+  allSelected: boolean;
+  someSelected: boolean;
+  onToggleSelectAll: () => void;
 }) => {
   const startX = useRef(0);
   const startWidth = useRef(0);
@@ -48,10 +56,22 @@ const TaskTableHeader = ({
   return (
     <div
       style={{
-        gridTemplateColumns: columnWidths.map((w) => `${w}px`).join(" "),
+        gridTemplateColumns: [
+          `${CHECKBOX_COLUMN_WIDTH}px`,
+          ...columnWidths.map((w) => `${w}px`),
+        ].join(" "),
       }}
       className={`grid bg-[#191919] text-[#7b7b7b] ${hasHorizontalScroll ? "" : "border border-b-0"} h-8 font-semibold`}
     >
+      <div
+        className={`flex items-center justify-center ${hasHorizontalScroll ? "border" : "border-r"}`}
+      >
+        <Checkbox
+          checked={allSelected ? true : someSelected ? "indeterminate" : false}
+          onCheckedChange={onToggleSelectAll}
+          aria-label="Select all tasks"
+        />
+      </div>
       {visibleColumns.map((column, index) => (
         <div
           key={column.id}
