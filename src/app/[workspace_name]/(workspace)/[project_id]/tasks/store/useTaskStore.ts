@@ -28,15 +28,17 @@ type TaskStore = {
   isOpen: boolean;
   taskId: number | null;
   view: "table" | "board";
-  groupBy: string;
-  sortBy: string;
+  tableGroupBy: string;
+  boardGroupBy: string;
+  tableSortBy: string;
   visibleColumns: VisibleColumn[];
 
   setIsOpen: (value: boolean, taskId: number | null) => void;
   setTaskId: (taskId: number | null) => void;
   setView: (view: "table" | "board") => void;
-  setGroupBy: (value: string) => void;
-  setSortBy: (value: string) => void;
+  setTableGroupBy: (value: string) => void;
+  setBoardGroupBy: (value: string) => void;
+  setTableSortBy: (value: string) => void;
   toggleColumn: (id: number) => void;
 
   selectedTask: Task | null;
@@ -49,8 +51,9 @@ export const useTaskStore = create<TaskStore>()(
       isOpen: false,
       taskId: null,
       view: "table",
-      groupBy: "none",
-      sortBy: "none",
+      tableGroupBy: "none",
+      boardGroupBy: "state",
+      tableSortBy: "none",
 
       visibleColumns: [
         { id: 1, label: "Name", isHidden: false },
@@ -64,8 +67,9 @@ export const useTaskStore = create<TaskStore>()(
         set({ isOpen: value, taskId, selectedTask: null }),
       setTaskId: (taskId) => set({ taskId }),
       setView: (view) => set({ view }),
-      setGroupBy: (value) => set({ groupBy: value }),
-      setSortBy: (value) => set({ sortBy: value }),
+      setTableGroupBy: (value) => set({ tableGroupBy: value }),
+      setBoardGroupBy: (value) => set({ boardGroupBy: value }),
+      setTableSortBy: (value) => set({ tableSortBy: value }),
 
       toggleColumn: (id) =>
         set((state) => ({
@@ -86,8 +90,9 @@ export const useTaskStore = create<TaskStore>()(
       // must not survive a reload.
       partialize: (state) => ({
         view: state.view,
-        groupBy: state.groupBy,
-        sortBy: state.sortBy,
+        tableGroupBy: state.tableGroupBy,
+        boardGroupBy: state.boardGroupBy,
+        tableSortBy: state.tableSortBy,
         visibleColumns: state.visibleColumns,
       }),
     },

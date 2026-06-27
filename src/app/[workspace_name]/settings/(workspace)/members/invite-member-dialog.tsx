@@ -22,6 +22,11 @@ import { useWorkspaceStore } from "@/src/store/workspace";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { z } from "zod";
+
+const inviteSchema = z.object({
+  email: z.string().min(1, "Email is required").email("Enter a valid email address"),
+});
 
 export default function InviteMemberDialog({
   open,
@@ -32,7 +37,8 @@ export default function InviteMemberDialog({
 }) {
   const workspace = useWorkspaceStore((s) => s.workspace);
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("member"); // default to "member"
+  const [emailError, setEmailError] = useState("");
+  const [role, setRole] = useState("member");
   const queryClient = useQueryClient();
 
   // TanStack Mutation
@@ -47,6 +53,7 @@ export default function InviteMemberDialog({
     },
     onSuccess: () => {
       setEmail("");
+      setEmailError("");
       setRole("member");
       onOpenChange(false); // close dialog on success
       // Optional: invalidate workspace members query if you have one
@@ -65,6 +72,12 @@ export default function InviteMemberDialog({
   });
 
   const handleSendInvite = () => {
+    const result = inviteSchema.safeParse({ email });
+    if (!result.success) {
+      setEmailError(result.error.issues[0].message);
+      return;
+    }
+    setEmailError("");
     inviteMutation.mutate();
   };
 
@@ -81,10 +94,16 @@ export default function InviteMemberDialog({
             <Label>Email</Label>
             <Input
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (emailError) setEmailError("");
+              }}
               placeholder="user@example.com"
               type="email"
             />
+            {emailError && (
+              <p className="text-xs text-destructive">{emailError}</p>
+            )}
           </div>
 
           {/* Role */}
@@ -113,7 +132,7 @@ export default function InviteMemberDialog({
             isLoading={inviteMutation.isPending}
             disabled={inviteMutation.isPending} // disable while sending
           >
-            Sending
+            Invite
           </Button>
         </DialogFooter>
       </DialogContent>

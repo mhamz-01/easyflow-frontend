@@ -21,14 +21,19 @@ import { useTaskStore } from "./store/useTaskStore";
 const TaskManagerHeader = () => {
   const {
     view,
-    groupBy,
-    sortBy,
+    tableGroupBy,
+    boardGroupBy,
+    tableSortBy,
     setView,
-    setGroupBy,
-    setSortBy,
+    setTableGroupBy,
+    setBoardGroupBy,
+    setTableSortBy,
     visibleColumns,
     toggleColumn,
   } = useTaskStore();
+
+  const activeGroupBy = view === "table" ? tableGroupBy : boardGroupBy;
+  const setGroupBy = view === "table" ? setTableGroupBy : setBoardGroupBy;
 
   return (
     <div className="flex items-center justify-between flex-wrap gap-4 my-5 px-3 pb-3">
@@ -69,7 +74,7 @@ const TaskManagerHeader = () => {
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
               <Layers className="h-4 w-4" />
-              Group by: {groupBy}
+              Group by: {activeGroupBy}
               <ChevronDown className="h-4 w-4 ml-2" />
             </Button>
           </DropdownMenuTrigger>
@@ -95,21 +100,21 @@ const TaskManagerHeader = () => {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
                 <ArrowUpDown className="h-4 w-4" />
-                Sort by: {sortBy}
+                Sort by: {tableSortBy}
                 <ChevronDown className="h-4 w-4 ml-2" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => setSortBy("none")}>
+              <DropdownMenuItem onClick={() => setTableSortBy("none")}>
                 No Sorting
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortBy("priority")}>
+              <DropdownMenuItem onClick={() => setTableSortBy("priority")}>
                 Priority
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortBy("dueDate")}>
+              <DropdownMenuItem onClick={() => setTableSortBy("dueDate")}>
                 Due Date
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortBy("state")}>
+              <DropdownMenuItem onClick={() => setTableSortBy("state")}>
                 State
               </DropdownMenuItem>
             </DropdownMenuContent>

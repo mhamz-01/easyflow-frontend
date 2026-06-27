@@ -25,7 +25,7 @@ const TaskTableBody = ({
   onToggleSelect: (taskId: number) => void;
 }) => {
   const { mutate } = useUpdateTask();
-  const { visibleColumns, sortBy, groupBy, setIsOpen } = useTaskStore();
+  const { visibleColumns, tableSortBy: sortBy, tableGroupBy: groupBy, setIsOpen } = useTaskStore();
 
   const visible = visibleColumns.filter((c) => !c.isHidden);
   const visibleWidths = columnWidths.slice(0, visible.length);

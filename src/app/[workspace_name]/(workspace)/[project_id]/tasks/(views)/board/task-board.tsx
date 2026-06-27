@@ -7,9 +7,9 @@ import { useTaskStore } from "../../store/useTaskStore";
 
 const TaskBoard = () => {
   const { project_id } = useParams();
-  const { groupBy } = useTaskStore();
+  const { boardGroupBy } = useTaskStore();
   const { groups, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } =
-    useBoardGroups(Number(project_id), groupBy);
+    useBoardGroups(Number(project_id), boardGroupBy);
 
   // Keep loading more pages while board is visible
   useEffect(() => {
