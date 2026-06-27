@@ -103,7 +103,7 @@ function TaskCard({ task }: { task: TaskViewList }) {
           <SelectAssignees
             selectedIds={task.assignees.map((a) => a.id)}
             onSelect={(selectedIds) => {
-              // mutate({ taskId: task.id, payload: { assigneeIds: selectedIds } });
+              updateTask({ taskId: task.id, payload: { assigneeIds: selectedIds } });
             }}
           />
         </div>
