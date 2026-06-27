@@ -15,7 +15,7 @@ export const RowCell = ({
     justify === "between" ? "justify-between" : "justify-start";
 
   return (
-    <div className={`${commonClass} ${justifyClass} ${className ?? ""}`}>
+    <div className={`min-w-0 ${commonClass} ${justifyClass} ${className ?? ""}`}>
       {children}
     </div>
   );

@@ -16,21 +16,24 @@ import { CHECKBOX_COLUMN_WIDTH } from "./task-table-header";
 const TaskTableBody = ({
   tasks = [],
   columnWidths,
-  hasHorizontalScroll,
   selectedIds,
   onToggleSelect,
 }: {
   tasks: TaskViewList[];
   columnWidths: number[];
-  hasHorizontalScroll: boolean;
   selectedIds: Set<number>;
   onToggleSelect: (taskId: number) => void;
 }) => {
   const { mutate } = useUpdateTask();
   const { visibleColumns, sortBy, groupBy, setIsOpen } = useTaskStore();
 
-
   const visible = visibleColumns.filter((c) => !c.isHidden);
+  const visibleWidths = columnWidths.slice(0, visible.length);
+  const gridTemplateColumns = [
+    `${CHECKBOX_COLUMN_WIDTH}px`,
+    ...visibleWidths.slice(0, -1).map((w) => `${w}px`),
+    `minmax(${visibleWidths[visibleWidths.length - 1] ?? 213}px, 1fr)`,
+  ].join(" ");
 
   // Sorting
   const sortedTasks = useMemo(() => {
@@ -65,12 +68,14 @@ const TaskTableBody = ({
     }, {});
   }, [sortedTasks, groupBy]);
 
+  const cellClass = "px-4 flex items-center truncate border-r border-b";
+
   return (
-    <div className="text-[#D5D6D7]">
+    <div className="text-[#D5D6D7] border-l">
       {Object.entries(grouped).map(([group, groupTasks]) => (
         <div key={group}>
           {groupBy !== "none" && (
-            <div className="px-4 py-4">
+            <div className="px-4 py-4 border-b">
               {(() => {
                 const color = getColorFromGroup(group);
                 return (
@@ -82,7 +87,6 @@ const TaskTableBody = ({
                     <h2 className="text-base font-semibold" style={{ color }}>
                       {group}
                     </h2>
-                    {/* ✅ fixed hardcoded {2} */}
                     <span className="text-xs text-muted-foreground">
                       {(groupTasks as TaskViewList[]).length} tasks
                     </span>
@@ -95,39 +99,21 @@ const TaskTableBody = ({
           {(groupTasks as TaskViewList[]).map((task) => (
             <div
               key={task.id}
-              className={`grid h-12 font-bold group ${
-                hasHorizontalScroll ? "" : "border-l-0 border-r border"
-              } hover:bg-gray-50`}
-              style={{
-                gridTemplateColumns: [
-                  `${CHECKBOX_COLUMN_WIDTH}px`,
-                  ...columnWidths
-                    .slice(0, visible.length)
-                    .map((w) => `${w}px`),
-                  ]
-                  .filter(Boolean)
-                  .join(" "),
-              }}
+              className="grid h-12 font-bold group hover:bg-gray-50"
+              style={{ gridTemplateColumns }}
             >
-              <div className="flex items-center justify-center px-2">
+              <div className="flex items-center justify-center px-2 border-r border-b">
                 <Checkbox
                   checked={selectedIds.has(task.id)}
                   onCheckedChange={() => onToggleSelect(task.id)}
                   aria-label={`Select ${task.name}`}
                 />
               </div>
-              {visible.map((column, index) => {
-                const isLast = index === visible.length - 1;
-                const commonClass = `px-4 flex items-center truncate ${
-                  hasHorizontalScroll ? "border" : "border-l-1 border-r-0"
-                } ${
-                  !isLast ? "" : hasHorizontalScroll ? "border-r-1" : ""
-                }`;
-
+              {visible.map((column) => {
                 switch (column.label) {
                   case "Name":
                     return (
-                      <RowCell key={column.id} commonClass={commonClass}>
+                      <RowCell key={column.id} commonClass={cellClass}>
                         <EditableTaskNameInput
                           task={task}
                           role="admin"
@@ -138,7 +124,7 @@ const TaskTableBody = ({
 
                   case "Assignee":
                     return (
-                      <RowCell key={column.id} commonClass={commonClass}>
+                      <RowCell key={column.id} commonClass={cellClass}>
                         <SelectAssignees
                           selectedIds={task.assignees.map((a) => a.id)}
                           onSelect={(selectedIds) => {
@@ -153,7 +139,7 @@ const TaskTableBody = ({
 
                   case "Priority":
                     return (
-                      <RowCell key={column.id} commonClass={commonClass}>
+                      <RowCell key={column.id} commonClass={cellClass}>
                         <PriorityCell
                           taskId={task.id}
                           priority={task.priority}
@@ -163,14 +149,14 @@ const TaskTableBody = ({
 
                   case "State":
                     return (
-                      <RowCell key={column.id} commonClass={commonClass}>
+                      <RowCell key={column.id} commonClass={cellClass}>
                         <StateCell taskId={task.id} state={task.state} />
                       </RowCell>
                     );
 
                   case "Due Date":
                     return (
-                      <RowCell key={column.id} commonClass={commonClass}>
+                      <RowCell key={column.id} commonClass={cellClass}>
                         <DateCell taskId={task.id} date={task.dueDate} />
                       </RowCell>
                     );

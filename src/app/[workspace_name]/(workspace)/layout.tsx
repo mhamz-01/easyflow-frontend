@@ -16,7 +16,7 @@ export default function WorkspaceLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="w-full min-[768px]:w-[calc(100%-16rem)]">
+      <main className="flex-1 min-w-0">
         {children}
       </main>
     </SidebarProvider>

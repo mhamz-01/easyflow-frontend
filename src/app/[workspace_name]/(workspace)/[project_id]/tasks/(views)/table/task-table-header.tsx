@@ -8,7 +8,6 @@ const TaskTableHeader = ({
   visibleColumns,
   columnWidths,
   setColumnWidths,
-  hasHorizontalScroll,
   allSelected,
   someSelected,
   onToggleSelectAll,
@@ -16,7 +15,6 @@ const TaskTableHeader = ({
   visibleColumns: { id: number; label: string; isHidden: boolean }[];
   columnWidths: number[];
   setColumnWidths: Dispatch<SetStateAction<number[]>>;
-  hasHorizontalScroll: boolean;
   allSelected: boolean;
   someSelected: boolean;
   onToggleSelectAll: () => void;
@@ -53,19 +51,19 @@ const TaskTableHeader = ({
     columnIndex.current = null;
   };
 
+  const widths = columnWidths.slice(0, visibleColumns.length);
+  const gridTemplateColumns = [
+    `${CHECKBOX_COLUMN_WIDTH}px`,
+    ...widths.slice(0, -1).map((w) => `${w}px`),
+    `minmax(${widths[widths.length - 1] ?? 213}px, 1fr)`,
+  ].join(" ");
+
   return (
     <div
-      style={{
-        gridTemplateColumns: [
-          `${CHECKBOX_COLUMN_WIDTH}px`,
-          ...columnWidths.map((w) => `${w}px`),
-        ].join(" "),
-      }}
-      className={`grid bg-[#191919] text-[#7b7b7b] ${hasHorizontalScroll ? "" : "border border-b-0"} h-8 font-semibold`}
+      style={{ gridTemplateColumns }}
+      className="grid bg-[#191919] text-[#7b7b7b] h-8 font-semibold"
     >
-      <div
-        className={`flex items-center justify-center ${hasHorizontalScroll ? "border" : "border-r"}`}
-      >
+      <div className="flex items-center justify-center border-l border-t border-r border-b">
         <Checkbox
           checked={allSelected ? true : someSelected ? "indeterminate" : false}
           onCheckedChange={onToggleSelectAll}
@@ -75,7 +73,7 @@ const TaskTableHeader = ({
       {visibleColumns.map((column, index) => (
         <div
           key={column.id}
-          className={`pl-4 flex justify-between items-center ${hasHorizontalScroll ? "border" : ""} ${index !== visibleColumns.length - 1 ? (hasHorizontalScroll ? "" : "border-r") : hasHorizontalScroll ? "border-r" : "border-r-0"} relative`} // don't show border right for last element
+          className="pl-4 flex justify-between items-center border-t border-r border-b relative"
         >
           {column.label}
 

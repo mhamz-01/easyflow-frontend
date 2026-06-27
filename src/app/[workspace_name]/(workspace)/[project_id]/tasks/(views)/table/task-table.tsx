@@ -11,9 +11,7 @@ import TaskEmptyState from "../../components/task-empty-state";
 import BulkDeleteBar from "../../components/bulk-delete-bar";
 
 const TaskTable = () => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
-  const [hasHorizontalScroll, setHasHorizontalScroll] = useState(false);
   const { visibleColumns } = useTaskStore();
   const { project_id } = useParams();
   const [columnWidths, setColumnWidths] = useState<number[]>(
@@ -79,18 +77,6 @@ const TaskTable = () => {
     return () => observer.disconnect();
   }, [handleIntersection]);
 
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const observer = new ResizeObserver(() => {
-      setHasHorizontalScroll(container.scrollWidth > container.clientWidth);
-    });
-
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, []);
-
   if (isLoading) return <TaskLoadingSkeleton />;
   if (!tasks?.length) return <TaskEmptyState />;
 
@@ -98,7 +84,7 @@ const TaskTable = () => {
   const someSelected = selectedIds.size > 0 && !allSelected;
 
   return (
-    <div ref={containerRef} className="overflow-x-auto text-xs">
+    <div className="overflow-x-auto text-xs">
       {selectedIds.size > 0 && (
         <BulkDeleteBar
           selectedIds={Array.from(selectedIds)}
@@ -109,7 +95,6 @@ const TaskTable = () => {
         columnWidths={columnWidths}
         setColumnWidths={setColumnWidths}
         visibleColumns={visibleColumns.filter((c) => !c.isHidden)}
-        hasHorizontalScroll={hasHorizontalScroll}
         allSelected={allSelected}
         someSelected={someSelected}
         onToggleSelectAll={toggleSelectAll}
@@ -117,7 +102,6 @@ const TaskTable = () => {
       <TaskTableBody
         tasks={tasks}
         columnWidths={columnWidths}
-        hasHorizontalScroll={hasHorizontalScroll}
         selectedIds={selectedIds}
         onToggleSelect={toggleSelect}
       />

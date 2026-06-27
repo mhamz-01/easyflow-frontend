@@ -16,17 +16,15 @@ const PriorityCell = ({
   });
 
   return (
-    <div>
-      <SelectDropdownField
-        value={optimisticPriority}
-        onChange={(value) => {
-          setOptimisticPriority(value);
-          mutate({ taskId, payload: { priority: value } });
-        }}
-        options={PRIORITY_DROPDOWN_OPTIONS}
-        className="dark:bg-transparent"
-      />
-    </div>
+    <SelectDropdownField
+      value={optimisticPriority}
+      onChange={(value) => {
+        setOptimisticPriority(value);
+        mutate({ taskId, payload: { priority: value } });
+      }}
+      options={PRIORITY_DROPDOWN_OPTIONS}
+      className="dark:bg-transparent"
+    />
   );
 };
 

@@ -43,7 +43,7 @@ export function SelectDropdown({
   return (
     <Select value={value} onValueChange={onChange} disabled={disabled}>
       <SelectTrigger
-        className={cn("capitalize w-max max-w-48 bg-red-500", className)}
+        className={cn("capitalize w-full", className)}
       >
         {!value && Icon && <Icon className={cn("h-4 w-4", iconClassName)} />}
         <SelectValue placeholder={placeholder} />

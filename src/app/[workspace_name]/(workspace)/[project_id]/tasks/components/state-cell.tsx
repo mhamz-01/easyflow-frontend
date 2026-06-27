@@ -10,17 +10,15 @@ const StateCell = ({ state, taskId }: { state: string; taskId: number }) => {
   });
 
   return (
-    <div>
-      <SelectDropdownField
-        value={optimisticState}
-        onChange={(value) => {
-          setOptimisticState(value);
-          mutate({ taskId, payload: { state: value } });
-        }}
-        options={STATE_DROPDOWN_OPTIONS}
-        className="dark:bg-transparent"
-      />
-    </div>
+    <SelectDropdownField
+      value={optimisticState}
+      onChange={(value) => {
+        setOptimisticState(value);
+        mutate({ taskId, payload: { state: value } });
+      }}
+      options={STATE_DROPDOWN_OPTIONS}
+      className="dark:bg-transparent"
+    />
   );
 };
 
