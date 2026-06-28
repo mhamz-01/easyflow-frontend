@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import whiteboardIcon from "@/public/icons/whiteboard.svg";
-import { Info, Pin, MoreVertical, Edit, Trash } from "lucide-react";
+import { MoreVertical, Edit, Trash, Loader2 } from "lucide-react";
 import Avatar from "@/src/components/custom/avatar";
 import { useRouter } from "next/navigation";
 import {
@@ -29,8 +29,14 @@ const WhiteboardsList = ({ whiteboardsListData }: { whiteboardsListData: Whitebo
   const workspaceId = useWorkspaceStore((s) => s.workspace?.id);
   const projectId = useProjectStore((s) => s.project?.id);
 
+  const [navigatingId, setNavigatingId] = useState<number | null>(null);
   const [selectedWhiteboardId, setSelectedWhiteboardId] = useState<number | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const handleNavigate = (id: number) => {
+    setNavigatingId(id);
+    router.push(`whiteboards/${String(id)}`);
+  };
 
   const deleteWhiteboardMutation = useMutation({
     // Accept workspaceId + projectId in variables so onSuccess always has fresh values
@@ -59,14 +65,18 @@ const WhiteboardsList = ({ whiteboardsListData }: { whiteboardsListData: Whitebo
           {whiteboardsListData.map((whiteboard: Whiteboard) => (
             <li
               key={whiteboard.id}
-              className="flex items-center justify-between rounded-md border px-4 py-3"
+              className={`flex items-center justify-between rounded-md border px-4 py-3 transition-opacity ${navigatingId === whiteboard.id ? "opacity-60" : ""}`}
             >
               {/* LEFT: whiteboard icon + name */}
               <div
-                onClick={() => router.push(`whiteboards/${String(whiteboard.id)}`)}
+                onClick={() => handleNavigate(whiteboard.id)}
                 className="flex items-center gap-3 cursor-pointer"
               >
-                <Image src={whiteboardIcon} alt="whiteboard icon" width={18} height={18} />
+                {navigatingId === whiteboard.id ? (
+                  <Loader2 className="h-[18px] w-[18px] animate-spin text-muted-foreground shrink-0" />
+                ) : (
+                  <Image src={whiteboardIcon} alt="whiteboard icon" width={18} height={18} />
+                )}
                 <span className="font-medium capitalize">{whiteboard.whiteboardName}</span>
               </div>
 
@@ -105,9 +115,7 @@ const WhiteboardsList = ({ whiteboardsListData }: { whiteboardsListData: Whitebo
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuItem
-                      onClick={() => router.push(`whiteboards/${whiteboard.id}`)}
-                    >
+                    <DropdownMenuItem onClick={() => handleNavigate(whiteboard.id)}>
                       <Edit />
                       Edit
                     </DropdownMenuItem>

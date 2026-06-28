@@ -7,10 +7,12 @@ import { EasyflowWhiteboard } from "@mhamz.01/easyflow-whiteboard";
 import type { TaskNodeData, DocumentNodeData } from "@mhamz.01/easyflow-whiteboard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import '@mhamz.01/easyflow-whiteboard/dist/styles.css';
+import { useParams } from "next/navigation";
 import { useWorkspaceStore } from "@/src/store/workspace";
 import { useProjectStore } from "@/src/store/useProjectStore";
 
 export default function WhiteboardEditor({ id }: { id: string }) {
+  const { workspace_name, project_id } = useParams<{ workspace_name: string; project_id: string }>();
   const workspace = useWorkspaceStore((s) => s.workspace);
   const project = useProjectStore((s) => s.project);
   const queryClient = useQueryClient(); // ✅
@@ -110,6 +112,8 @@ export default function WhiteboardEditor({ id }: { id: string }) {
         saveDebounceMs={2000}
         availableDocuments={availableDocuments}
         availableTasks={availableTasks}
+        createNewTaskHref={`/${workspace_name}/${project_id}/tasks`}
+        createNewDocumentHref={`/${workspace_name}/${project_id}/docs`}
       />
     </div>
   );

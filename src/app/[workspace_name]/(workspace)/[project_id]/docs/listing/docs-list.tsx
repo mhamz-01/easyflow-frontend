@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import docsIcon from "@/public/icons/docs.svg";
-import { Info, Pin, MoreVertical, Edit, Trash } from "lucide-react";
+import { MoreVertical, Edit, Trash, Loader2 } from "lucide-react";
 import Avatar from "@/src/components/custom/avatar";
 import { useRouter } from "next/navigation";
 import {
@@ -29,8 +29,14 @@ const DocsList = ({ docsListData }: { docsListData: Doc[] }) => {
   const workspaceId = useWorkspaceStore((s) => s.workspace?.id);
   const projectId = useProjectStore((s) => s.project?.id);
 
+  const [navigatingId, setNavigatingId] = useState<number | null>(null);
   const [selectedDocId, setSelectedDocId] = useState<number | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const handleNavigate = (id: number) => {
+    setNavigatingId(id);
+    router.push(`docs/${String(id)}`);
+  };
 
   const deleteDocMutation = useMutation({
     // Accept workspaceId + projectId in variables so onSuccess always has fresh values
@@ -57,14 +63,18 @@ const DocsList = ({ docsListData }: { docsListData: Doc[] }) => {
           {docsListData.map((doc: Doc) => (
             <li
               key={doc.id}
-              className="flex items-center justify-between rounded-md border px-4 py-3"
+              className={`flex items-center justify-between rounded-md border px-4 py-3 transition-opacity ${navigatingId === doc.id ? "opacity-60" : ""}`}
             >
               {/* LEFT: doc icon + name */}
               <div
-                onClick={() => router.push(`docs/${String(doc.id)}`)}
+                onClick={() => handleNavigate(doc.id)}
                 className="flex items-center gap-3 cursor-pointer"
               >
-                <Image src={docsIcon} alt="docs icon" width={18} height={18} />
+                {navigatingId === doc.id ? (
+                  <Loader2 className="h-[18px] w-[18px] animate-spin text-muted-foreground shrink-0" />
+                ) : (
+                  <Image src={docsIcon} alt="docs icon" width={18} height={18} />
+                )}
                 <span className="font-medium capitalize">{doc.documentName}</span>
               </div>
 
@@ -103,7 +113,7 @@ const DocsList = ({ docsListData }: { docsListData: Doc[] }) => {
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => router.push(`docs/${doc.id}`)}>
+                    <DropdownMenuItem onClick={() => handleNavigate(doc.id)}>
                       <Edit />
                       Edit
                     </DropdownMenuItem>

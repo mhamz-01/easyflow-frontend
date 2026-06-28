@@ -3,22 +3,10 @@
 import { getSingleDoc, updateDoc } from "@/src/lib/api/documents/services";
 import { Editor } from "@mhamz.01/easyflow-texteditor";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useRef } from "react";
 
 export default function DocEditor({ id }: { id: string }) {
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "/easyflow-editor.css";
-    link.id = "easyflow-editor-styles";
-    document.head.appendChild(link);
-    return () => {
-      const el = document.getElementById("easyflow-editor-styles");
-      if (el) document.head.removeChild(el);
-    };
-  }, []);
 
   // ── Fetch doc ────────────────────────────────────────────────────
   const { data, isLoading } = useQuery({
