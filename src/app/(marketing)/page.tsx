@@ -2,23 +2,22 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import LandingPage from "./_components/landing-page";
 
+// Returning users with a stored workspace get redirected there;
+// everyone else sees the marketing page below.
 const Page = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
     const workspaceSlug = localStorage.getItem("workspaceSlug");
 
     if (workspaceSlug) {
       router.replace(`/${workspaceSlug}`);
-    } else {
-      router.replace("/onboarding");
     }
   }, [router]);
 
-  return null;
+  return <LandingPage />;
 };
 
 export default Page;
