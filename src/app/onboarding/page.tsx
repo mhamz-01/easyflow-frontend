@@ -20,6 +20,7 @@ import {
 } from "@/src/lib/api/workspace/services";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Spinner } from "@/src/components/shadcn/spinner";
+import GlobalLoader from "@/src/components/custom/global-loader";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -118,11 +119,7 @@ const Onboarding = () => {
   }
 
   // otherwise show him the loading state
-  return (
-    <div className="w-full flex justify-center items-center h-screen">
-      <Spinner />
-    </div>
-  );
+  return <GlobalLoader />;
 };
 
 export default Onboarding;
