@@ -6,6 +6,7 @@ type AppPreviewFrameProps = {
   screenshotAlt?: string;
   fit?: "cover" | "contain";
   priority?: boolean;
+  sizes?: string;
 };
 
 // Drop a real product screenshot in via `screenshotSrc` — everything else
@@ -15,6 +16,10 @@ const AppPreviewFrame = ({
   screenshotAlt = "EasyFlow workspace",
   fit = "cover",
   priority = false,
+  // Frame never renders wider than max-w-5xl (64rem/1024px); without an
+  // explicit `sizes`, next/image assumes 100vw and fetches a full-viewport-
+  // width image on large monitors even though the frame is capped.
+  sizes = "(min-width: 1024px) 1024px, 100vw",
 }: AppPreviewFrameProps) => {
   return (
     <div className="relative">
@@ -36,8 +41,11 @@ const AppPreviewFrame = ({
               src={screenshotSrc}
               alt={screenshotAlt}
               fill
+              sizes={sizes}
+              quality={70}
               className={cn(fit === "cover" ? "object-cover object-top" : "object-contain")}
               priority={priority}
+              loading={priority ? undefined : "lazy"}
             />
           ) : (
             <div className="flex h-full w-full flex-col gap-3 p-6">

@@ -1,10 +1,16 @@
+import dynamic from "next/dynamic";
 import MarketingNavbar from "./marketing-navbar";
 import HeroSection from "./hero-section";
-import ShowcaseSection from "./showcase-section";
-import FeaturesSection from "./features-section";
-import HowItWorksSection from "./how-it-works-section";
-import CtaSection from "./cta-section";
 import MarketingFooter from "./marketing-footer";
+
+// Below-the-fold sections are code-split out of the hero's initial JS chunk —
+// they still render on the server (ssr stays on, so no CLS/SEO impact), but
+// their framer-motion-heavy client bundles load in parallel instead of
+// blocking the hero from becoming interactive first.
+const ShowcaseSection = dynamic(() => import("./showcase-section"));
+const FeaturesSection = dynamic(() => import("./features-section"));
+const HowItWorksSection = dynamic(() => import("./how-it-works-section"));
+const CtaSection = dynamic(() => import("./cta-section"));
 
 const LandingPage = () => {
   return (
