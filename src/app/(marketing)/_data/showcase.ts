@@ -2,7 +2,7 @@ import type { StaticImageData } from "next/image";
 import type { ActionIconKey } from "./action-icons";
 import whiteboardImg from "@/public/images/marketing/showcase-whiteboard.jpg";
 import docsImg from "@/public/images/marketing/showcase-docs.png";
-import boardImg from "@/public/images/marketing/showcase-board.png";
+import taskDetailImg from "@/public/images/marketing/showcase-task-detail.png";
 
 export type ShowcaseItem = {
   matchIcon: ActionIconKey;
@@ -34,9 +34,9 @@ export const showcaseItems: ShowcaseItem[] = [
   {
     matchIcon: "tasks",
     eyebrow: "Tasks",
-    title: "See the whole board at a glance",
+    title: "Every detail, right where you need it",
     description:
-      "Organize work into boards and columns, drag tasks across stages, and keep every project moving without a status-update meeting.",
-    image: boardImg,
+      "Assignees, due dates, subtasks, and comments — all on one task view, so nothing gets lost chasing context in a separate thread.",
+    image: taskDetailImg,
   },
 ];

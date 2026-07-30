@@ -20,7 +20,7 @@ const HeroSection = () => {
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.4]);
 
   return (
-    <section ref={heroRef} className="relative overflow-hidden">
+    <section id="hero" ref={heroRef} className="relative overflow-hidden">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[560px] bg-[radial-gradient(closest-side,rgba(13,142,255,0.12),transparent)]"

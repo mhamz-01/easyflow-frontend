@@ -1,3 +1,5 @@
+"use client";
+
 import { features } from "../_data/features";
 import FeatureCard from "./feature-card";
 import ScrollReveal from "./scroll-reveal";
@@ -17,13 +19,20 @@ const FeaturesSection = () => {
         </p>
       </ScrollReveal>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Bento grid: a featured 2x2 hero tile, a mix of 1- and 2-wide tiles,
+          and a full-width banner for the AI card — fixed row height on lg so
+          the spans tile cleanly. */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:auto-rows-[190px] lg:grid-cols-4">
         {features.map((feature, index) => (
           <ScrollReveal
             key={feature.title}
             delay={(index % 4) * 0.08}
             y={20}
-            className={cn(feature.span === 2 && "lg:col-span-2")}
+            className={cn(
+              feature.span === 2 && "sm:col-span-2",
+              feature.span === 4 && "sm:col-span-2 lg:col-span-4",
+              feature.featured && "lg:row-span-2",
+            )}
           >
             <FeatureCard {...feature} />
           </ScrollReveal>

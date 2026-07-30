@@ -15,8 +15,10 @@ export type Feature = {
   iconSrc?: StaticImageData;
   icon?: LucideIcon;
   badge?: string;
-  // Bento grid span on large screens — 2 columns wide, or the default 1.
-  span?: 1 | 2;
+  // Bento grid footprint on large screens — 1, 2, or 4 (full-width banner) columns wide.
+  span?: 1 | 2 | 4;
+  // Also spans 2 rows, making it the large "hero" tile of the grid.
+  featured?: boolean;
 };
 
 export const features: Feature[] = [
@@ -27,6 +29,7 @@ export const features: Feature[] = [
     accent: "green",
     iconSrc: tasksIcon,
     span: 2,
+    featured: true,
   },
   {
     title: "Docs",
@@ -79,6 +82,6 @@ export const features: Feature[] = [
     accent: "pink",
     iconSrc: brainIcon,
     badge: "Coming soon",
-    span: 2,
+    span: 4,
   },
 ];
