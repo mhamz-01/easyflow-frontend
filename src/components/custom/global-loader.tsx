@@ -1,15 +1,62 @@
-import Image from "next/image";
-import logo from "@/public/images/logo.png";
-import { Spinner } from "@/src/components/shadcn/spinner";
+"use client";
+
+import { motion } from "framer-motion";
+
+const DOTS = [
+  { color: "var(--primary-blue)", delay: 0 },
+  { color: "var(--primary-pink)", delay: 0.2 },
+  { color: "var(--primary-yellow)", delay: 0.4 },
+  { color: "var(--primary-green)", delay: 0.6 },
+];
 
 // Full-screen loading state shown while the app resolves auth/workspace
-// state before routing the visitor somewhere — used at the root gate and
+// state before routing the visitor somewhere — used at the home gate and
 // anywhere else that needs a top-level "figuring things out" screen.
+//
+// Four brand-color dots pulse around a slowly spinning ring instead of a
+// static logo mark — reads as "working" rather than just sitting there.
 const GlobalLoader = () => {
   return (
-    <div className="flex h-screen w-full flex-col items-center justify-center gap-4 bg-background">
-      <Image src={logo} alt="EasyFlow" className="h-8 w-auto animate-pulse" priority />
-      <Spinner className="size-5 text-muted-foreground" />
+    <div className="flex h-screen w-full flex-col items-center justify-center gap-8 bg-background">
+      <motion.div
+        className="relative size-16"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+      >
+        {DOTS.map((dot, i) => (
+          <div
+            key={dot.color}
+            className="absolute inset-0"
+            style={{ transform: `rotate(${i * 90}deg)` }}
+          >
+            <motion.span
+              className="absolute top-0 left-1/2 size-3 -translate-x-1/2 rounded-full"
+              style={{ backgroundColor: dot.color }}
+              animate={{ scale: [0.5, 1, 0.5], opacity: [0.4, 1, 0.4] }}
+              transition={{
+                duration: 1.6,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: dot.delay,
+              }}
+            />
+          </div>
+        ))}
+      </motion.div>
+
+      <div className="flex flex-col items-center gap-3">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          Easy<span className="text-primary-blue">Flow</span>
+        </h1>
+
+        <div className="h-0.5 w-28 overflow-hidden rounded-full bg-background-200">
+          <motion.div
+            className="h-full w-1/3 rounded-full bg-primary-blue"
+            animate={{ x: ["-120%", "320%"] }}
+            transition={{ duration: 1.3, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </div>
+      </div>
     </div>
   );
 };

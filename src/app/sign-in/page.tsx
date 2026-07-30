@@ -19,12 +19,13 @@ import {
 import { Input } from "@/src/components/shadcn/input";
 import { useForm } from "react-hook-form";
 import { Spinner } from "@/src/components/shadcn/spinner";
-import { useState } from "react";
-import { useSignIn, useSignUp } from "@clerk/nextjs";
+import { useEffect, useState } from "react";
+import { useAuth, useSignIn, useSignUp } from "@clerk/nextjs";
 import { EmailCodeFactor, OAuthStrategy } from "@clerk/types";
 import { useRouter } from "next/navigation";
 import { SignInFirstFactor } from "@clerk/types";
 import Link from "next/link";
+import GlobalLoader from "@/src/components/custom/global-loader";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -36,6 +37,7 @@ const formSchema = z.object({
 export default function SignUp() {
   const { isLoaded: signUpLoaded, signUp, setActive } = useSignUp();
   const { isLoaded: signInLoaded, signIn } = useSignIn();
+  const { isLoaded: authLoaded, isSignedIn } = useAuth();
   const [isEmailSubmitted, setIsEmailSubmitted] = useState<boolean>(false);
   const [isSendingOTP, setIsSendingOTP] = useState<boolean>(false); // show loader when submitting email for verification
   const [email, setEmail] = useState("");
@@ -46,7 +48,16 @@ export default function SignUp() {
     defaultValues: { email: "", verificationCode: "" },
   });
 
-  if (!signUpLoaded || !signInLoaded) return null;
+  // Already signed in (e.g. another account is active in this browser) —
+  // bounce to the home gate instead of showing the sign-in form again.
+  useEffect(() => {
+    if (authLoaded && isSignedIn) {
+      router.replace("/home");
+    }
+  }, [authLoaded, isSignedIn, router]);
+
+  if (!signUpLoaded || !signInLoaded || !authLoaded) return null;
+  if (isSignedIn) return <GlobalLoader />;
 
   const signInWith = (strategy: OAuthStrategy) => {
     signIn
@@ -125,7 +136,7 @@ export default function SignUp() {
               return;
             }
 
-            router.push("/");
+            router.push("/home");
           },
         });
       } else {

@@ -19,11 +19,12 @@ import {
 import { Input } from "@/src/components/shadcn/input";
 import { useForm } from "react-hook-form";
 import { Spinner } from "@/src/components/shadcn/spinner";
-import { useState } from "react";
-import { useSignIn, useSignUp } from "@clerk/nextjs";
+import { useEffect, useState } from "react";
+import { useAuth, useSignIn, useSignUp } from "@clerk/nextjs";
 import { OAuthStrategy } from "@clerk/types";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import GlobalLoader from "@/src/components/custom/global-loader";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -35,6 +36,7 @@ const formSchema = z.object({
 export default function SignUp() {
   const { isLoaded: signUpLoaded, signUp, setActive } = useSignUp();
   const { isLoaded: signInLoaded, signIn } = useSignIn();
+  const { isLoaded: authLoaded, isSignedIn } = useAuth();
   const [isEmailSubmitted, setIsEmailSubmitted] = useState(false);
   const [email, setEmail] = useState("");
   const router = useRouter();
@@ -44,7 +46,16 @@ export default function SignUp() {
     defaultValues: { email: "", verificationCode: "" },
   });
 
-  if (!signUpLoaded || !signInLoaded) return null;
+  // Already signed in (e.g. another account is active in this browser) —
+  // bounce to the home gate instead of showing the sign-up form again.
+  useEffect(() => {
+    if (authLoaded && isSignedIn) {
+      router.replace("/home");
+    }
+  }, [authLoaded, isSignedIn, router]);
+
+  if (!signUpLoaded || !signInLoaded || !authLoaded) return null;
+  if (isSignedIn) return <GlobalLoader />;
 
   const signInWith = (strategy: OAuthStrategy) => {
     signIn
@@ -99,7 +110,7 @@ export default function SignUp() {
               // optionally handle extra tasks here
               return;
             }
-            await router.push("/");
+            await router.push("/home");
           },
         });
       } else {

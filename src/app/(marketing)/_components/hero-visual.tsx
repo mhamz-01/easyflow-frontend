@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import AppPreviewFrame from "./app-preview-frame";
 import homeImg from "@/public/images/marketing/showcase-home.jpg";
 
@@ -8,24 +9,32 @@ import homeImg from "@/public/images/marketing/showcase-home.jpg";
 // halo glowing from behind its top edge, a passing light sweep, and a tilted
 // 3D entrance that settles into a slow continuous float.
 const HeroVisual = () => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  // These loops are expensive (large blurred layers animating scale/rotate
+  // forever) and were running full-time even after the hero scrolled out of
+  // view, competing with scroll compositing for the whole rest of the page.
+  // Pausing them outside the viewport is what actually fixes scroll jank.
+  const isInView = useInView(ref, { margin: "200px 0px 200px 0px" });
+
   return (
-    <div className="relative w-full">
+    <div ref={ref} className="relative w-full">
       <motion.div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[380px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_90deg,rgba(13,142,255,0.45),rgba(255,0,200,0.28),rgba(255,197,61,0.28),rgba(13,142,255,0.45))] blur-3xl sm:h-[460px] sm:w-[900px]"
-        animate={{ scale: [1, 1.1, 1], rotate: [0, 25, 0] }}
+        animate={isInView ? { scale: [1, 1.1, 1], rotate: [0, 25, 0] } : false}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
       />
 
       <motion.div
         aria-hidden
         className="pointer-events-none absolute top-10 left-1/2 -z-10 h-px w-[140%] -translate-x-1/2 -rotate-6 bg-gradient-to-r from-transparent via-primary-blue/70 to-transparent"
-        animate={{ x: ["-20%", "20%"], opacity: [0, 1, 0] }}
+        animate={isInView ? { x: ["-20%", "20%"], opacity: [0, 1, 0] } : false}
         transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", repeatDelay: 2 }}
       />
 
       <motion.div
-        animate={{ y: [0, -12, 0] }}
+        animate={isInView ? { y: [0, -12, 0] } : false}
         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
         style={{ perspective: 1000 }}
       >

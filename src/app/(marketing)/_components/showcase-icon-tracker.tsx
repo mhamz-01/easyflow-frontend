@@ -25,7 +25,10 @@ const ShowcaseIconTracker = ({ activeKey, isVisible }: ShowcaseIconTrackerProps)
         isVisible ? "opacity-100" : "opacity-0",
       )}
     >
-      <div className="flex gap-3 rounded-2xl border border-border bg-background/80 p-3 backdrop-blur sm:gap-4">
+      {/* Solid (not backdrop-blur) background: this panel is sticky and sits
+          over scroll-scrubbed content, so a live backdrop-filter would repaint
+          every scroll frame — a solid fill reads the same without the cost. */}
+      <div className="flex gap-3 rounded-2xl border border-border bg-background-200/95 p-3 sm:gap-4">
         {actionIcons.map((item) => {
           const isActive = item.key === activeKey;
           const isComingSoon = item.key === "brain";

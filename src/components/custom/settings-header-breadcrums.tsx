@@ -16,7 +16,7 @@ const SettingsHeaderBreadcrums = () => {
       <BreadcrumbList>
         <BreadcrumbItem>
           <Home size={18} />
-          <Link href="/">Home</Link>
+          <Link href="/home">Home</Link>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>

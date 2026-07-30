@@ -102,8 +102,8 @@ const GeneralSettings = () => {
       // remove workspaceSlug from local Storage
       localStorage.removeItem("workspaceSlug");
 
-      // push user back to main page
-      router.push("/");
+      // push user back to the home gate (routes to another workspace, or onboarding)
+      router.push("/home");
     },
     // if deletion is not successfull show error to the user
     onError: (error: any) => {
