@@ -71,7 +71,7 @@ const TaskTableBody = ({
   const cellClass = "px-4 flex items-center truncate border-r border-b";
 
   return (
-    <div className="text-[#D5D6D7] border-l">
+    <div className="text-foreground border-l">
       {Object.entries(grouped).map(([group, groupTasks]) => (
         <div key={group}>
           {groupBy !== "none" && (
@@ -99,7 +99,7 @@ const TaskTableBody = ({
           {(groupTasks as TaskViewList[]).map((task) => (
             <div
               key={task.id}
-              className="grid h-12 font-bold group hover:bg-gray-50"
+              className="grid h-12 font-bold group hover:bg-accent"
               style={{ gridTemplateColumns }}
             >
               <div className="flex items-center justify-center px-2 border-r border-b">

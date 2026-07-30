@@ -17,9 +17,10 @@ const ListingFilterTabs = ({ value, onChange }: ListingFilterTabsProps) => {
       <TabsList className="bg-transparent gap-5">
         <TabsTrigger
           value="public"
-          className="rounded-none border-0 pb-5 font-bold text-white
+          className="rounded-none border-0 pb-5 font-bold text-muted-foreground shadow-none
+            data-[state=active]:shadow-none
+            data-[state=active]:border-b
             dark:data-[state=active]:bg-transparent
-            dark:data-[state=active]:border-b
             dark:data-[state=active]:border-b-primary-blue
             dark:data-[state=active]:text-primary-blue"
         >
@@ -27,9 +28,10 @@ const ListingFilterTabs = ({ value, onChange }: ListingFilterTabsProps) => {
         </TabsTrigger>
         <TabsTrigger
           value="private"
-          className="rounded-none border-0 pb-5 font-bold text-white
+          className="rounded-none border-0 pb-5 font-bold text-muted-foreground shadow-none
+            data-[state=active]:shadow-none
+            data-[state=active]:border-b
             dark:data-[state=active]:bg-transparent
-            dark:data-[state=active]:border-b
             dark:data-[state=active]:border-b-primary-blue
             dark:data-[state=active]:text-primary-blue"
         >

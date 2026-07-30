@@ -14,7 +14,7 @@ const TaskBoardSkeleton = () => {
             (_, cardIdx) => (
               <div
                 key={cardIdx}
-                className="bg-white border rounded-lg p-3 flex flex-col gap-3 shadow-sm"
+                className="bg-background border rounded-lg p-3 flex flex-col gap-3 shadow-sm"
               >
                 {/* Task name */}
                 <div className="h-3 bg-gray-200 rounded w-full" />

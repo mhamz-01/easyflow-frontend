@@ -38,7 +38,7 @@ const WorkspaceMenuItem = ({
   return (
     <div
       className={`flex gap-3 items-center py-2 px-4 cursor-pointer ${
-        workspace.workspaceSlug === currentWorkspaceSlug ? "bg-gray-50" : ""
+        workspace.workspaceSlug === currentWorkspaceSlug ? "bg-accent" : ""
       }`}
     >
       <div>
@@ -90,14 +90,14 @@ const WorkspaceMenuItem = ({
             <div className="flex gap-1 mt-1">
               <Link
                 href={`/${currentWorkspaceSlug}/settings/general?tab=workspace`}
-                className="flex gap-2 items-center bg-black text-xs py-2 px-2 rounded"
+                className="flex gap-2 items-center bg-accent text-xs py-2 px-2 rounded"
               >
                 <Settings size={16} />
                 Settings
               </Link>
               <Link
                 href={`/${currentWorkspaceSlug}/settings/members?tab=workspace`}
-                className="flex gap-2 items-center bg-black text-xs py-2 px-2 rounded"
+                className="flex gap-2 items-center bg-accent text-xs py-2 px-2 rounded"
               >
                 <UserRoundPlus size={16} />
                 Invite members

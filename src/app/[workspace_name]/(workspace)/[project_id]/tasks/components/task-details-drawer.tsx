@@ -156,7 +156,7 @@ const handleAddWhiteboard = (whiteboardId: number) => {
     <Sheet open={isOpen} onOpenChange={() => setIsOpen(!isOpen, null)}>
       <SheetContent
         side="right"
-        className="min-w-150 bg-black text-white border-l border-neutral-800 overflow-y-auto p-5"
+        className="min-w-150 bg-background text-foreground border-l border-border overflow-y-auto p-5"
       >
         {isPending ? (
           <TaskDetailsDrawerSkeleton />
@@ -171,7 +171,7 @@ const handleAddWhiteboard = (whiteboardId: number) => {
 
             {/* Description */}
             {description && (
-              <p className="text-sm text-neutral-400 leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 {description}
               </p>
             )}
@@ -215,7 +215,7 @@ const handleAddWhiteboard = (whiteboardId: number) => {
               </Dialog>
             </div>
 
-            <Separator className="bg-neutral-800" />
+            <Separator className="bg-accent" />
 
 {/* Attached Documents */}
 <DrawerCollapsibleSection title="Attached Documents" count={documents.length}>
@@ -223,7 +223,7 @@ const handleAddWhiteboard = (whiteboardId: number) => {
     documents.map((doc) => (
       <div
         key={doc.id}
-        className="flex items-center gap-2 bg-neutral-900 px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-neutral-800 transition-colors"
+        className="flex items-center gap-2 bg-muted px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-accent transition-colors"
         onClick={() => router.push(`docs/${doc.id}`)}
       >
         <Image src={docsIcon} alt="docs icon" width={16} height={16} />
@@ -232,9 +232,9 @@ const handleAddWhiteboard = (whiteboardId: number) => {
     ))
   ) : (
     <div
-    className="flex items-center gap-2 bg-neutral-900 px-3 py-2 rounded-lg"
+    className="flex items-center gap-2 bg-muted px-3 py-2 rounded-lg"
   >
-    <p className="text-sm text-neutral-500 italic">
+    <p className="text-sm text-muted-foreground italic">
       No documents attached yet.  
     </p>
     </div>
@@ -248,7 +248,7 @@ const handleAddWhiteboard = (whiteboardId: number) => {
     whiteboards.map((wb) => (
       <div
         key={wb.id}
-        className="flex items-center gap-2 bg-neutral-900 px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-neutral-800 transition-colors"
+        className="flex items-center gap-2 bg-muted px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-accent transition-colors"
         onClick={() => router.push(`whiteboards/${wb.id}`)}
       >
         <Image src={whiteboardIcon} alt="whiteboard icon" width={16} height={16} />
@@ -257,22 +257,22 @@ const handleAddWhiteboard = (whiteboardId: number) => {
     ))
   ) : (
     <div
-    className="flex items-center gap-2 bg-neutral-900 px-3 py-2 rounded-lg"
+    className="flex items-center gap-2 bg-muted px-3 py-2 rounded-lg"
   >
-    <p className="text-sm text-neutral-500 italic">
+    <p className="text-sm text-muted-foreground italic">
       No whiteboards attached yet. 
     </p>
     </div>
   )}
 </DrawerCollapsibleSection>
-            <Separator className="bg-neutral-800" />
+            <Separator className="bg-accent" />
 
       {/* Checklist */}
 <DrawerCollapsibleSection title="Checklist" count={checklist.length}>
   {checklist.length > 0 ? (
     checklist.map((group, index) => (
       <div key={index} className="space-y-2">
-        <p className="text-xs text-neutral-400">{group.name}</p>
+        <p className="text-xs text-muted-foreground">{group.name}</p>
         {group.items
           .filter((item) => item.trim() !== "")
           .map((item, idx) => (
@@ -285,16 +285,16 @@ const handleAddWhiteboard = (whiteboardId: number) => {
     ))
   ) : (
     <div
-    className="flex items-center gap-2 bg-neutral-900 px-3 py-2 rounded-lg text-sm "
+    className="flex items-center gap-2 bg-muted px-3 py-2 rounded-lg text-sm "
   >
-    <p className="text-neutral-500 italic">
+    <p className="text-muted-foreground italic">
       No checklist created yet. 
     </p>
   </div>
   )}
 </DrawerCollapsibleSection>
 
-            {/* <Separator className="bg-neutral-800" /> */}
+            {/* <Separator className="bg-accent" /> */}
 
           {/* Attachments */}
 {attachments.length > 0 && (
@@ -305,7 +305,7 @@ const handleAddWhiteboard = (whiteboardId: number) => {
       return (
         <div
           key={file.id}
-          className="flex items-center justify-between bg-neutral-900 px-3 py-2 rounded-lg"
+          className="flex items-center justify-between bg-muted px-3 py-2 rounded-lg"
         >
           <div className="flex items-center gap-3 text-sm">
             {isImage ? (
@@ -320,7 +320,7 @@ const handleAddWhiteboard = (whiteboardId: number) => {
             <span className="truncate max-w-50">{file.originalName}</span>
           </div>
           <a href={fileUrl} download target="_blank" rel="noopener noreferrer">
-            <Expand size={16} className="text-neutral-400 cursor-pointer" />
+            <Expand size={16} className="text-muted-foreground cursor-pointer" />
           </a>
         </div>
       );
@@ -328,7 +328,7 @@ const handleAddWhiteboard = (whiteboardId: number) => {
   </DrawerCollapsibleSection>
 )}
 
-            <Separator className="bg-neutral-800" />
+            <Separator className="bg-accent" />
 
          {/* Links */}
 {links.length > 0 && (
@@ -336,7 +336,7 @@ const handleAddWhiteboard = (whiteboardId: number) => {
     {links.map((link, index) => (
       <div
         key={index}
-        className="flex items-center gap-2 bg-neutral-900 px-3 py-2 rounded-lg text-sm"
+        className="flex items-center gap-2 bg-muted px-3 py-2 rounded-lg text-sm"
       >
         <Link2 size={16} />
         <a href={link} target="_blank" className="hover:underline truncate">
@@ -348,10 +348,10 @@ const handleAddWhiteboard = (whiteboardId: number) => {
 )}
 
             {/* Meta Card */}
-            <Card className="bg-neutral-900 border-neutral-800 rounded-2xl mt-8">
+            <Card className="bg-muted border-border rounded-2xl mt-8">
               <CardContent className="p-6 space-y-5 text-sm">
                 <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2 text-neutral-400">
+                  <div className="flex items-center gap-2 text-muted-foreground">
                     <Calendar size={16} />
                     State
                   </div>
@@ -359,7 +359,7 @@ const handleAddWhiteboard = (whiteboardId: number) => {
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2 text-neutral-400">
+                  <div className="flex items-center gap-2 text-muted-foreground">
                     <UserIcon size={16} />
                     Assignees
                   </div>
@@ -370,7 +370,7 @@ const handleAddWhiteboard = (whiteboardId: number) => {
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2 text-neutral-400">
+                  <div className="flex items-center gap-2 text-muted-foreground">
                     <Flag size={16} />
                     Priority
                   </div>
@@ -378,7 +378,7 @@ const handleAddWhiteboard = (whiteboardId: number) => {
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <span className="text-neutral-400">Created by</span>
+                  <span className="text-muted-foreground">Created by</span>
                   <div className="flex items-center gap-2">
                     <Avatar className="h-7 w-7">
                       <AvatarImage src={task?.creator.imageUrl} />
@@ -389,15 +389,15 @@ const handleAddWhiteboard = (whiteboardId: number) => {
                 </div>
 
                 <div className="flex justify-between">
-  <span className="text-neutral-400">Start Date</span>
-  <span className={task?.startDate ? "" : "text-neutral-500 italic"}>
+  <span className="text-muted-foreground">Start Date</span>
+  <span className={task?.startDate ? "" : "text-muted-foreground italic"}>
     {task?.startDate ? formatDate(task.startDate) : "Not mentioned"}
   </span>
 </div>
 
 <div className="flex justify-between">
-  <span className="text-neutral-400">End Date</span>
-  <span className={task?.dueDate ? "text-red-500" : "text-neutral-500 italic"}>
+  <span className="text-muted-foreground">End Date</span>
+  <span className={task?.dueDate ? "text-red-500" : "text-muted-foreground italic"}>
     {task?.dueDate ? formatDate(task.dueDate) : "Not mentioned"}
   </span>
 </div>

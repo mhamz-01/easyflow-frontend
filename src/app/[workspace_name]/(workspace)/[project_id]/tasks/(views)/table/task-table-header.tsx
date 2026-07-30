@@ -61,7 +61,7 @@ const TaskTableHeader = ({
   return (
     <div
       style={{ gridTemplateColumns }}
-      className="grid bg-[#191919] text-[#7b7b7b] h-8 font-semibold"
+      className="grid bg-muted text-muted-foreground h-8 font-semibold"
     >
       <div className="flex items-center justify-center border-l border-t border-r border-b">
         <Checkbox

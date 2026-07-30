@@ -26,7 +26,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
         <body className={`${redHatDisplay.variable} antialiased`}>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false}>
             <TanstackClientProvider>{children}</TanstackClientProvider>
           </ThemeProvider>
           <Toaster position="top-right" />

@@ -37,10 +37,10 @@ export default function DrawerCollapsibleSection({
         <button type="button" className="group flex items-center gap-2 w-full text-left">
           <ChevronRight
             size={16}
-            className="text-neutral-400 transition-transform duration-200 group-data-[state=open]:rotate-90"
+            className="text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-90"
           />
-          <h3 className="text-sm font-medium text-neutral-300">
-            {title} <span className="text-neutral-500">({count})</span>
+          <h3 className="text-sm font-medium text-foreground">
+            {title} <span className="text-muted-foreground">({count})</span>
           </h3>
         </button>
       </CollapsibleTrigger>

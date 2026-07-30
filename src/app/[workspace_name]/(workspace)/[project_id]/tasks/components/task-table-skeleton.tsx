@@ -12,7 +12,7 @@ const TaskTableSkeleton = () => {
 
       {/* Rows */}
       {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="flex border-b hover:bg-gray-50">
+        <div key={i} className="flex border-b hover:bg-accent">
           {/* Name */}
           <div className="w-64 h-10 px-4 flex items-center border-r">
             <div className="h-3 bg-gray-200 rounded w-4/5" />

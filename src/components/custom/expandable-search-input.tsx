@@ -28,7 +28,7 @@ const ExpandableSearchInput = ({ value, onChange }: ExpandableSearchInputProps) 
           value={value}                          // ✅ controlled
           onChange={(e) => onChange(e.target.value)} // ✅
           className={`
-            h-9 rounded-md bg-muted/40 px-3 text-sm text-white
+            h-9 rounded-md bg-muted/40 px-3 text-sm text-foreground
             outline-none transition-all duration-300 ease-in-out
             ${openInput ? "w-[150px] opacity-100 mr-2" : "w-0 opacity-0 mr-0"}
             pointer-events-${openInput ? "auto" : "none"}
@@ -40,7 +40,7 @@ const ExpandableSearchInput = ({ value, onChange }: ExpandableSearchInputProps) 
           className="flex h-9 w-9 items-center justify-center rounded-md
             hover:bg-muted/40 transition-colors"
         >
-          <Search size={20} className="text-white" />
+          <Search size={20} className="text-foreground" />
         </button>
       </div>
     </div>

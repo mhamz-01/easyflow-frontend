@@ -43,7 +43,7 @@ const UserAccountMenu = ({ floatRight }: { floatRight?: boolean }) => {
         ref={modalRef}
         className={`absolute z-10 ${
           floatRight ? "left-0" : "right-0"
-        } mt-3 w-54 rounded-md bg-background shadow-xl border border-gray-50 transition-all duration-200 origin-top ${
+        } mt-3 w-54 rounded-md bg-background shadow-xl border border-border transition-all duration-200 origin-top ${
           open
             ? "opacity-100 scale-100"
             : "opacity-0 scale-95 pointer-events-none"
@@ -61,7 +61,7 @@ const UserAccountMenu = ({ floatRight }: { floatRight?: boolean }) => {
         <div className="p-2">
           <Link
             href={`/${workspace?.workspaceSlug}/settings/profile?tab=account`}
-            className="flex w-full items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-sm"
+            className="flex w-full items-center gap-3 px-3 py-2 rounded-md hover:bg-accent text-sm"
           >
             <Settings size={18} />
             Settings
@@ -70,7 +70,7 @@ const UserAccountMenu = ({ floatRight }: { floatRight?: boolean }) => {
           home page */}
           <button
             onClick={() => signOut({ redirectUrl: "/sign-in" })}
-            className="flex w-full items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-sm text-red-600"
+            className="flex w-full items-center gap-3 px-3 py-2 rounded-md hover:bg-accent text-sm text-red-600"
           >
             <LogOut size={18} />
             Logout

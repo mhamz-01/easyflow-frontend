@@ -15,8 +15,8 @@ const priorityConfig = {
 
 const stateConfig: Record<string, { bg: string; color: string }> = {
   backlog: {
-    bg: "var(--color-background-secondary)",
-    color: "var(--color-text-secondary)",
+    bg: "var(--muted)",
+    color: "var(--muted-foreground)",
   },
   todo: { bg: "#E6F1FB", color: "#185FA5" },
   "in progress": { bg: "#EAF3DE", color: "#3B6D11" },
@@ -47,7 +47,7 @@ function TaskCard({ task }: { task: TaskViewList }) {
         onClick={() => setIsOpen(true, task.id)}
         className="flex items-start justify-between gap-2 cursor-pointer group"
       >
-        <p className="text-sm font-medium leading-snug group-hover:text-white">
+        <p className="text-sm font-medium leading-snug group-hover:text-primary-blue">
           {task.name}
         </p>
         {priority && (

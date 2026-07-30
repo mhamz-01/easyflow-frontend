@@ -88,7 +88,7 @@ const WorkspaceDrodownMenu = () => {
       <div
         ref={triggerRef}
         onClick={() => setOpen(!open)}
-        className="group/dropdown-trigger max-w-50 flex gap-2 items-center px-2 py-2 border border-gray-50 rounded hover:cursor-pointer"
+        className="group/dropdown-trigger max-w-50 flex gap-2 items-center px-2 py-2 border border-border rounded hover:cursor-pointer"
       >
         <WorkspaceIcon
           character={currentWorkspace?.workspaceName?.[0] || "W"}
@@ -105,7 +105,7 @@ const WorkspaceDrodownMenu = () => {
       {/* dropdown menu */}
       <div
         ref={modalRef}
-        className={`absolute left-0 top-12 z-10 w-75 max-h-[calc(100vh-6rem)] overflow-y-auto border border-gray-50 rounded bg-background shadow-xl py-2 transition-all duration-300 ease-in-out ${
+        className={`absolute left-0 top-12 z-10 w-75 max-h-[calc(100vh-6rem)] overflow-y-auto border border-border rounded bg-background shadow-xl py-2 transition-all duration-300 ease-in-out ${
           open
             ? "opacity-100 translate-y-0 pointer-events-auto"
             : "opacity-0 -translate-y-2 pointer-events-none"
@@ -138,7 +138,7 @@ const WorkspaceDrodownMenu = () => {
           <Button
             variant={"ghost"}
             onClick={() => signOut({ redirectUrl: "/sign-in" })}
-            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-sm text-red-600"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-accent text-sm text-red-600"
           >
             <LogOut size={18} />
             Logout

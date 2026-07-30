@@ -148,9 +148,9 @@ export default function SignUp() {
             </button>
 
             <div className="flex items-center gap-2">
-              <span className="h-px bg-white w-full"></span>
+              <span className="h-px bg-border w-full"></span>
               <span>OR</span>
-              <span className="h-px bg-white w-full"></span>
+              <span className="h-px bg-border w-full"></span>
             </div>
           </div>
 

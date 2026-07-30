@@ -56,10 +56,10 @@ const RecentActivities = () => {
           <div className="flex flex-col gap-3 mt-4">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="flex items-center gap-3 py-3 animate-pulse">
-                <div className="w-9 h-9 rounded bg-[#3c3c3c]" />
+                <div className="w-9 h-9 rounded bg-muted" />
                 <div className="flex flex-col gap-1.5 flex-1">
-                  <div className="h-3 w-1/3 rounded bg-[#3c3c3c]" />
-                  <div className="h-2.5 w-1/2 rounded bg-[#3c3c3c]" />
+                  <div className="h-3 w-1/3 rounded bg-muted" />
+                  <div className="h-2.5 w-1/2 rounded bg-muted" />
                 </div>
               </div>
             ))}

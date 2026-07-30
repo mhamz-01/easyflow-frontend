@@ -60,17 +60,15 @@ export function SettingsSidebar() {
             )}
           </div>
           {/* sidebar tabs */}
-          <TabsList className="w-full bg-black mt-2">
+          <TabsList className="w-full mt-2">
             <TabsTrigger
               onClick={() => handleTabChange("account")}
-              className="dark:data-[state=active]:bg-gray-50"
               value="account"
             >
               Account
             </TabsTrigger>
             <TabsTrigger
               onClick={() => handleTabChange("workspace")}
-              className="dark:data-[state=active]:bg-gray-50"
               value="workspace"
             >
               Workspace
