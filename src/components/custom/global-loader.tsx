@@ -9,13 +9,20 @@ const DOTS = [
   { color: "var(--primary-green)", delay: 0.6 },
 ];
 
+type GlobalLoaderProps = {
+  // Optional status line under the wordmark, e.g. "Setting up your account…"
+  // — lets callers narrate a multi-step background process instead of
+  // leaving the visitor staring at a bare spinner.
+  message?: string;
+};
+
 // Full-screen loading state shown while the app resolves auth/workspace
 // state before routing the visitor somewhere — used at the home gate and
 // anywhere else that needs a top-level "figuring things out" screen.
 //
 // Four brand-color dots pulse around a slowly spinning ring instead of a
 // static logo mark — reads as "working" rather than just sitting there.
-const GlobalLoader = () => {
+const GlobalLoader = ({ message }: GlobalLoaderProps) => {
   return (
     <div className="flex h-screen w-full flex-col items-center justify-center gap-8 bg-background">
       <motion.div
@@ -56,6 +63,18 @@ const GlobalLoader = () => {
             transition={{ duration: 1.3, repeat: Infinity, ease: "easeInOut" }}
           />
         </div>
+
+        {message && (
+          <motion.p
+            key={message}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="text-sm text-muted-foreground"
+          >
+            {message}
+          </motion.p>
+        )}
       </div>
     </div>
   );

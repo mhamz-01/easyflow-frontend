@@ -4,7 +4,29 @@ import { useWorkspaceStore } from "@/src/store/workspace";
 
 export const api = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_API_URL}/api`,
+  // Bound every request so a stuck backend call surfaces as an error
+  // instead of leaving the UI spinning indefinitely.
+  timeout: 20000,
 });
+
+// Status code of a failed request, if it's an axios error with a response.
+// Lets callers tell "not ready yet" (404) apart from real failures.
+export const getApiErrorStatus = (error: unknown): number | undefined => {
+  if (axios.isAxiosError(error)) {
+    return error.response?.status;
+  }
+  return undefined;
+};
+
+export const getApiErrorMessage = (
+  error: unknown,
+  fallback: string
+): string => {
+  if (axios.isAxiosError(error)) {
+    return error.response?.data?.message ?? fallback;
+  }
+  return fallback;
+};
 
 // Add interceptor to attach token to every request
 api.interceptors.request.use(async (config) => {

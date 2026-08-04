@@ -1,5 +1,5 @@
 import { WORKSPACE_API } from "./constants";
-import { api } from "../client";
+import { api, getApiErrorMessage } from "../client";
 import { NewWorkspaceCreated } from "@/src/types/workspace";
 
 // GET Methods
@@ -20,14 +20,12 @@ export const getWorkspaces = async () => {
   }
 };
 // make an api call to "/workspace/check" it will return response whether the user have created workspace or not
+// Errors are intentionally left to propagate (not swallowed) so the caller
+// can tell "user not provisioned yet, keep retrying" (404) apart from a
+// real failure, and can show real feedback instead of a silent fake success.
 export const checkUserWorkspace = async () => {
-  try {
-    const response = await api.get(WORKSPACE_API.CHECK);
-    return response.data; // { success: true, hasWorkspace: boolean, workspaceSlug?: string }
-  } catch (error) {
-    console.error("Error checking workspace:", error);
-    return { success: false, hasWorkspace: false };
-  }
+  const response = await api.get(WORKSPACE_API.CHECK);
+  return response.data; // { success: true, hasWorkspace: boolean, workspaceSlug?: string }
 };
 
 // POST Methods
@@ -46,8 +44,11 @@ export const createWorkspace = async (
     return response.data;
   } catch (error) {
     console.error("Error creating workspace:", error);
-    // Throw error so callers can handle it (e.g., mutation onError)
-    throw new Error("Failed to create workspace");
+    // Throw error so callers can handle it (e.g., mutation onError) —
+    // preserve the backend's message when there is one instead of masking it.
+    throw new Error(
+      getApiErrorMessage(error, "Failed to create workspace. Please try again.")
+    );
   }
 };
 

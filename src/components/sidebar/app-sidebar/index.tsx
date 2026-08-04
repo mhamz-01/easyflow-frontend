@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Home, Inbox } from "lucide-react";
+import { Home, Inbox, MessageSquare } from "lucide-react";
 
 import {
   Sidebar,
@@ -29,11 +29,19 @@ const mainItems = [
     title: "Home",
     icon: Home,
     type: "link",
+    path: "",
+  },
+  {
+    title: "Chat",
+    icon: MessageSquare,
+    type: "link",
+    path: "/chat",
   },
   {
     title: "Inbox",
     icon: Inbox,
     type: "modal",
+    path: "",
   },
 ] as const;
 
@@ -70,7 +78,7 @@ export function AppSidebar() {
                 ) : (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
-                      <Link href={`/${workspace?.workspaceSlug ?? "/"}`}>
+                      <Link href={`/${workspace?.workspaceSlug ?? ""}${item.path}`}>
                         <item.icon />
                         <span>{item.title}</span>
                       </Link>
