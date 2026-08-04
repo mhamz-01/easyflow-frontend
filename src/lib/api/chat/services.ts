@@ -1,13 +1,20 @@
 // chat/services.ts
 import { api } from "../client";
-import type { ApiResponse, ChatMessage, ChatMessagesPage } from "@/src/types/chat";
+import type {
+  ApiResponse,
+  ChatAttachment,
+  ChatMessage,
+  ChatMessagesPage,
+} from "@/src/types/chat";
 
 export const chatService = {
   /**
-   * Cursor-paginated message history for the current workspace
-   * (workspace is resolved server-side from the x-workspace-id header).
+   * Cursor-paginated message history for the current workspace/channel
+   * (workspace is resolved server-side from the x-workspace-id header;
+   * omit projectId for General, pass it for a project's channel).
    */
   getMessages: async (params?: {
+    projectId?: number;
     cursor?: number;
     limit?: number;
   }): Promise<ChatMessagesPage> => {
@@ -19,12 +26,18 @@ export const chatService = {
   },
 
   /**
-   * Send a message to the current workspace's chat.
+   * Send a message to the current workspace/channel — omit projectId for
+   * General. content and attachment are each optional but at least one is
+   * required (a message can be a bare attachment card).
    */
-  sendMessage: async (content: string): Promise<ChatMessage> => {
+  sendMessage: async (payload: {
+    projectId?: number;
+    content?: string;
+    attachment?: ChatAttachment;
+  }): Promise<ChatMessage> => {
     const response = await api.post<ApiResponse<ChatMessage>>(
       "/chat/messages",
-      { content },
+      payload,
     );
     return response.data.data;
   },
