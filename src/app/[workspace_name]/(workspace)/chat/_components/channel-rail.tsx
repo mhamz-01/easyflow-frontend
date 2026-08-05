@@ -6,7 +6,7 @@ import { cn } from "@/src/lib/utils";
 import { getProjectsByWorkspaceSlug } from "@/src/lib/api/project/services";
 import type { sidebarProjectType } from "@/src/types/project";
 
-// Reuses the same ["projects", workspaceSlug] cache entry the sidebar's own
+// Reuses  same ["projects", workspaceSlug] cache entry the sidebar's own
 // project list already populates — private-project visibility is handled
 // server-side (getProjectsForSidebar), so this list is already correctly
 // filtered per user.
