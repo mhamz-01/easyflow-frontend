@@ -8,7 +8,7 @@ import type { sidebarProjectType } from "@/src/types/project";
 
 // Reuses  same ["projects", workspaceSlug] cache entry  sidebar's own
 // project list already populates — private-project visibility is handled
-// server-side (getProjectsForSidebar), so this list is already correctly
+// server-side (getProjectsForSidebar), so this list  already correctly
 // filtered per user.
 const ChatChannelRail = ({
   workspaceSlug,
