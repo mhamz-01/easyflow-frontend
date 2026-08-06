@@ -60,7 +60,7 @@ const MarketingNavbar = () => {
     >
       <ScrollProgressBar />
       <div className="mx-auto grid h-16 max-w-6xl grid-cols-[1fr_auto_1fr] items-center px-6">
-        <Link href="/" className="flex items-center gap-2 justify-self-start">
+        <Link href="/" className="col-start-1 flex items-center gap-2 justify-self-start">
           <Image src={logo} alt="EasyFlow" className="h-7 w-auto" priority />
           <span className="text-xl font-bold tracking-tight text-foreground">
             Easy<span className="text-primary-blue">Flow</span>
@@ -68,8 +68,12 @@ const MarketingNavbar = () => {
         </Link>
 
         {/* True-centered regardless of how wide the logo/buttons blocks are,
-            since the flanking grid columns share the remaining space equally. */}
-        <nav className="hidden items-center gap-8 text-sm text-gray-100 md:flex">
+            since the flanking grid columns share the remaining space equally.
+            col-start pins each item to its track explicitly — without it, a
+            display:none nav on mobile gets skipped by grid auto-placement and
+            the button group collapses into the middle column instead of the
+            right one. */}
+        <nav className="col-start-2 hidden items-center gap-8 text-sm text-gray-100 md:flex">
           <a href="#showcase" className="transition-colors hover:text-foreground">
             Product
           </a>
@@ -81,7 +85,7 @@ const MarketingNavbar = () => {
           </a>
         </nav>
 
-        <div className="flex items-center justify-self-end gap-2">
+        <div className="col-start-3 flex items-center justify-self-end gap-2">
           {/* Desktop auth actions */}
           <div className="hidden items-center gap-2 md:flex">
             <Button asChild variant="ghost" size="sm">
@@ -92,11 +96,8 @@ const MarketingNavbar = () => {
             </Button>
           </div>
 
-          {/* Mobile: compact CTA + menu trigger opening a full nav sheet */}
-          <div className="flex items-center gap-2 md:hidden">
-            <Button asChild variant="primary" size="sm">
-              <Link href="/sign-up">Get started</Link>
-            </Button>
+          {/* Mobile: single menu trigger opening a full nav sheet */}
+          <div className="flex items-center md:hidden">
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" aria-label="Open menu">
