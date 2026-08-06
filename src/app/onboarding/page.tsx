@@ -25,6 +25,12 @@ import GlobalLoader from "@/src/components/custom/global-loader";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import {
+  isTransientStatus,
+  shouldRetryTransient,
+  READY_CHECK_RETRY_DELAY,
+} from "@/src/lib/api/retry";
+import PendingInvitationsPanel from "@/src/components/workspace/pending-invitations-panel";
 
 const workspaceSchema = z.object({
   workspaceName: z
@@ -33,19 +39,6 @@ const workspaceSchema = z.object({
 });
 
 type WorkspaceSchema = z.infer<typeof workspaceSchema>;
-
-// Right after OAuth sign-up, Clerk's session exists on the client before
-// our backend has necessarily finished mirroring the user via webhook (see
-// clerkWebHook), and the session cookie itself can lag a beat behind the
-// redirect. So 404 ("account not provisioned yet"), 401 (cookie not yet
-// readable) and network/5xx hiccups are all worth retrying with backoff —
-// but capped, so a genuine failure surfaces instead of spinning forever.
-const READY_CHECK_MAX_RETRIES = 8; // ~ up to ~30s of backoff below
-const READY_CHECK_RETRY_DELAY = (attempt: number) =>
-  Math.min(1000 * 2 ** attempt, 5000);
-
-const isTransientStatus = (status: number | undefined) =>
-  status === undefined || status === 401 || status === 404 || status >= 500;
 
 const PROVISIONING_MESSAGES = [
   "Setting up your account…",
@@ -97,9 +90,7 @@ const Onboarding = () => {
   } = useQuery({
     queryKey: ["checkUserWorkspace"],
     queryFn: checkUserWorkspace,
-    retry: (attempts, err) =>
-      isTransientStatus(getApiErrorStatus(err)) &&
-      attempts < READY_CHECK_MAX_RETRIES,
+    retry: shouldRetryTransient,
     retryDelay: (attempt) => READY_CHECK_RETRY_DELAY(attempt),
   });
 
@@ -148,44 +139,57 @@ const Onboarding = () => {
   // only show the UI if user don't have a workspace yet!
   if (workspaceCheck && !workspaceCheck.hasWorkspace) {
     return (
-      <div className="w-full max-w-md mx-auto mt-20 p-6 rounded-2xl shadow-sm">
-        <h1 className="text-2xl font-semibold text-center mb-2">
-          Welcome to EasyFlow 👋
-        </h1>
-        <p className="text-center mb-8">
-          Let’s set up your workspace to get things running smoothly.
-        </p>
+      <div className="w-full mx-auto mt-20">
+        {/* Failure-proof fallback for the invited-but-unregistered flow: this
+            is looked up by the account's email server-side, so it surfaces
+            here even if the invite link's redirect-back-here chain broke
+            somewhere along the way (storage cleared, link opened in another
+            browser, etc). */}
+        <PendingInvitationsPanel
+          onAccepted={(workspaceSlug) => {
+            if (workspaceSlug) router.push(`/${workspaceSlug}`);
+          }}
+        />
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Workspace Name */}
-            <FormField
-              control={form.control}
-              name="workspaceName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Workspace Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter your workspace name"
-                      {...field}
-                      className="focus-visible:ring-2 focus-visible:ring-blue-500"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <div className="w-full max-w-md mx-auto p-6 rounded-2xl shadow-sm">
+          <h1 className="text-2xl font-semibold text-center mb-2">
+            Welcome to EasyFlow 👋
+          </h1>
+          <p className="text-center mb-8">
+            Let’s set up your workspace to get things running smoothly.
+          </p>
 
-            {/* Submit */}
-            <Button
-              type="submit"
-              className="w-full bg-primary-blue text-white hover:bg-primary-blue cursor-pointer"
-            >
-              {isPending ? <Spinner /> : "Continue"}
-            </Button>
-          </form>
-        </Form>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Workspace Name */}
+              <FormField
+                control={form.control}
+                name="workspaceName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Workspace Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter your workspace name"
+                        {...field}
+                        className="focus-visible:ring-2 focus-visible:ring-blue-500"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Submit */}
+              <Button
+                type="submit"
+                className="w-full bg-primary-blue text-white hover:bg-primary-blue cursor-pointer"
+              >
+                {isPending ? <Spinner /> : "Continue"}
+              </Button>
+            </form>
+          </Form>
+        </div>
       </div>
     );
   }

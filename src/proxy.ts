@@ -5,6 +5,10 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/api/webhooks(.*)",
+  // Public so a logged-out invitee can see the invite preview and choose
+  // sign-up/sign-in without Clerk bouncing them before the page can persist
+  // the invite token for the redirect back here.
+  "/accept-invitation(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

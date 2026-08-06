@@ -22,10 +22,14 @@ import { Spinner } from "@/src/components/shadcn/spinner";
 import { useEffect, useState } from "react";
 import { useAuth, useSignIn, useSignUp } from "@clerk/nextjs";
 import { EmailCodeFactor, OAuthStrategy } from "@clerk/types";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { SignInFirstFactor } from "@clerk/types";
 import Link from "next/link";
 import GlobalLoader from "@/src/components/custom/global-loader";
+import {
+  consumePendingInviteReturn,
+  storePendingInviteReturn,
+} from "@/src/lib/pending-invite";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -42,29 +46,39 @@ export default function SignUp() {
   const [isSendingOTP, setIsSendingOTP] = useState<boolean>(false); // show loader when submitting email for verification
   const [email, setEmail] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { email: "", verificationCode: "" },
   });
 
+  // See sign-up/page.tsx for why this checks both the query param and
+  // sessionStorage — this is how a pending workspace invite survives the
+  // trip through Clerk auth and back.
+  const resolvePostAuthTarget = (fallback: string) =>
+    searchParams.get("redirect_url") || consumePendingInviteReturn() || fallback;
+
   // Already signed in (e.g. another account is active in this browser) —
   // bounce to the home gate instead of showing the sign-in form again.
   useEffect(() => {
     if (authLoaded && isSignedIn) {
-      router.replace("/home");
+      router.replace(resolvePostAuthTarget("/home"));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoaded, isSignedIn, router]);
 
   if (!signUpLoaded || !signInLoaded || !authLoaded) return null;
   if (isSignedIn) return <GlobalLoader />;
 
   const signInWith = (strategy: OAuthStrategy) => {
+    const target = resolvePostAuthTarget("/onboarding");
+    storePendingInviteReturn(target);
     signIn
       .authenticateWithRedirect({
         strategy,
         redirectUrl: "/sign-in/sso-callback",
-        redirectUrlComplete: "/onboarding",
+        redirectUrlComplete: target,
       })
       .catch((err) => {
         console.error("OAuth sign-in error:", err);
@@ -136,7 +150,7 @@ export default function SignUp() {
               return;
             }
 
-            router.push("/home");
+            router.push(resolvePostAuthTarget("/home"));
           },
         });
       } else {

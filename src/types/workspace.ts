@@ -63,7 +63,8 @@
   export interface AcceptInvitationResponse {
     success: boolean;
     message: string;
-    workspaceId?: number; // returned workspace ID if accepted
+    workspaceSlug?: string; // returned workspace slug if accepted, for redirecting
+    alreadyMember?: boolean;
   }
 
   export interface deleteInvitationResponse {

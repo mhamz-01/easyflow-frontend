@@ -22,9 +22,13 @@ import { Spinner } from "@/src/components/shadcn/spinner";
 import { useEffect, useState } from "react";
 import { useAuth, useSignIn, useSignUp } from "@clerk/nextjs";
 import { OAuthStrategy } from "@clerk/types";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import GlobalLoader from "@/src/components/custom/global-loader";
+import {
+  consumePendingInviteReturn,
+  storePendingInviteReturn,
+} from "@/src/lib/pending-invite";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -40,29 +44,43 @@ export default function SignUp() {
   const [isEmailSubmitted, setIsEmailSubmitted] = useState(false);
   const [email, setEmail] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { email: "", verificationCode: "" },
   });
 
+  // A pending invite may arrive as a ?redirect_url= query param (set by the
+  // accept-invitation page before sending the visitor here) or, if that's
+  // been lost along the way, from sessionStorage. Falls back to each flow's
+  // normal default so non-invite sign-ups are unaffected.
+  const resolvePostAuthTarget = (fallback: string) =>
+    searchParams.get("redirect_url") || consumePendingInviteReturn() || fallback;
+
   // Already signed in (e.g. another account is active in this browser) —
   // bounce to the home gate instead of showing the sign-up form again.
   useEffect(() => {
     if (authLoaded && isSignedIn) {
-      router.replace("/home");
+      router.replace(resolvePostAuthTarget("/home"));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoaded, isSignedIn, router]);
 
   if (!signUpLoaded || !signInLoaded || !authLoaded) return null;
   if (isSignedIn) return <GlobalLoader />;
 
   const signInWith = (strategy: OAuthStrategy) => {
+    // OAuth completes on a redirect back into the app, so the target has to
+    // be a static URL computed now rather than read again after the round
+    // trip — persist it too in case the provider strips query params.
+    const target = resolvePostAuthTarget("/onboarding");
+    storePendingInviteReturn(target);
     signIn
       .authenticateWithRedirect({
         strategy,
         redirectUrl: "/sign-in/sso-callback",
-        redirectUrlComplete: "/onboarding",
+        redirectUrlComplete: target,
       })
       .catch((err) => {
         console.error("OAuth sign-in error:", err);
@@ -110,7 +128,7 @@ export default function SignUp() {
               // optionally handle extra tasks here
               return;
             }
-            await router.push("/home");
+            await router.push(resolvePostAuthTarget("/home"));
           },
         });
       } else {
