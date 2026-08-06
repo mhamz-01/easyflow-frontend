@@ -18,7 +18,7 @@ import {
   checkUserWorkspace,
   createWorkspace,
 } from "@/src/lib/api/workspace/services";
-import { getApiErrorStatus } from "@/src/lib/api/client";
+import { getApiErrorMessage, getApiErrorStatus } from "@/src/lib/api/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Spinner } from "@/src/components/shadcn/spinner";
 import GlobalLoader from "@/src/components/custom/global-loader";
@@ -121,8 +121,10 @@ const Onboarding = () => {
           <p className="text-sm text-muted-foreground">
             {stillProvisioning
               ? "This can happen right after signing up. Try again in a moment — if it keeps happening, please contact support."
-              : error?.message ||
-                "Something went wrong while checking your account. Please try again."}
+              : getApiErrorMessage(
+                  error,
+                  "Something went wrong while checking your account. Please try again.",
+                )}
           </p>
           <Button
             variant="outline"
