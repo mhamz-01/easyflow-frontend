@@ -14,10 +14,12 @@ const ChatChannelRail = ({
   workspaceSlug,
   activeProjectId,
   onSelect,
+  className,
 }: {
   workspaceSlug: string | undefined;
   activeProjectId: number | null;
   onSelect: (projectId: number | null) => void;
+  className?: string;
 }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["projects", workspaceSlug],
@@ -28,7 +30,7 @@ const ChatChannelRail = ({
   const projects: sidebarProjectType[] = data?.projects ?? [];
 
   return (
-    <nav className="flex w-56 shrink-0 flex-col gap-0.5 border-r p-2">
+    <nav className={cn("flex w-56 shrink-0 flex-col gap-0.5 border-r p-2", className)}>
       <ChannelRow
         label="General"
         isActive={activeProjectId === null}
