@@ -44,11 +44,16 @@ const MarketingNavbar = () => {
       transition={{ duration: 0.35, ease: [0.21, 0.47, 0.32, 0.98] }}
     >
       <ScrollProgressBar />
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <Link href="/" className="flex items-center gap-2">
+      <div className="mx-auto grid h-16 max-w-6xl grid-cols-[1fr_auto_1fr] items-center px-6">
+        <Link href="/" className="flex items-center gap-2 justify-self-start">
           <Image src={logo} alt="EasyFlow" className="h-7 w-auto" priority />
+          <span className="text-xl font-bold tracking-tight text-foreground">
+            Easy<span className="text-primary-blue">Flow</span>
+          </span>
         </Link>
 
+        {/* True-centered regardless of how wide the logo/buttons blocks are,
+            since the flanking grid columns share the remaining space equally. */}
         <nav className="hidden items-center gap-8 text-sm text-gray-100 md:flex">
           <a href="#showcase" className="transition-colors hover:text-foreground">
             Product
@@ -61,7 +66,7 @@ const MarketingNavbar = () => {
           </a>
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-self-end gap-2">
           <Button asChild variant="ghost" size="sm">
             <Link href="/sign-in">Sign in</Link>
           </Button>
