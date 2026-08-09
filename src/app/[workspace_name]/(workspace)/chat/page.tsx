@@ -15,7 +15,7 @@ import {
   SheetTitle,
 } from "@/src/components/shadcn/sheet";
 import { useWorkspaceStore } from "@/src/store/workspace";
-import { useChatUnreadStore, hasWorkspaceUnread } from "@/src/store/chatUnread";
+import { useChatUnread, useMarkChannelRead, hasAnyUnread } from "@/src/hooks/use-chat-unread";
 import { useChatMessages, useChatRealtime } from "@/src/hooks/chat";
 import { getProjectsByWorkspaceSlug } from "@/src/lib/api/project/services";
 import type { sidebarProjectType } from "@/src/types/project";
@@ -81,22 +81,30 @@ export default function ChatPage() {
 
   useChatRealtime(workspaceId, projectId);
 
-  const setActiveChannel = useChatUnreadStore((s) => s.setActiveChannel);
-  const clearActiveChannel = useChatUnreadStore((s) => s.clearActiveChannel);
-  useEffect(() => {
-    if (!workspaceId) return;
-    setActiveChannel(workspaceId, projectId);
-    return () => clearActiveChannel();
-  }, [workspaceId, projectId, setActiveChannel, clearActiveChannel]);
-
-  const anyChannelUnread = useChatUnreadStore((s) =>
-    workspaceId ? hasWorkspaceUnread(s.unread, workspaceId) : false,
-  );
-
   const messages = useMemo(
     () => data?.pages.flatMap((page) => page.messages) ?? [],
     [data],
   );
+
+  // Advance this channel's read cursor whenever it's the one on-screen and
+  // its latest real (non-optimistic) message changes — covers both "just
+  // opened this channel" and "a new message streamed in while I'm already
+  // looking at it." lastRealMessage stays undefined while the only entry
+  // is still a pending optimistic echo (negative temp id), so we don't
+  // mark-read against an id the server doesn't know yet.
+  const { data: unreadChannels } = useChatUnread(workspaceId);
+  const anyChannelUnread = hasAnyUnread(unreadChannels);
+  const markChannelRead = useMarkChannelRead(workspaceId);
+  const lastRealMessageId = [...messages].reverse().find((m) => !m.pending && m.id > 0)?.id;
+
+  useEffect(() => {
+    if (!workspaceId || lastRealMessageId === undefined) return;
+    markChannelRead.mutate({
+      projectId: projectId ?? undefined,
+      lastMessageId: lastRealMessageId,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workspaceId, projectId, lastRealMessageId]);
 
   return (
     <div className="flex h-svh flex-col">
@@ -114,7 +122,7 @@ export default function ChatPage() {
           <Hash className="size-3.5" />
           <span className="max-w-24 truncate">{activeChannelLabel}</span>
           {anyChannelUnread && (
-            <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-primary-blue" />
+            <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-destructive" />
           )}
         </Button>
       </div>

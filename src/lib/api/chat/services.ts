@@ -5,6 +5,7 @@ import type {
   ChatAttachment,
   ChatMessage,
   ChatMessagesPage,
+  ChatUnreadChannel,
 } from "@/src/types/chat";
 
 export const chatService = {
@@ -50,6 +51,33 @@ export const chatService = {
     const response = await api.delete<ApiResponse<{ id: number; projectId: number | null }>>(
       `/chat/messages/${messageId}`,
     );
+    return response.data.data;
+  },
+
+  /**
+   * Unread status for every channel the current user can see in this
+   * workspace (General + each accessible project), one call for the whole
+   * sidebar + channel rail.
+   */
+  getUnread: async (): Promise<ChatUnreadChannel[]> => {
+    const response = await api.get<ApiResponse<{ channels: ChatUnreadChannel[] }>>(
+      "/chat/unread",
+    );
+    return response.data.data.channels;
+  },
+
+  /**
+   * Advance the read cursor for a channel — omit projectId for General.
+   * lastMessageId is the highest message id already loaded client-side;
+   * omit it to let the server resolve the channel's true latest instead.
+   */
+  markRead: async (payload: {
+    projectId?: number;
+    lastMessageId?: number;
+  }): Promise<{ projectId: number | null; lastReadMessageId: number | null }> => {
+    const response = await api.post<
+      ApiResponse<{ projectId: number | null; lastReadMessageId: number | null }>
+    >("/chat/read", payload);
     return response.data.data;
   },
 };

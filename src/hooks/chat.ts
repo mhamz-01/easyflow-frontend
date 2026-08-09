@@ -7,7 +7,7 @@ import {
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { chatService } from "../lib/api/chat/services";
-import { getSupabaseClient } from "../lib/realtime/supabaseClient";
+import { subscribeToChatTopic } from "../lib/realtime/chatChannelRegistry";
 import type { ChatAttachment, ChatMessage, ChatMessagesPage } from "@/src/types/chat";
 
 type ChatCache = { pages: ChatMessagesPage[]; pageParams: unknown[] };
@@ -212,14 +212,12 @@ export const useChatRealtime = (
   useEffect(() => {
     if (!workspaceId || projectId === undefined) return;
 
-    const supabase = getSupabaseClient();
     const topic = `workspace-chat:${workspaceId}:${projectId ?? "general"}`;
-    const channel = supabase.channel(topic, {
-      config: { private: true },
-    });
 
-    channel
-      .on("broadcast", { event: "chat_message" }, ({ payload }) => {
+    const unsubscribeMessage = subscribeToChatTopic(
+      topic,
+      "chat_message",
+      (payload) => {
         const message = payload as ChatMessage;
         const key = chatKeys.messages(workspaceId, projectId);
 
@@ -261,8 +259,21 @@ export const useChatRealtime = (
           };
           return { ...data, pages: newPages };
         });
-      })
-      .on("broadcast", { event: "chat_message_deleted" }, ({ payload }) => {
+      },
+      (status) => {
+        if (status === "CHANNEL_ERROR") {
+          // Connection dropped — refetch to catch up on anything missed.
+          queryClient.invalidateQueries({
+            queryKey: chatKeys.messages(workspaceId, projectId),
+          });
+        }
+      },
+    );
+
+    const unsubscribeDeleted = subscribeToChatTopic(
+      topic,
+      "chat_message_deleted",
+      (payload) => {
         const { id } = payload as { id: number };
         const key = chatKeys.messages(workspaceId, projectId);
 
@@ -276,18 +287,12 @@ export const useChatRealtime = (
             })),
           };
         });
-      })
-      .subscribe((status) => {
-        if (status === "CHANNEL_ERROR") {
-          // Connection dropped — refetch to catch up on anything missed.
-          queryClient.invalidateQueries({
-            queryKey: chatKeys.messages(workspaceId, projectId),
-          });
-        }
-      });
+      },
+    );
 
     return () => {
-      supabase.removeChannel(channel);
+      unsubscribeMessage();
+      unsubscribeDeleted();
     };
   }, [workspaceId, projectId, queryClient]);
 };

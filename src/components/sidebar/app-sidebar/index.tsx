@@ -22,8 +22,7 @@ import WorkspaceDrodownMenu from "../../modals/workspace-dropdown-menu";
 import UserAccountMenu from "../../modals/user-account-menu";
 import ComingSoonModal from "../../modals/coming-soon-modal";
 import { useWorkspaceStore } from "@/src/store/workspace";
-import { useChatUnreadStore, hasWorkspaceUnread } from "@/src/store/chatUnread";
-import { useChatUnreadSync } from "@/src/hooks/use-chat-unread-sync";
+import { useChatUnread, hasAnyUnread } from "@/src/hooks/use-chat-unread";
 
 // main menu items
 const mainItems = [
@@ -51,10 +50,8 @@ export function AppSidebar() {
   const workspace = useWorkspaceStore((state) => state.workspace);
   const [comingSoonOpen, setComingSoonOpen] = useState(false);
 
-  useChatUnreadSync(workspace?.id, workspace?.workspaceSlug);
-  const chatUnread = useChatUnreadStore((s) =>
-    workspace ? hasWorkspaceUnread(s.unread, workspace.id) : false,
-  );
+  const { data: unreadChannels } = useChatUnread(workspace?.id);
+  const chatUnread = hasAnyUnread(unreadChannels);
 
   return (
     <Sidebar>
@@ -93,7 +90,7 @@ export function AppSidebar() {
                     {item.title === "Chat" && chatUnread && (
                       <span
                         aria-label="Unread messages"
-                        className="absolute top-1/2 right-2 size-2 -translate-y-1/2 rounded-full bg-primary-blue"
+                        className="absolute top-1/2 right-2 size-2 -translate-y-1/2 rounded-full bg-destructive"
                       />
                     )}
                   </SidebarMenuItem>

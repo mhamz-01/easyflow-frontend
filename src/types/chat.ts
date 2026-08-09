@@ -44,6 +44,13 @@ export interface ChatMessagesPage {
   };
 }
 
+// One entry per channel the requesting user can see (General + every
+// project they have access to) — projectId null = General.
+export interface ChatUnreadChannel {
+  projectId: number | null;
+  unread: boolean;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   message: string;

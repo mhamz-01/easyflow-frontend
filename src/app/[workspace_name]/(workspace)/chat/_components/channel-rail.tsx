@@ -4,7 +4,7 @@ import { Hash, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/src/lib/utils";
 import { getProjectsByWorkspaceSlug } from "@/src/lib/api/project/services";
-import { useChatUnreadStore, isChannelUnread } from "@/src/store/chatUnread";
+import { useChatUnread, isChannelUnread } from "@/src/hooks/use-chat-unread";
 import type { sidebarProjectType } from "@/src/types/project";
 
 // Reuses  same ["projects", workspaceSlug] cache entry  sidebar's own
@@ -29,7 +29,7 @@ const ChatChannelRail = ({
     queryFn: () => getProjectsByWorkspaceSlug(workspaceSlug!),
     enabled: Boolean(workspaceSlug),
   });
-  const unread = useChatUnreadStore((s) => s.unread);
+  const { data: unreadChannels } = useChatUnread(workspaceId);
 
   const projects: sidebarProjectType[] = data?.projects ?? [];
 
@@ -38,7 +38,7 @@ const ChatChannelRail = ({
       <ChannelRow
         label="General"
         isActive={activeProjectId === null}
-        isUnread={!!workspaceId && isChannelUnread(unread, workspaceId, null)}
+        isUnread={isChannelUnread(unreadChannels, null)}
         onClick={() => onSelect(null)}
       />
 
@@ -54,7 +54,7 @@ const ChatChannelRail = ({
             key={project.id}
             label={project.name}
             isActive={activeProjectId === project.id}
-            isUnread={!!workspaceId && isChannelUnread(unread, workspaceId, project.id)}
+            isUnread={isChannelUnread(unreadChannels, project.id)}
             onClick={() => onSelect(project.id)}
           />
         ))
@@ -86,7 +86,7 @@ const ChannelRow = ({
     <span className={cn("truncate flex-1", isUnread && !isActive && "font-semibold")}>
       {label}
     </span>
-    {isUnread && !isActive && <span className="size-1.5 shrink-0 rounded-full bg-primary-blue" />}
+    {isUnread && !isActive && <span className="size-1.5 shrink-0 rounded-full bg-destructive" />}
   </button>
 );
 
