@@ -155,6 +155,52 @@ export const useSendMessage = (
   });
 };
 
+// ─── Delete ───────────────────────────────────────────────────────────────────
+// Optimistic: the message disappears from the cache immediately; restored on
+// error. Other tabs/members learn about the deletion via the realtime
+// "chat_message_deleted" broadcast handled in useChatRealtime below — this
+// mutation only needs to update the deleter's own cache.
+
+export const useDeleteMessage = (
+  workspaceId: number | null | undefined,
+  projectId: number | null | undefined,
+) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (messageId: number) => chatService.deleteMessage(messageId),
+
+    onMutate: async (messageId: number) => {
+      if (!workspaceId || projectId === undefined) return undefined;
+
+      const key = chatKeys.messages(workspaceId, projectId);
+      await queryClient.cancelQueries({ queryKey: key });
+
+      const previous = queryClient.getQueryData<ChatCache>(key);
+
+      queryClient.setQueryData<ChatCache>(key, (data) => {
+        if (!data) return data;
+        return {
+          ...data,
+          pages: data.pages.map((page) => ({
+            ...page,
+            messages: page.messages.filter((m) => m.id !== messageId),
+          })),
+        };
+      });
+
+      return { previous, key };
+    },
+
+    onError: (_err, _messageId, context) => {
+      if (context?.key) {
+        queryClient.setQueryData(context.key, context.previous);
+      }
+      toast.error("Couldn't delete message. Please try again.");
+    },
+  });
+};
+
 // ─── Live updates ─────────────────────────────────────────────────────────────
 
 export const useChatRealtime = (
@@ -214,6 +260,21 @@ export const useChatRealtime = (
             messages: [...lastPage.messages, message],
           };
           return { ...data, pages: newPages };
+        });
+      })
+      .on("broadcast", { event: "chat_message_deleted" }, ({ payload }) => {
+        const { id } = payload as { id: number };
+        const key = chatKeys.messages(workspaceId, projectId);
+
+        queryClient.setQueryData<ChatCache>(key, (data) => {
+          if (!data) return data;
+          return {
+            ...data,
+            pages: data.pages.map((page) => ({
+              ...page,
+              messages: page.messages.filter((m) => m.id !== id),
+            })),
+          };
         });
       })
       .subscribe((status) => {

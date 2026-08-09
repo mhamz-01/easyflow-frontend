@@ -41,4 +41,15 @@ export const chatService = {
     );
     return response.data.data;
   },
+
+  /**
+   * Soft-delete a message you authored. Server enforces ownership — a 403
+   * comes back if it isn't yours.
+   */
+  deleteMessage: async (messageId: number): Promise<{ id: number; projectId: number | null }> => {
+    const response = await api.delete<ApiResponse<{ id: number; projectId: number | null }>>(
+      `/chat/messages/${messageId}`,
+    );
+    return response.data.data;
+  },
 };

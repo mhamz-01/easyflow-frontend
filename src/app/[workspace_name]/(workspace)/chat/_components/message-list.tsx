@@ -19,12 +19,16 @@ const ChatMessageList = ({
   hasMore,
   isFetchingMore,
   onLoadMore,
+  workspaceId,
+  projectId,
 }: {
   messages: ChatMessage[];
   currentUserEmail: string | undefined;
   hasMore: boolean;
   isFetchingMore: boolean;
   onLoadMore: () => void;
+  workspaceId: number | null | undefined;
+  projectId: number | null;
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const wasNearBottom = useRef(true);
@@ -91,6 +95,8 @@ const ChatMessageList = ({
           key={message.id}
           message={message}
           isOwn={message.author.email === currentUserEmail}
+          workspaceId={workspaceId}
+          projectId={projectId}
         />
       ))}
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Paperclip, SendHorizontal, X } from "lucide-react";
+import { SendHorizontal, X } from "lucide-react";
 import { Button } from "@/src/components/shadcn/button";
 import { Textarea } from "@/src/components/shadcn/textarea";
 import { useSendMessage } from "@/src/hooks/chat";
@@ -27,7 +27,6 @@ const ChatComposer = ({
   const workspaceSlug = useWorkspaceStore((s) => s.workspace?.workspaceSlug);
   const [value, setValue] = useState("");
   const [attachment, setAttachment] = useState<ChatAttachment | null>(null);
-  const [pickerOpen, setPickerOpen] = useState(false);
   const sendMessage = useSendMessage(workspaceId, projectId);
 
   const handleSend = () => {
@@ -60,15 +59,14 @@ const ChatComposer = ({
       )}
 
       <div className="flex items-end gap-2">
-        <Button
-          size="icon"
-          variant="outline"
-          onClick={() => setPickerOpen(true)}
-          disabled={!workspaceId}
-          aria-label="Attach a task, document, or whiteboard"
-        >
-          <Paperclip />
-        </Button>
+        {workspaceId && (
+          <AttachmentPicker
+            workspaceId={workspaceId}
+            workspaceSlug={workspaceSlug}
+            projectId={projectId}
+            onPick={setAttachment}
+          />
+        )}
 
         <Textarea
           value={value}
@@ -93,17 +91,6 @@ const ChatComposer = ({
           <SendHorizontal />
         </Button>
       </div>
-
-      {workspaceId && (
-        <AttachmentPicker
-          open={pickerOpen}
-          onOpenChange={setPickerOpen}
-          workspaceId={workspaceId}
-          workspaceSlug={workspaceSlug}
-          projectId={projectId}
-          onPick={setAttachment}
-        />
-      )}
     </div>
   );
 };

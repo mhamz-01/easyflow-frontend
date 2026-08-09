@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
@@ -15,6 +15,7 @@ import {
   SheetTitle,
 } from "@/src/components/shadcn/sheet";
 import { useWorkspaceStore } from "@/src/store/workspace";
+import { useChatUnreadStore, hasWorkspaceUnread } from "@/src/store/chatUnread";
 import { useChatMessages, useChatRealtime } from "@/src/hooks/chat";
 import { getProjectsByWorkspaceSlug } from "@/src/lib/api/project/services";
 import type { sidebarProjectType } from "@/src/types/project";
@@ -80,6 +81,18 @@ export default function ChatPage() {
 
   useChatRealtime(workspaceId, projectId);
 
+  const setActiveChannel = useChatUnreadStore((s) => s.setActiveChannel);
+  const clearActiveChannel = useChatUnreadStore((s) => s.clearActiveChannel);
+  useEffect(() => {
+    if (!workspaceId) return;
+    setActiveChannel(workspaceId, projectId);
+    return () => clearActiveChannel();
+  }, [workspaceId, projectId, setActiveChannel, clearActiveChannel]);
+
+  const anyChannelUnread = useChatUnreadStore((s) =>
+    workspaceId ? hasWorkspaceUnread(s.unread, workspaceId) : false,
+  );
+
   const messages = useMemo(
     () => data?.pages.flatMap((page) => page.messages) ?? [],
     [data],
@@ -95,16 +108,20 @@ export default function ChatPage() {
         <Button
           variant="outline"
           size="sm"
-          className="shrink-0 md:hidden"
+          className="relative shrink-0 md:hidden"
           onClick={() => setIsRailOpen(true)}
         >
           <Hash className="size-3.5" />
           <span className="max-w-24 truncate">{activeChannelLabel}</span>
+          {anyChannelUnread && (
+            <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-primary-blue" />
+          )}
         </Button>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
         <ChatChannelRail
+          workspaceId={workspaceId}
           workspaceSlug={workspaceSlug}
           activeProjectId={projectId}
           onSelect={setChannel}
@@ -117,6 +134,7 @@ export default function ChatPage() {
               <SheetTitle>Channels</SheetTitle>
             </SheetHeader>
             <ChatChannelRail
+              workspaceId={workspaceId}
               workspaceSlug={workspaceSlug}
               activeProjectId={projectId}
               onSelect={(nextProjectId) => {
@@ -146,6 +164,8 @@ export default function ChatPage() {
               hasMore={!!hasNextPage}
               isFetchingMore={isFetchingNextPage}
               onLoadMore={() => fetchNextPage()}
+              workspaceId={workspaceId}
+              projectId={projectId}
             />
           )}
 

@@ -22,6 +22,18 @@ export const taskService = {
   },
 
   /**
+   * Get task by ID with an explicit project id — for contexts (like chat,
+   * whose URL has no project segment) where getCurrentProjectId() can't
+   * resolve the project from window.location.
+   */
+  getTaskByProjectId: async (projectId: number, taskId: number): Promise<Task> => {
+    const response = await api.get<ApiResponse<Task>>(
+      `/projects/${projectId}/tasks/${taskId}`,
+    );
+    return response.data.data;
+  },
+
+  /**
    * Get tasks
    */
   getTasksByProject: async (

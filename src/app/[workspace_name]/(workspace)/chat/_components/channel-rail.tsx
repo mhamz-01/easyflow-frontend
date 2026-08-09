@@ -4,6 +4,7 @@ import { Hash, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/src/lib/utils";
 import { getProjectsByWorkspaceSlug } from "@/src/lib/api/project/services";
+import { useChatUnreadStore, isChannelUnread } from "@/src/store/chatUnread";
 import type { sidebarProjectType } from "@/src/types/project";
 
 // Reuses  same ["projects", workspaceSlug] cache entry  sidebar's own
@@ -11,11 +12,13 @@ import type { sidebarProjectType } from "@/src/types/project";
 // server-side (getProjectsForSidebar) so this list  already correctly
 // filtered per user.
 const ChatChannelRail = ({
+  workspaceId,
   workspaceSlug,
   activeProjectId,
   onSelect,
   className,
 }: {
+  workspaceId: number | null | undefined;
   workspaceSlug: string | undefined;
   activeProjectId: number | null;
   onSelect: (projectId: number | null) => void;
@@ -26,6 +29,7 @@ const ChatChannelRail = ({
     queryFn: () => getProjectsByWorkspaceSlug(workspaceSlug!),
     enabled: Boolean(workspaceSlug),
   });
+  const unread = useChatUnreadStore((s) => s.unread);
 
   const projects: sidebarProjectType[] = data?.projects ?? [];
 
@@ -34,6 +38,7 @@ const ChatChannelRail = ({
       <ChannelRow
         label="General"
         isActive={activeProjectId === null}
+        isUnread={!!workspaceId && isChannelUnread(unread, workspaceId, null)}
         onClick={() => onSelect(null)}
       />
 
@@ -49,6 +54,7 @@ const ChatChannelRail = ({
             key={project.id}
             label={project.name}
             isActive={activeProjectId === project.id}
+            isUnread={!!workspaceId && isChannelUnread(unread, workspaceId, project.id)}
             onClick={() => onSelect(project.id)}
           />
         ))
@@ -60,10 +66,12 @@ const ChatChannelRail = ({
 const ChannelRow = ({
   label,
   isActive,
+  isUnread,
   onClick,
 }: {
   label: string;
   isActive: boolean;
+  isUnread: boolean;
   onClick: () => void;
 }) => (
   <button
@@ -75,7 +83,10 @@ const ChannelRow = ({
     )}
   >
     <Hash className="size-3.5 shrink-0" />
-    <span className="truncate">{label}</span>
+    <span className={cn("truncate flex-1", isUnread && !isActive && "font-semibold")}>
+      {label}
+    </span>
+    {isUnread && !isActive && <span className="size-1.5 shrink-0 rounded-full bg-primary-blue" />}
   </button>
 );
 
