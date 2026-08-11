@@ -15,12 +15,15 @@ import { useProjectStore } from "@/src/store/useProjectStore";
 import { useAuth } from "@clerk/nextjs";
 import { createDoc } from "@/src/lib/api/documents/services";
 import { Spinner } from "../../../../../components/shadcn/spinner";
-import { Ellipsis, Maximize, Users, X, ArrowLeft, Plus } from "lucide-react";
+import { Ellipsis, Maximize, Users, X, ArrowLeft, Plus, ShieldCheck } from "lucide-react";
 import { createdDocResponse, docsListResponse } from "@/src/types/documents";
 import ShareDocModal from "@/src/components/modals/share-doc-modal";
+import ManageDocAccessModal from "@/src/components/modals/manage-doc-access-modal";
 import { useQuery } from "@tanstack/react-query";
 import { getSingleDoc } from "@/src/lib/api/documents/services";
+import { docsKeys } from "@/src/lib/api/documents/keys";
 import { trackActivity } from "@/src/lib/api/recent-activities/track";
+import { useCurrentWorkspaceRole } from "@/src/lib/api/workspace/members/hooks";
 
 export function DocsHeader() {
   const { open } = useSidebar();
@@ -33,13 +36,13 @@ export function DocsHeader() {
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isAccessOpen, setIsAccessOpen] = useState(false);
 const docId = params?.id ? Number(params.id) : null;
 
-
-
+const { isAdminOrOwner } = useCurrentWorkspaceRole(workspace?.id);
 
 const { data: docData } = useQuery({
-  queryKey: ["doc", docId],
+  queryKey: docsKeys.single(docId!),
   queryFn: () => getSingleDoc(docId!),
   enabled: !!docId,
 });
@@ -74,6 +77,7 @@ const mutationDocs = useMutation({
             documentName: data.createdDoc.documentName,
             assignees: data.createdDoc.assignees,
             isPrivate: data.createdDoc.isPrivate,
+            defaultAccess: data.createdDoc.defaultAccess,
           },
           ...(oldData.docs || []),
         ],
@@ -82,14 +86,19 @@ const mutationDocs = useMutation({
   },
 });
 
-  const handleCreate = (name: string, isPrivate:boolean) => {
+  const handleCreate = (
+    name: string,
+    isPrivate: boolean,
+    defaultAccess?: "view" | "edit",
+  ) => {
     if (workspace?.id && project?.id && userId) {
       mutationDocs.mutate({
         workspaceId: workspace.id,
         projectId: project.id,
         createdBy: userId,
-        documentName: name, 
-        isPrivate, 
+        documentName: name,
+        isPrivate,
+        defaultAccess,
       });
     }
   };
@@ -136,6 +145,7 @@ const mutationDocs = useMutation({
     buttonText="Create Document"
     isPending={mutationDocs.isPending}
     onSubmit={handleCreate}
+    showDefaultAccessOption
   />
 </Dialog>
         </div>
@@ -199,6 +209,30 @@ const mutationDocs = useMutation({
     />
   )}
 </Dialog>
+          {isAdminOrOwner && docId && docData?.document.isPrivate === false && (
+            <>
+              <span className="max-sm:hidden h-3.5 w-px bg-border" />
+              <button
+                onClick={() => setIsAccessOpen(true)}
+                className="max-sm:hidden hover:text-foreground transition-colors flex items-center gap-1"
+                title="Manage Access"
+              >
+                <ShieldCheck size={14} />
+                <span className="text-xs font-medium">Access</span>
+              </button>
+              {isAccessOpen && (
+                <ManageDocAccessModal
+                  open={isAccessOpen}
+                  onOpenChange={setIsAccessOpen}
+                  docId={docId}
+                  documentName={docData?.document.documentName ?? ""}
+                  defaultAccess={docData?.document.defaultAccess ?? "edit"}
+                  canEditDefaultAccess
+                  createdBy={docData?.document.createdBy ?? -1}
+                />
+              )}
+            </>
+          )}
           <span className="h-3.5 w-px bg-border" />
           <button className="hover:text-foreground transition-colors" title="More options">
             <Ellipsis size={15} />
@@ -245,6 +279,7 @@ const mutationDocs = useMutation({
     buttonText="Create Document"
     isPending={mutationDocs.isPending}
     onSubmit={handleCreate}
+    showDefaultAccessOption
   />
 </Dialog>
       </div>

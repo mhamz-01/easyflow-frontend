@@ -9,6 +9,7 @@ export type Doc = {
   id: number;
   documentName: string;
   isPrivate: boolean;
+  defaultAccess: "view" | "edit";
   createdBy: number;
   creator?: DocAssignee;
   createdDate: string;
@@ -31,6 +32,7 @@ export type singleDoc = {
   createdDate: Date;
   content: null | contentTab[];
   isPrivate: boolean;
+  defaultAccess: "view" | "edit";
   projectId: number;
   workspaceId: number;
   updatedAt: Date;
@@ -38,7 +40,37 @@ export type singleDoc = {
 
 };
 
+// Effective access level the requesting user has on this document —
+// always "edit" for private docs (untouched by this feature).
+export type DocAccessLevel = "view" | "edit";
+
 export type singleDocResponse = {
+  success: boolean;
+  document: singleDoc;
+  access: DocAccessLevel;
+};
+
+// A per-user access override on a public document, as returned by
+// GET /docs/:id/access.
+export type DocAccessEntry = {
+  id: number;
+  userId: number;
+  accessLevel: "view" | "edit" | "none";
+  grantedBy: number | null;
+  user?: DocAssignee;
+};
+
+export type docAccessListResponse = {
+  success: boolean;
+  grants: DocAccessEntry[];
+};
+
+export type grantDocAccessResponse = {
+  success: boolean;
+  grant: DocAccessEntry;
+};
+
+export type setDefaultAccessResponse = {
   success: boolean;
   document: singleDoc;
 };

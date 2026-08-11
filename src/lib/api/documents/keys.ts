@@ -4,4 +4,6 @@ export const docsKeys = {
     workspaceId,
     projectId,
   ],
+  single: (id: number) => ["doc", id],
+  access: (id: number) => ["doc", id, "access"],
 };

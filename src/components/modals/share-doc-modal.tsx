@@ -11,8 +11,8 @@ import { Checkbox } from "@/src/components/shadcn/checkbox";
 import { Label } from "@/src/components/shadcn/label";
 import { Spinner } from "../shadcn/spinner";
 import { useWorkspaceStore } from "@/src/store/workspace";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getWorkspaceMembers } from "@/src/lib/api/workspace/members/services";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useWorkspaceMembers } from "@/src/lib/api/workspace/members/hooks";
 import { assignDoc } from "@/src/lib/api/documents/services";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -35,11 +35,7 @@ const ShareDocModal = ({
   const queryClient = useQueryClient();
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
-  const { data: membersData, isLoading } = useQuery({
-    queryKey: ["workspaceMembers", workspaceId],
-    queryFn: () => getWorkspaceMembers({ workspaceId: workspaceId! }),
-    enabled: !!workspaceId,
-  });
+  const { data: membersData, isLoading } = useWorkspaceMembers(workspaceId);
 
   const { mutate, isPending } = useMutation({
     mutationFn: () => assignDoc({ docId, memberIds: selectedIds }),

@@ -39,6 +39,7 @@
     role: string;
     User: {
       id: number;
+      clerkId?: string;
       imageUrl?: string;
       createdAt: string;
       email: string;

@@ -35,6 +35,7 @@ const DocsListingEmptyState = () => {
               documentName: data.createdDoc.documentName,
               assignees: data.createdDoc.assignees,
               isPrivate: data.createdDoc.isPrivate, // ✅
+              defaultAccess: data.createdDoc.defaultAccess,
             },
             ...(oldData.docs || []),
           ],
@@ -43,7 +44,11 @@ const DocsListingEmptyState = () => {
     },
   });
 
-  const handleCreate = (name: string, isPrivate: boolean) => {
+  const handleCreate = (
+    name: string,
+    isPrivate: boolean,
+    defaultAccess?: "view" | "edit",
+  ) => {
     if (workspaceId && projectId && userId) {
       mutation.mutate({
         workspaceId,
@@ -51,6 +56,7 @@ const DocsListingEmptyState = () => {
         createdBy: userId,
         documentName: name,    // ✅
         isPrivate,             // ✅
+        defaultAccess,
       });
     }
   };
@@ -73,6 +79,7 @@ const DocsListingEmptyState = () => {
           buttonText="Create Document"
           isPending={mutation.isPending}
           onSubmit={handleCreate}
+          showDefaultAccessOption
         />
       </Dialog>
     </div>

@@ -2,6 +2,7 @@
 
 import { Button } from "@/src/components/shadcn/button";
 import { getSingleDoc } from "@/src/lib/api/documents/services";
+import { docsKeys } from "@/src/lib/api/documents/keys";
 import { useDocumentStore } from "@/src/store/useDocumentStore";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, RefreshCw } from "lucide-react";
@@ -16,7 +17,7 @@ const Page = () => {
   // const router = useRouter();
   const setDocument = useDocumentStore((s) => s.setDocument);
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["doc", params.id],
+    queryKey: docsKeys.single(Number(params.id)),
     queryFn: () => getSingleDoc(Number(params.id)),
     enabled: !!params.id,
   });

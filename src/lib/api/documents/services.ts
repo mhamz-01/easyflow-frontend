@@ -4,6 +4,10 @@
     singleDocResponse,
     singleDoc,
     createdDocResponse,
+    docAccessListResponse,
+    grantDocAccessResponse,
+    setDefaultAccessResponse,
+    DocAccessLevel,
   } from "@/src/types/documents";
   import { api } from "../client";
 
@@ -36,19 +40,22 @@
     createdBy,
     documentName,
     isPrivate,
+    defaultAccess,
   }: {
     workspaceId: number;
     projectId: number;
     createdBy: string;
     documentName: string; // new for name
     isPrivate: boolean;
+    defaultAccess?: DocAccessLevel;
   }) => {
     const response = await api.post("/docs/create", {
       workspaceId,
       projectId,
       createdBy,
       documentName, // new for name
-      isPrivate
+      isPrivate,
+      defaultAccess,
     });
     return response.data as createdDocResponse;
   };
@@ -86,5 +93,53 @@
   }) => {
     const response = await api.post("/docs/assign", { docId, memberIds });
     return response.data as { success: boolean; assignees: number[] };
+  };
+
+  // Access-control management — public documents only.
+  // See GET/POST /docs/:id/access, DELETE /docs/:id/access/:userId,
+  // PATCH /docs/:id/default-access on the backend.
+  export const getDocAccessList = async (docId: number) => {
+    const response = await api.get(`/docs/${docId}/access`);
+    return response.data as docAccessListResponse;
+  };
+
+  export const grantDocAccess = async ({
+    docId,
+    userId,
+    accessLevel,
+  }: {
+    docId: number;
+    userId: number;
+    accessLevel: "view" | "edit" | "none";
+  }) => {
+    const response = await api.post(`/docs/${docId}/access`, {
+      userId,
+      accessLevel,
+    });
+    return response.data as grantDocAccessResponse;
+  };
+
+  export const revokeDocAccess = async ({
+    docId,
+    userId,
+  }: {
+    docId: number;
+    userId: number;
+  }) => {
+    const response = await api.delete(`/docs/${docId}/access/${userId}`);
+    return response.data as { success: boolean };
+  };
+
+  export const setDefaultAccess = async ({
+    docId,
+    defaultAccess,
+  }: {
+    docId: number;
+    defaultAccess: DocAccessLevel;
+  }) => {
+    const response = await api.patch(`/docs/${docId}/default-access`, {
+      defaultAccess,
+    });
+    return response.data as setDefaultAccessResponse;
   };
 
