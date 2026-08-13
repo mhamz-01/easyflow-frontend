@@ -1,7 +1,16 @@
 // lib/api/whiteboards/services.ts
 
 
-import { whiteboardsListResponse,singleWhiteboardResponse,createdWhiteboardResponse,singleWhiteboard } from "@/src/types/whiteboard";
+import {
+  whiteboardsListResponse,
+  singleWhiteboardResponse,
+  createdWhiteboardResponse,
+  singleWhiteboard,
+  whiteboardAccessListResponse,
+  grantWhiteboardAccessResponse,
+  setWhiteboardDefaultAccessResponse,
+  WhiteboardAccessLevel,
+} from "@/src/types/whiteboard";
 import { api } from "../client";
 
 // Get Methods
@@ -31,20 +40,23 @@ export const createWhiteboard = async ({
   projectId,
   createdBy,
   whiteboardName,
-  isPrivate
+  isPrivate,
+  defaultAccess,
 }: {
   workspaceId: number;
   projectId: number;
   createdBy: string;
   whiteboardName:string;
   isPrivate: boolean;
+  defaultAccess?: WhiteboardAccessLevel;
 }) => {
   const response = await api.post("/whiteboards/create", {
     workspaceId,
     projectId,
     createdBy,
     whiteboardName,
-    isPrivate
+    isPrivate,
+    defaultAccess,
   });
   return response.data as createdWhiteboardResponse;
 };
@@ -80,4 +92,52 @@ export const assignWhiteboard = async ({
 }) => {
   const response = await api.post("/whiteboards/assign", { whiteboardId, memberIds });
   return response.data as { success: boolean; assignees: number[] };
+};
+
+// Access-control management — public whiteboards only.
+// See GET/POST /whiteboards/:id/access, DELETE /whiteboards/:id/access/:userId,
+// PATCH /whiteboards/:id/default-access on the backend.
+export const getWhiteboardAccessList = async (whiteboardId: number) => {
+  const response = await api.get(`/whiteboards/${whiteboardId}/access`);
+  return response.data as whiteboardAccessListResponse;
+};
+
+export const grantWhiteboardAccess = async ({
+  whiteboardId,
+  userId,
+  accessLevel,
+}: {
+  whiteboardId: number;
+  userId: number;
+  accessLevel: "view" | "edit" | "none";
+}) => {
+  const response = await api.post(`/whiteboards/${whiteboardId}/access`, {
+    userId,
+    accessLevel,
+  });
+  return response.data as grantWhiteboardAccessResponse;
+};
+
+export const revokeWhiteboardAccess = async ({
+  whiteboardId,
+  userId,
+}: {
+  whiteboardId: number;
+  userId: number;
+}) => {
+  const response = await api.delete(`/whiteboards/${whiteboardId}/access/${userId}`);
+  return response.data as { success: boolean };
+};
+
+export const setWhiteboardDefaultAccess = async ({
+  whiteboardId,
+  defaultAccess,
+}: {
+  whiteboardId: number;
+  defaultAccess: WhiteboardAccessLevel;
+}) => {
+  const response = await api.patch(`/whiteboards/${whiteboardId}/default-access`, {
+    defaultAccess,
+  });
+  return response.data as setWhiteboardDefaultAccessResponse;
 };

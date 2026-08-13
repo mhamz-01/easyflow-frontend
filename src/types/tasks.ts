@@ -43,6 +43,7 @@ export interface TaskViewList {
   dueDate: string;
   priority: string;
   state: string;
+  isPrivate: boolean;
 }
 export interface Task {
   id: number;
@@ -64,10 +65,11 @@ export interface Task {
   workspace: Workspace;
   project?: Project | null;
   dueDate: string;
-  attachedDocs: number[];        
-  attachedWhiteboards: number[]; 
+  attachedDocs: number[];
+  attachedWhiteboards: number[];
   documents: { id: number; documentName: string }[];
   whiteboards: { id: number; whiteboardName: string }[]; // ✅ was "name"
+  isPrivate: boolean;
 }
 
 export interface CreateTask {
@@ -82,8 +84,9 @@ export interface CreateTask {
   startDate?: string | null;
   checklist?: ChecklistItem[];
   assigneeIds?: number[];
-  attachedDocs?: number[];        
-  attachedWhiteboards?: number[]; 
+  attachedDocs?: number[];
+  attachedWhiteboards?: number[];
+  isPrivate?: boolean;
 }
 
 export interface UpdateTaskPayload {

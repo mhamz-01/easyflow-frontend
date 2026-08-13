@@ -18,6 +18,7 @@ import {
 import { useWorkspaceStore } from "@/src/store/workspace";
 import { useProjectStore } from "@/src/store/useProjectStore";
 import TaskSelectWhiteboard from "./task-select-whiteboard";
+import TaskVisibilityToggle from "./task-visibility-toggle";
 
 const CreateTaskModal = ({ onClose }: { onClose: () => void }) => {
   const createTask = useCreateTask();
@@ -36,19 +37,20 @@ const CreateTaskModal = ({ onClose }: { onClose: () => void }) => {
         },
       ],
       documents: [],
-      whiteboards: [],   
+      whiteboards: [],
       state: "todo",
       priority: "medium",
       assignees: [],
       attachments: [],
       attachedFilesId: [],
+      visibility: "public",
     },
   });
 
   function onSubmit(data: CreateTaskFormDataType) {
     if (!workspaceId || !projectId) return;
 
-    const { attachments, linkName, documents, whiteboards, ...apiData } = data;
+    const { attachments, linkName, documents, whiteboards, visibility, ...apiData } = data;
 
     // drop the default empty checklist placeholder if the user never filled one in
     const cleanedChecklist = (apiData.checklist ?? []).filter(
@@ -64,6 +66,7 @@ const CreateTaskModal = ({ onClose }: { onClose: () => void }) => {
       projectId: projectId,
       attachedDocs: documents ?? [],
       attachedWhiteboards: whiteboards ?? [],
+      isPrivate: visibility === "private",
     });
 
     // close right away and clear the form -- creation continues in the
@@ -72,23 +75,40 @@ const CreateTaskModal = ({ onClose }: { onClose: () => void }) => {
     form.reset();
   }
   return (
-    <DialogContent className="sm:max-w-200">
-      <DialogHeader>
+    <DialogContent className="sm:max-w-200 flex max-h-[85vh] min-h-0 flex-col overflow-hidden">
+      <DialogHeader className="shrink-0">
         <DialogTitle className="text-center">Create Task</DialogTitle>
       </DialogHeader>
       <FormProvider {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
-            <TaskNameInput />
-            <TaskDescriptionInput />
-            <TaskLinksInput />
-            <TaskDocumentCheckbox />
-            <TaskSelectWhiteboard/>
-            <TaskChecklist />
-            <TaskDropdowns />
-            <TaskAttachedFilesList />
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex min-h-0 flex-1 flex-col overflow-hidden"
+        >
+          {/* Scrollable field area — header/footer stay pinned so the
+              dialog never grows taller than the viewport. `min-h-0` is
+              required here: flex items default to `min-height: auto`,
+              which lets them grow past their flex-basis to fit content
+              instead of shrinking to the available space — without it,
+              this div (and the DialogOverlay behind it) grows with the
+              content instead of scrolling internally, which is what let
+              the page-level scrollbar take over whenever a dropdown
+              opened. */}
+          <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+            <FieldGroup>
+              <TaskNameInput />
+              <TaskVisibilityToggle />
+              <TaskDescriptionInput />
+              <TaskLinksInput />
+              <TaskDocumentCheckbox />
+              <TaskSelectWhiteboard/>
+              <TaskChecklist />
+              <TaskDropdowns />
+              <TaskAttachedFilesList />
+            </FieldGroup>
+          </div>
+          <div className="shrink-0 mt-4 border-t border-border pt-4">
             <TaskDialogFooter />
-          </FieldGroup>
+          </div>
         </form>
       </FormProvider>
     </DialogContent>

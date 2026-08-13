@@ -49,8 +49,13 @@ function TaskDropdown<T>({
 
   if (!isOpen) return null;
 
+  // Plain in-flow content — no `position: absolute`, no assumptions about
+  // its own floating/portaling. Callers are responsible for putting this
+  // somewhere that can safely float (a `PopoverContent`, which is portaled
+  // to `document.body` and can't fight an ancestor scroll container for
+  // space) rather than leaving it embedded directly in a scrollable form.
   return (
-    <div className="absolute z-50 top-10 mt-1 w-full rounded-md border bg-background shadow">
+    <div className="w-full rounded-md bg-background">
       {/* Header */}
       <div className="flex justify-between px-3 py-2 border-b">
         <p className="text-sm font-medium">
@@ -63,7 +68,7 @@ function TaskDropdown<T>({
       </div>
 
       {items.length > 0 ? (
-        <div className="max-h-48 overflow-auto">
+        <div className="max-h-48 overflow-y-auto">
           {items.map((item) => {
             const id = getId(item);
 

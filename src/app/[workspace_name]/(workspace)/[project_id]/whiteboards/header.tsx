@@ -13,12 +13,15 @@ import { useWorkspaceStore } from "@/src/store/workspace";
 import { useProjectStore } from "@/src/store/useProjectStore";
 import { useAuth } from "@clerk/nextjs";
 import { createWhiteboard, getSingleWhiteboard } from "@/src/lib/api/whiteboards/services";
+import { whiteboardKeys } from "@/src/lib/api/whiteboards/keys";
 import { Spinner } from "../../../../../components/shadcn/spinner";
-import { Ellipsis, Maximize, Users, X, ArrowLeft, GripHorizontal, Plus } from "lucide-react";
+import { Ellipsis, Maximize, Users, X, ArrowLeft, GripHorizontal, Plus, ShieldCheck } from "lucide-react";
 import { createdWhiteboardResponse, whiteboardsListResponse } from "@/src/types/whiteboard";
 import { useState } from "react";
 import ShareWhiteboardModal from "@/src/components/modals/share-whiteboard-modal";
+import ManageWhiteboardAccessModal from "@/src/components/modals/manage-whiteboard-access-modal";
 import { trackActivity } from "@/src/lib/api/recent-activities/track";
+import { useCurrentWorkspaceRole } from "@/src/lib/api/workspace/members/hooks";
 
 export function WhiteboardHeader() {
   const { open } = useSidebar();
@@ -32,12 +35,13 @@ export function WhiteboardHeader() {
   const [showBar, setShowBar] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isAccessOpen, setIsAccessOpen] = useState(false);
   const whiteboardId = params?.id ? Number(params.id) : null;
 
-
+  const { isAdminOrOwner } = useCurrentWorkspaceRole(workspace?.id);
 
   const { data: whiteboardData } = useQuery({
-    queryKey: ["whiteboard", whiteboardId],
+    queryKey: whiteboardKeys.single(whiteboardId!),
     queryFn: () => getSingleWhiteboard(whiteboardId!),
     enabled: !!whiteboardId,
   });
@@ -73,6 +77,7 @@ export function WhiteboardHeader() {
               whiteboardName: data.createdDoc.whiteboardName,
               assignees: data.createdDoc.assignees,
               isPrivate: data.createdDoc.isPrivate,
+              defaultAccess: data.createdDoc.defaultAccess,
             },
             ...(oldData.whiteboards || []),
           ],
@@ -82,7 +87,11 @@ export function WhiteboardHeader() {
   });
   // why here createdDoc is used?
 
-  const handleCreate = (name: string, isPrivate:boolean) => {
+  const handleCreate = (
+    name: string,
+    isPrivate: boolean,
+    defaultAccess?: "view" | "edit",
+  ) => {
     if (workspace?.id && project?.id && userId) {
       mutationWhiteboard.mutate({
         workspaceId: workspace?.id,
@@ -90,6 +99,7 @@ export function WhiteboardHeader() {
         createdBy: userId,
         whiteboardName: name,
         isPrivate,
+        defaultAccess,
       });
     }
   };
@@ -136,6 +146,7 @@ export function WhiteboardHeader() {
               buttonText="Create Whiteboard"
               isPending={mutationWhiteboard.isPending}
               onSubmit={handleCreate}
+              showDefaultAccessOption
             />
           </Dialog>
         </div>
@@ -218,6 +229,30 @@ export function WhiteboardHeader() {
     />
   )}
 </Dialog>
+              {isAdminOrOwner && whiteboardId && whiteboardData?.whiteboard.isPrivate === false && (
+                <>
+                  <span className="hidden sm:block h-3.5 w-px bg-border" />
+                  <button
+                    onClick={() => setIsAccessOpen(true)}
+                    className="hidden sm:flex hover:text-foreground transition-colors items-center gap-1"
+                    title="Manage Access"
+                  >
+                    <ShieldCheck size={14} />
+                    <span className="text-xs font-medium">Access</span>
+                  </button>
+                  {isAccessOpen && (
+                    <ManageWhiteboardAccessModal
+                      open={isAccessOpen}
+                      onOpenChange={setIsAccessOpen}
+                      whiteboardId={whiteboardId}
+                      whiteboardName={whiteboardData?.whiteboard.whiteboardName ?? ""}
+                      defaultAccess={whiteboardData?.whiteboard.defaultAccess ?? "edit"}
+                      canEditDefaultAccess
+                      createdBy={whiteboardData?.whiteboard.createdBy ?? -1}
+                    />
+                  )}
+                </>
+              )}
               {/* <span className="h-3.5 w-px bg-border" /> */}
               {/* <button className="hover:text-foreground transition-colors" title="More options">
                 <Ellipsis size={15} />
@@ -249,6 +284,7 @@ export function WhiteboardHeader() {
                 buttonText="Create Whiteboard"
                 isPending={mutationWhiteboard.isPending}
                 onSubmit={handleCreate}
+                showDefaultAccessOption
               />
             </Dialog>
           </div>

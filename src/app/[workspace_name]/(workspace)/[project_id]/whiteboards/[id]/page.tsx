@@ -2,6 +2,7 @@
 
 import { Button } from "@/src/components/shadcn/button";
 import { getSingleWhiteboard } from "@/src/lib/api/whiteboards/services";
+import { whiteboardKeys } from "@/src/lib/api/whiteboards/keys";
 import { useWhiteboardStore } from "@/src/store/useWhiteboardStore";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, RefreshCw } from "lucide-react";
@@ -20,7 +21,7 @@ const Page = () => {
 
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["whiteboard", params.id],
+    queryKey: whiteboardKeys.single(Number(params.id)),
     queryFn: () => getSingleWhiteboard(Number(params.id)),
     enabled: !!params.id,
   });

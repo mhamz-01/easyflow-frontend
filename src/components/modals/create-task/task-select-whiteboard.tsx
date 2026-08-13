@@ -11,6 +11,7 @@ import whiteboardIcon from "@/public/icons/whiteboard.svg";
 import TaskDropdown from "./task-dropdown";
 import DropdownSearchInput from "../../dropdown-search-input";
 import { useFormContext, useWatch } from "react-hook-form";
+import { Popover, PopoverAnchor, PopoverContent } from "../../shadcn/popover";
 
 export default function TaskSelectWhiteboard() {
   const project = useProjectStore((s) => s.project);
@@ -38,24 +39,38 @@ export default function TaskSelectWhiteboard() {
 
   return (
     <TaskCollapsibleButton title="Add whiteboards" img={whiteboardIcon}
-  
+
     badgeCount={selectedWhiteboard.length}>
-      <Field className="relative max-w-sm">
-        <DropdownSearchInput
-          search={search}
-          setSearch={setSearch}
-          setIsOpen={setIsOpen}
-        />
-        <TaskDropdown
-          items={filteredWhiteboards}
-          inputName="whiteboards"         
-          getId={(wb) => wb.id}
-          getLabel={(wb) => wb.whiteboardName}
-          isOpen={isOpen}
-          iconSrc={whiteboardIcon}
-          setIsOpen={setIsOpen}
-        />
-      </Field>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverAnchor asChild>
+          <Field className="max-w-sm">
+            <DropdownSearchInput
+              search={search}
+              setSearch={setSearch}
+              setIsOpen={setIsOpen}
+            />
+          </Field>
+        </PopoverAnchor>
+        {/* Portaled to document.body — same fix as the documents picker
+            (see task-documents.tsx): the list can never fight the modal's
+            own scroll container for space or leak a scrollbar into it. */}
+        <PopoverContent
+          align="start"
+          sideOffset={4}
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          className="w-80 p-0"
+        >
+          <TaskDropdown
+            items={filteredWhiteboards}
+            inputName="whiteboards"
+            getId={(wb) => wb.id}
+            getLabel={(wb) => wb.whiteboardName}
+            isOpen={isOpen}
+            iconSrc={whiteboardIcon}
+            setIsOpen={setIsOpen}
+          />
+        </PopoverContent>
+      </Popover>
     </TaskCollapsibleButton>
   );
 }

@@ -15,6 +15,7 @@ import docsIcon from "@/public/icons/docs.svg";
 import TaskDropdown from "./task-dropdown";
 import DropdownSearchInput from "../../dropdown-search-input";
 import { useFormContext, useWatch } from "react-hook-form";
+import { Popover, PopoverAnchor, PopoverContent } from "../../shadcn/popover";
 
 export default function TaskDocumentCheckbox() {
   const project = useProjectStore((s) => s.project);
@@ -48,25 +49,38 @@ export default function TaskDocumentCheckbox() {
     img={docsIcon}
     badgeCount={selectedDocs.length}
   >
-      <Field className="relative max-w-sm">
-        {/* search input */}
-        <DropdownSearchInput
-          search={search}
-          setSearch={setSearch}
-          setIsOpen={setIsOpen}
-        />
-
-        {/* dropdown */}
-        <TaskDropdown
-          items={filteredDocs}
-          inputName="documents"
-          getId={(doc) => doc.id!}
-          getLabel={(doc) => doc.documentName!}
-          isOpen={isOpen}
-          iconSrc={docsIcon}
-          setIsOpen={setIsOpen}
-        />
-      </Field>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverAnchor asChild>
+          <Field className="max-w-sm">
+            {/* search input */}
+            <DropdownSearchInput
+              search={search}
+              setSearch={setSearch}
+              setIsOpen={setIsOpen}
+            />
+          </Field>
+        </PopoverAnchor>
+        {/* Portaled to document.body — the list can never fight the modal's
+            own scroll container for space or leak a scrollbar into it,
+            regardless of how many docs there are or how tall the form
+            currently is. */}
+        <PopoverContent
+          align="start"
+          sideOffset={4}
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          className="w-80 p-0"
+        >
+          <TaskDropdown
+            items={filteredDocs}
+            inputName="documents"
+            getId={(doc) => doc.id!}
+            getLabel={(doc) => doc.documentName!}
+            isOpen={isOpen}
+            iconSrc={docsIcon}
+            setIsOpen={setIsOpen}
+          />
+        </PopoverContent>
+      </Popover>
     </TaskCollapsibleButton>
   );
 }

@@ -23,6 +23,7 @@ import {
   Link2,
   File,
   Expand,
+  Lock,
 } from "lucide-react";
 import { useTaskStore } from "../store/useTaskStore";
 import { DialogTitle } from "@/src/components/shadcn/dialog";
@@ -163,8 +164,14 @@ const handleAddWhiteboard = (whiteboardId: number) => {
         ) : (
           <div className="space-y-6">
             {/* Title */}
-            <DialogTitle className="text-2xl font-semibold">
+            <DialogTitle className="text-2xl font-semibold flex items-center gap-2">
               {task?.name}
+              {task?.isPrivate && (
+                <span className="inline-flex items-center gap-1 rounded-full border bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                  <Lock size={12} />
+                  Private
+                </span>
+              )}
             </DialogTitle>
 
             <DialogDescription></DialogDescription>

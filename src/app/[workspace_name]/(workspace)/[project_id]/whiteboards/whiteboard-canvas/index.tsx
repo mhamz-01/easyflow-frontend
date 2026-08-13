@@ -1,6 +1,7 @@
 "use client";
 
 import { getSingleWhiteboard, updateWhiteboard } from "@/src/lib/api/whiteboards/services";
+import { whiteboardKeys } from "@/src/lib/api/whiteboards/keys";
 import { getAllDocs } from "@/src/lib/api/documents/services";
 import { taskService } from "@/src/lib/api/tasks/service";
 import { EasyflowWhiteboard } from "@mhamz.01/easyflow-whiteboard";
@@ -10,20 +11,27 @@ import '@mhamz.01/easyflow-whiteboard/dist/styles.css';
 import { useParams } from "next/navigation";
 import { useWorkspaceStore } from "@/src/store/workspace";
 import { useProjectStore } from "@/src/store/useProjectStore";
+import { Lock } from "lucide-react";
 
 export default function WhiteboardEditor({ id }: { id: string }) {
   const { workspace_name, project_id } = useParams<{ workspace_name: string; project_id: string }>();
   const workspace = useWorkspaceStore((s) => s.workspace);
   const project = useProjectStore((s) => s.project);
   const queryClient = useQueryClient(); // ✅
+  const whiteboardId = Number(id);
 
   // ── Fetch whiteboard ──────────────────────────────────────────────
   const { data, isLoading } = useQuery({
-    queryKey: ["whiteboard", id],
-    queryFn: () => getSingleWhiteboard(Number(id)),
+    queryKey: whiteboardKeys.single(whiteboardId),
+    queryFn: () => getSingleWhiteboard(whiteboardId),
     staleTime: 0,         // ✅ always refetch
     refetchOnMount: true, // ✅ refetch every time component mounts
   });
+
+  // Resolved by the backend (requireWhiteboardAccess) at fetch time —
+  // "edit" unconditionally for private whiteboards, otherwise the
+  // requester's effective view/edit level on this public whiteboard.
+  const isReadOnly = data?.access === "view";
 
   // ── Fetch docs ────────────────────────────────────────────────────
   const { data: docsData } = useQuery({
@@ -47,7 +55,7 @@ export default function WhiteboardEditor({ id }: { id: string }) {
     mutationFn: updateWhiteboard,
     onSuccess: () => {
       // ✅ bust cache so next mount always fetches fresh
-      queryClient.invalidateQueries({ queryKey: ["whiteboard", id] });
+      queryClient.invalidateQueries({ queryKey: whiteboardKeys.single(whiteboardId) });
       console.log("✅ Whiteboard saved");
     },
     onError: (err) => {
@@ -95,7 +103,13 @@ export default function WhiteboardEditor({ id }: { id: string }) {
   }
 
   return (
-    <div className="w-screen h-screen">
+    <div className="w-screen h-screen relative">
+      {isReadOnly && (
+        <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 rounded-full border bg-background/90 backdrop-blur px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm">
+          <Lock size={12} />
+          View only
+        </div>
+      )}
       <EasyflowWhiteboard
         initialData={data?.whiteboard.content ?? {
           canvas: "",
@@ -103,8 +117,12 @@ export default function WhiteboardEditor({ id }: { id: string }) {
           documents: [],
         }}
         onSave={(payload) => {
+          // Belt-and-suspenders: the canvas is already non-editable via the
+          // `editable` prop, so this shouldn't fire — but don't persist a
+          // write the backend would reject anyway if it somehow does.
+          if (isReadOnly) return;
           mutation.mutate({
-            id: Number(id),
+            id: whiteboardId,
             columnName: "content",
             value: payload,
           });
@@ -114,6 +132,7 @@ export default function WhiteboardEditor({ id }: { id: string }) {
         availableTasks={availableTasks}
         createNewTaskHref={`/${workspace_name}/${project_id}/tasks`}
         createNewDocumentHref={`/${workspace_name}/${project_id}/docs`}
+        editable={!isReadOnly}
       />
     </div>
   );

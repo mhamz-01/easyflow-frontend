@@ -11,8 +11,8 @@ export const createTaskFormSchema = z.object({
   description: z.string().optional().nullable(),
   linkName: z.string().or(z.literal("")).optional(),
   links: z.array(z.string()).optional(),
-  documents: z.array(z.number()).optional(),      
-  whiteboards: z.array(z.number()).optional(),    
+  documents: z.array(z.number()).optional(),
+  whiteboards: z.array(z.number()).optional(),
   checklist: z.array(checklistItemSchema).optional(),
   state: z.string().optional(),
   priority: z.string().optional(),
@@ -20,13 +20,17 @@ export const createTaskFormSchema = z.object({
   dueDate: z.date().optional(),
   attachments: z.array(z.instanceof(File)).optional(),
   attachedFilesId: z.array(z.number()).optional(),
+  // "public" | "private" — mapped to a boolean `isPrivate` for the API.
+  // Kept as a string here since the select dropdown components this form
+  // reuses (SelectDropdownForm/SelectDropdown) only carry string values.
+  visibility: z.enum(["public", "private"]).optional(),
 });
 // For API submission - transform to remove attachments
 export const createTaskApiSchema = createTaskFormSchema
   .omit({ attachments: true })
   .transform((data) => {
-    const { linkName, ...rest } = data; // Remove linkName if not needed in API
-    return rest;
+    const { linkName, visibility, ...rest } = data; // Remove linkName if not needed in API
+    return { ...rest, isPrivate: visibility === "private" };
   });
 
 export type CreateTaskFormDataType = z.infer<typeof createTaskFormSchema>;

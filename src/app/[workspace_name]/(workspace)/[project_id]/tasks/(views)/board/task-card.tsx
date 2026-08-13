@@ -1,6 +1,6 @@
 import SelectAssignees from "@/src/components/dropdown-select/select-assignees";
 import { TaskViewList } from "@/src/types/tasks";
-import { CalendarIcon, ClockIcon, UserIcon } from "lucide-react";
+import { CalendarIcon, ClockIcon, Lock, UserIcon } from "lucide-react";
 import { useTaskStore } from "../../store/useTaskStore";
 import SelectDate from "@/src/components/select-date/SelectDate";
 import { formatDate } from "@/src/lib/utils";
@@ -47,7 +47,12 @@ function TaskCard({ task }: { task: TaskViewList }) {
         onClick={() => setIsOpen(true, task.id)}
         className="flex items-start justify-between gap-2 cursor-pointer group"
       >
-        <p className="text-sm font-medium leading-snug group-hover:text-primary-blue">
+        <p className="text-sm font-medium leading-snug group-hover:text-primary-blue flex items-center gap-1.5">
+          {task.isPrivate && (
+            <span title="Private task">
+              <Lock className="h-3 w-3 shrink-0 text-muted-foreground" />
+            </span>
+          )}
           {task.name}
         </p>
         {priority && (

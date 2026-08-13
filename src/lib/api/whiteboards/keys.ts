@@ -4,4 +4,6 @@ export const whiteboardKeys = {
     workspaceId,
     projectId,
   ],
+  single: (id: number) => ["whiteboard", id],
+  access: (id: number) => ["whiteboard", id, "access"],
 };

@@ -35,6 +35,7 @@ const WhiteboardListingEmptyState = () => {
               whiteboardName: data.createdDoc.whiteboardName,
               assignees: data.createdDoc.assignees,
               isPrivate: data.createdDoc.isPrivate, // ✅
+              defaultAccess: data.createdDoc.defaultAccess,
             },
             ...(oldData.whiteboards || []),
           ],
@@ -43,7 +44,11 @@ const WhiteboardListingEmptyState = () => {
     },
   });
 
-  const handleCreate = (name: string, isPrivate: boolean) => {
+  const handleCreate = (
+    name: string,
+    isPrivate: boolean,
+    defaultAccess?: "view" | "edit",
+  ) => {
     if (workspaceId && projectId && userId) {
       mutation.mutate({
         workspaceId,
@@ -51,6 +56,7 @@ const WhiteboardListingEmptyState = () => {
         createdBy: userId,
         whiteboardName: name,  // ✅
         isPrivate,             // ✅
+        defaultAccess,
       });
     }
   };
@@ -73,6 +79,7 @@ const WhiteboardListingEmptyState = () => {
           buttonText="Create Whiteboard"
           isPending={mutation.isPending}
           onSubmit={handleCreate}
+          showDefaultAccessOption
         />
       </Dialog>
     </div>
