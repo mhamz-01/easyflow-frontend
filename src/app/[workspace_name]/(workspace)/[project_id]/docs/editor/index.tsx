@@ -2,14 +2,33 @@
 
 import { getSingleDoc, updateDoc } from "@/src/lib/api/documents/services";
 import { docsKeys } from "@/src/lib/api/documents/keys";
-import { Editor } from "@mhamz.01/easyflow-texteditor";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Lock } from "lucide-react";
+import dynamic from "next/dynamic";
+
+// Tiptap is heavy — split it into its own chunk instead of bundling it
+// into every navigation to this route, so the doc-fetch query below can
+// fire as soon as this component mounts instead of waiting on the editor
+// bundle to finish downloading and parsing first. The `useEffect` below
+// starts that chunk's download immediately (in parallel with the query),
+// so by the time `data` resolves it's typically already loaded — same
+// skeleton, same final render, just no artificial serialization.
+const Editor = dynamic(
+  () => import("@mhamz.01/easyflow-texteditor").then((mod) => mod.Editor),
+  {
+    ssr: false,
+    loading: () => <div className="h-full w-full rounded-xl bg-muted animate-pulse" />,
+  },
+);
 
 export default function DocEditor({ id }: { id: string }) {
   const queryClient = useQueryClient();
   const docId = Number(id);
+
+  useEffect(() => {
+    import("@mhamz.01/easyflow-texteditor");
+  }, []);
 
   // ── Fetch doc ────────────────────────────────────────────────────
   const { data, isLoading } = useQuery({

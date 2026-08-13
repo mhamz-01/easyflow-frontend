@@ -1,5 +1,5 @@
 "use client";
-import { ChevronRight, MoreHorizontal, Plus } from "lucide-react";
+import { ChevronRight, Loader2, MoreHorizontal, Plus } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupAction,
@@ -24,7 +24,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "../../shadcn/collapsible";
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import Image from "next/image";
 import { truncateWord } from "@/src/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -43,6 +43,16 @@ import { toast } from "sonner";
 import { AlertDialog, AlertDialogTrigger } from "../../shadcn/alert-dialog";
 import AlertDialogContentModal from "../../modals/alert-dialog-content";
 import { useProjectStore } from "@/src/store/useProjectStore";
+
+// Must be a descendant of the <Link> it reports on (useLinkStatus reads the
+// nearest ancestor Link's pending state) — gives the click an immediate,
+// visible reaction instead of the row just sitting there until the new
+// route finishes loading.
+const SubItemPendingIndicator = () => {
+  const { pending } = useLinkStatus();
+  if (!pending) return null;
+  return <Loader2 className="size-3 shrink-0 animate-spin text-muted-foreground" />;
+};
 
 const SidebarProjects = () => {
   // states
@@ -203,6 +213,7 @@ const SidebarProjects = () => {
                               alt="icon"
                             />
                             <span>{truncateWord(projectSubItem.name)}</span>
+                            <SubItemPendingIndicator />
                           </Link>
                         </SidebarMenuSubItem>
                       ))}

@@ -4,14 +4,31 @@ import { getSingleWhiteboard, updateWhiteboard } from "@/src/lib/api/whiteboards
 import { whiteboardKeys } from "@/src/lib/api/whiteboards/keys";
 import { getAllDocs } from "@/src/lib/api/documents/services";
 import { taskService } from "@/src/lib/api/tasks/service";
-import { EasyflowWhiteboard } from "@mhamz.01/easyflow-whiteboard";
 import type { TaskNodeData, DocumentNodeData } from "@mhamz.01/easyflow-whiteboard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import '@mhamz.01/easyflow-whiteboard/dist/styles.css';
 import { useParams } from "next/navigation";
+import { useEffect } from "react";
 import { useWorkspaceStore } from "@/src/store/workspace";
 import { useProjectStore } from "@/src/store/useProjectStore";
 import { Lock } from "lucide-react";
+import dynamic from "next/dynamic";
+
+// The canvas library is heavy — split it into its own chunk instead of
+// bundling it into every navigation to this route, so the whiteboard/docs/
+// tasks queries below can fire as soon as this component mounts instead of
+// waiting on the canvas bundle to finish downloading and parsing first.
+// The `useEffect` below starts that chunk's download immediately (in
+// parallel with those queries), so by the time `data` resolves it's
+// typically already loaded — same skeleton, same final render, just no
+// artificial serialization.
+const EasyflowWhiteboard = dynamic(
+  () => import("@mhamz.01/easyflow-whiteboard").then((mod) => mod.EasyflowWhiteboard),
+  {
+    ssr: false,
+    loading: () => <div className="max-h-max rounded-xl bg-muted animate-pulse" />,
+  },
+);
 
 export default function WhiteboardEditor({ id }: { id: string }) {
   const { workspace_name, project_id } = useParams<{ workspace_name: string; project_id: string }>();
@@ -19,6 +36,10 @@ export default function WhiteboardEditor({ id }: { id: string }) {
   const project = useProjectStore((s) => s.project);
   const queryClient = useQueryClient(); // ✅
   const whiteboardId = Number(id);
+
+  useEffect(() => {
+    import("@mhamz.01/easyflow-whiteboard");
+  }, []);
 
   // ── Fetch whiteboard ──────────────────────────────────────────────
   const { data, isLoading } = useQuery({
