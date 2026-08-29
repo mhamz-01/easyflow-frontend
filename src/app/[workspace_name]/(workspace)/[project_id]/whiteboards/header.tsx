@@ -22,6 +22,7 @@ import ShareWhiteboardModal from "@/src/components/modals/share-whiteboard-modal
 import ManageWhiteboardAccessModal from "@/src/components/modals/manage-whiteboard-access-modal";
 import { trackActivity } from "@/src/lib/api/recent-activities/track";
 import { useCurrentWorkspaceRole } from "@/src/lib/api/workspace/members/hooks";
+import SaveStatusButton from "@/src/components/custom/save-status-button";
 
 export function WhiteboardHeader() {
   const { open } = useSidebar();
@@ -263,30 +264,7 @@ export function WhiteboardHeader() {
               </button> */}
             </div>
 
-            <Dialog open={isOpen} onOpenChange={setIsOpen}>
-              <DialogTrigger asChild>
-                <Button variant="primary" disabled={mutationWhiteboard.isPending}>
-                  {mutationWhiteboard.isPending ? (
-                    <Spinner />
-                  ) : (
-                    <>
-                      <span className="max-sm:hidden">Create Whiteboard</span>
-                      <Plus size={18} className="inline sm:hidden" />
-                    </>
-                  )}
-                </Button>
-              </DialogTrigger>
-              <CreateItemModal
-                title="Create Whiteboard"
-                description="Enter a name for your new Whiteboard."
-                label="Whiteboard Name"
-                placeholder="e.g. Meeting Notes"
-                buttonText="Create Whiteboard"
-                isPending={mutationWhiteboard.isPending}
-                onSubmit={handleCreate}
-                showDefaultAccessOption
-              />
-            </Dialog>
+            <SaveStatusButton />
           </div>
         </div>
       </div>

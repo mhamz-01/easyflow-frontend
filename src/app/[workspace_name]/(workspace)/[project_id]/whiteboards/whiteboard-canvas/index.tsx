@@ -13,6 +13,7 @@ import { useWorkspaceStore } from "@/src/store/workspace";
 import { useProjectStore } from "@/src/store/useProjectStore";
 import { Lock } from "lucide-react";
 import dynamic from "next/dynamic";
+import { useSaveStatusStore } from "@/src/store/useSaveStatusStore";
 
 // The canvas library is heavy — split it into its own chunk instead of
 // bundling it into every navigation to this route, so the whiteboard/docs/
@@ -36,10 +37,17 @@ export default function WhiteboardEditor({ id }: { id: string }) {
   const project = useProjectStore((s) => s.project);
   const queryClient = useQueryClient(); // ✅
   const whiteboardId = Number(id);
+  const setSaveStatus = useSaveStatusStore((s) => s.setStatus);
 
   useEffect(() => {
     import("@mhamz.01/easyflow-whiteboard");
   }, []);
+
+  // ── Reset save status when entering/leaving this whiteboard ───────
+  useEffect(() => {
+    setSaveStatus("idle");
+    return () => setSaveStatus("idle");
+  }, [whiteboardId, setSaveStatus]);
 
   // ── Fetch whiteboard ──────────────────────────────────────────────
   const { data, isLoading } = useQuery({
@@ -74,13 +82,17 @@ export default function WhiteboardEditor({ id }: { id: string }) {
   // ── Mutation ──────────────────────────────────────────────────────
   const mutation = useMutation({
     mutationFn: updateWhiteboard,
+    onMutate: () => {
+      setSaveStatus("saving");
+    },
     onSuccess: () => {
       // ✅ bust cache so next mount always fetches fresh
       queryClient.invalidateQueries({ queryKey: whiteboardKeys.single(whiteboardId) });
-      console.log("✅ Whiteboard saved");
+      setSaveStatus("saved");
     },
     onError: (err) => {
       console.error("❌ Whiteboard save failed:", err);
+      setSaveStatus("error");
     },
   });
 

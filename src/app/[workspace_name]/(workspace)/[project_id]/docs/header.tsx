@@ -24,6 +24,7 @@ import { getSingleDoc } from "@/src/lib/api/documents/services";
 import { docsKeys } from "@/src/lib/api/documents/keys";
 import { trackActivity } from "@/src/lib/api/recent-activities/track";
 import { useCurrentWorkspaceRole } from "@/src/lib/api/workspace/members/hooks";
+import SaveStatusButton from "@/src/components/custom/save-status-button";
 
 export function DocsHeader() {
   const { open } = useSidebar();
@@ -243,45 +244,7 @@ const mutationDocs = useMutation({
           </button>
         </div>
 
-        {/* <Button
-          onClick={handleCreate}
-          variant="primary"
-          size="sm"
-          disabled={mutationDocs.isPending}
-        >
-          {mutationDocs.isPending ? (
-            <Spinner />
-          ) : (
-            <>
-              <span className="max-sm:hidden">New Document</span>
-              <Plus size={16} className="inline sm:hidden" />
-            </>
-          )}
-        </Button> */}
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-  <DialogTrigger asChild>
-    <Button variant="primary" disabled={mutationDocs.isPending}>
-      {mutationDocs.isPending ? (
-        <Spinner />
-      ) : (
-        <>
-          <span className="max-sm:hidden">Create Document</span>
-          <Plus size={18} className="inline sm:hidden" />
-        </>
-      )}
-    </Button>
-  </DialogTrigger>
-  <CreateItemModal
-    title="Create Document"
-    description="Enter a name for your new document."
-    label="Document Name"
-    placeholder="e.g. Meeting Notes"
-    buttonText="Create Document"
-    isPending={mutationDocs.isPending}
-    onSubmit={handleCreate}
-    showDefaultAccessOption
-  />
-</Dialog>
+        <SaveStatusButton />
       </div>
     </section>
   );

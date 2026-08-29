@@ -21,13 +21,11 @@ import type { sidebarProjectType } from "@/src/types/project";
 import { computeTaskAnalytics } from "./_overview/task-analytics";
 import OverviewSkeleton from "./_overview/overview-skeleton";
 import QuickLinks from "./_overview/quick-links";
-import StatTile from "./_overview/stat-tile";
-import TaskStatusMeter from "./_overview/task-status-meter";
+import TaskHealthCard from "./_overview/task-health-card";
 import TasksPreview from "./_overview/tasks-preview";
 import DocsPreview from "./_overview/docs-preview";
 import WhiteboardsPreview from "./_overview/whiteboards-preview";
-import ChatPreview from "./_overview/chat-preview";
-import ActivityPreview from "./_overview/activity-preview";
+import UpdatesPanel from "./_overview/updates-panel";
 
 const ProjectOverviewPage = () => {
   const params = useParams<{ workspace_name: string; project_id: string }>();
@@ -121,43 +119,22 @@ const ProjectOverviewPage = () => {
       </div>
 
       <div className="flex flex-col gap-5 px-4 pb-10 sm:px-6">
-        <div>
-          <span className="text-xs font-medium uppercase tracking-wide text-primary-blue">
-            Project overview
-          </span>
-          <h1 className="mt-1 truncate text-2xl font-semibold tracking-tight">
-            {project?.name ?? "Project"}
-          </h1>
-        </div>
-
-        <QuickLinks basePath={basePath} chatHref={chatHref} chatUnread={isChatUnread} />
-
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-          <StatTile label="Total tasks" value={analytics.total} isLoading={isTasksLoading} />
-          <StatTile
-            label="Completed"
-            value={`${analytics.completionRate}%`}
-            sub={`${analytics.counts.done} of ${analytics.total} done`}
-            tone={analytics.completionRate === 100 && analytics.total > 0 ? "good" : "default"}
-            isLoading={isTasksLoading}
-          />
-          <StatTile
-            label="Overdue"
-            value={analytics.overdueCount}
-            tone={analytics.overdueCount > 0 ? "warning" : "good"}
-            isLoading={isTasksLoading}
-          />
-          <StatTile label="Docs" value={docs.length} isLoading={isDocsLoading} />
-          <StatTile label="Whiteboards" value={whiteboards.length} isLoading={isWhiteboardsLoading} />
-        </div>
-
-        {analytics.total > 0 && (
-          <div className="rounded-2xl border border-white/[0.06] bg-[#1C1C1C] px-4 py-3.5">
-            <TaskStatusMeter counts={analytics.counts} total={analytics.total} />
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <span className="text-xs font-medium uppercase tracking-wide text-primary-blue">
+              Project overview
+            </span>
+            <h1 className="mt-1 truncate text-2xl font-semibold tracking-tight">
+              {project?.name ?? "Project"}
+            </h1>
           </div>
-        )}
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <QuickLinks basePath={basePath} chatHref={chatHref} chatUnread={isChatUnread} />
+        </div>
+
+        <TaskHealthCard analytics={analytics} isLoading={isTasksLoading} />
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <TasksPreview
             basePath={basePath}
             total={analytics.total}
@@ -167,16 +144,14 @@ const ProjectOverviewPage = () => {
           />
           <DocsPreview basePath={basePath} docs={docs} isLoading={isDocsLoading} />
           <WhiteboardsPreview basePath={basePath} whiteboards={whiteboards} isLoading={isWhiteboardsLoading} />
-          <ChatPreview
+          <UpdatesPanel
+            basePath={basePath}
             chatHref={chatHref}
             messages={chatMessages}
-            isLoading={isChatLoading}
-            isUnread={isChatUnread}
-          />
-          <ActivityPreview
-            basePath={basePath}
+            isChatLoading={isChatLoading}
+            isChatUnread={isChatUnread}
             activities={activitiesData?.data ?? []}
-            isLoading={isActivitiesLoading}
+            isActivitiesLoading={isActivitiesLoading}
           />
         </div>
       </div>

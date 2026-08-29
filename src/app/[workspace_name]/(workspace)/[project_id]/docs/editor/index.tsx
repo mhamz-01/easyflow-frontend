@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef } from "react";
 import { Lock } from "lucide-react";
 import dynamic from "next/dynamic";
+import { useSaveStatusStore } from "@/src/store/useSaveStatusStore";
 
 // Tiptap is heavy — split it into its own chunk instead of bundling it
 // into every navigation to this route, so the doc-fetch query below can
@@ -25,10 +26,17 @@ const Editor = dynamic(
 export default function DocEditor({ id }: { id: string }) {
   const queryClient = useQueryClient();
   const docId = Number(id);
+  const setSaveStatus = useSaveStatusStore((s) => s.setStatus);
 
   useEffect(() => {
     import("@mhamz.01/easyflow-texteditor");
   }, []);
+
+  // ── Reset save status when entering/leaving this doc ──────────────
+  useEffect(() => {
+    setSaveStatus("idle");
+    return () => setSaveStatus("idle");
+  }, [docId, setSaveStatus]);
 
   // ── Fetch doc ────────────────────────────────────────────────────
   const { data, isLoading } = useQuery({
@@ -47,6 +55,9 @@ export default function DocEditor({ id }: { id: string }) {
   // ── Save mutation ────────────────────────────────────────────────
   const mutation = useMutation({
     mutationFn: updateDoc,
+    onMutate: () => {
+      setSaveStatus("saving");
+    },
     onSuccess: (_, variables) => {
       // ✅ update cache directly — NO invalidateQueries (prevents remount)
       if (variables.columnName === "content") {
@@ -55,9 +66,11 @@ export default function DocEditor({ id }: { id: string }) {
           document: { ...oldData?.document, content: variables.value },
         }));
       }
+      setSaveStatus("saved");
     },
     onError: (err) => {
       console.error("❌ Doc save failed:", err);
+      setSaveStatus("error");
     },
   });
 
