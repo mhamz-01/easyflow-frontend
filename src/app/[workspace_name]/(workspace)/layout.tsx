@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SidebarProvider } from "@/src/components/shadcn/sidebar";
 import { AppSidebar } from "@/src/components/sidebar/app-sidebar";
+import { NotificationRealtimeListener } from "@/src/components/notifications/notification-realtime-listener";
 
 export const metadata: Metadata = {
   title: "EasyFlow - Built for teams who want clarity",
@@ -19,6 +20,7 @@ export default function WorkspaceLayout({
       <main className="flex-1 min-w-0">
         {children}
       </main>
+      <NotificationRealtimeListener />
     </SidebarProvider>
   );
 }

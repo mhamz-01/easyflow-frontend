@@ -9,6 +9,7 @@ import StickyNotes from "./_sticky-notes";
 import SelectProjectModal from "@/src/components/modals/select-project-modal";
 import { useUser } from "@clerk/nextjs";
 import { getRandomHeadline } from "@/src/constants/home-greetings";
+import NotificationBell from "@/src/components/notifications/notification-bell";
 
 const actionTypeMap: Record<string, "whiteboards" | "docs" | "tasks"> = {
   Whiteboard: "whiteboards",
@@ -42,7 +43,10 @@ export default function Home() {
 
   return (
     <>
-      <SidebarTrigger className="ml-4 mt-4" />
+      <div className="flex items-center justify-between mx-4 mt-4">
+        <SidebarTrigger />
+        <NotificationBell />
+      </div>
       <section className="grid place-content-center pb-6">
         <div>
           <div className="text-center max-w-xl mx-auto">

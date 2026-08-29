@@ -93,7 +93,7 @@ const CreateTaskModal = ({ onClose }: { onClose: () => void }) => {
               content instead of scrolling internally, which is what let
               the page-level scrollbar take over whenever a dropdown
               opened. */}
-          <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+          <div className="themed-scrollbar scroll-fade-y min-h-0 flex-1 overflow-y-auto pr-1">
             <FieldGroup>
               <TaskNameInput />
               <TaskVisibilityToggle />

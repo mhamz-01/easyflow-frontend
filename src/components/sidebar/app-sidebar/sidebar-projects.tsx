@@ -132,15 +132,38 @@ const SidebarProjects = () => {
             data?.projects?.map((project: sidebarProjectType) => (
               <Collapsible key={project.id}>
                 <SidebarMenuItem>
-                  {/* collapsible trigger */}
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton className="group flex justify-between">
-                      <span>{truncateWord(project.name)}</span>
-                      <ChevronRight size={18} 
-                       className="shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90"
-                       />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
+                  {/* project name -> overview page, chevron -> expand sub-items */}
+                  <SidebarMenuButton asChild className="group flex justify-between">
+                    <div>
+                      <Link
+                        href={`/${workspace?.workspaceSlug}/${project.id}`}
+                        onClick={() => {
+                          setProject({
+                            id: project.id,
+                            projectName: project.name,
+                          });
+                          if (isMobile) {
+                            setOpenMobile(false);
+                          }
+                        }}
+                        className="flex-1 min-w-0 truncate"
+                      >
+                        {truncateWord(project.name)}
+                      </Link>
+                      <CollapsibleTrigger asChild>
+                        <button
+                          type="button"
+                          aria-label="Toggle project sections"
+                          className="shrink-0 rounded p-0.5 hover:bg-accent"
+                        >
+                          <ChevronRight
+                            size={18}
+                            className="shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90"
+                          />
+                        </button>
+                      </CollapsibleTrigger>
+                    </div>
+                  </SidebarMenuButton>
 
                   {/* dropdown menu */}
                   <DropdownMenu>

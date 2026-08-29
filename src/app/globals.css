@@ -121,6 +121,50 @@
   }
 }
 
+/* Slim, theme-matched scrollbar for internal scroll containers (modal
+   bodies, dropdown panels) — replaces the browser default, which on
+   Windows/Chrome is wide and light and clashes with the dark theme. */
+.themed-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--gray-100) transparent;
+}
+.themed-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.themed-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.themed-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--gray-100);
+  border-radius: 9999px;
+}
+.themed-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--gray-200);
+}
+
+/* CSS-only top/bottom "scroll shadow" — fades in only on the edge(s)
+   where there's more content to scroll toward, and disappears once
+   you've scrolled all the way to that edge. No scroll listener/JS
+   needed: two gradients scroll with the content and mask the shadow
+   near whichever edge is currently at rest; two more stay fixed to the
+   viewport and only show through where the content ones don't cover
+   them. (Classic technique — see Lea Verou's "scroll shadows".) Assumes
+   the container sits directly on a bg-background surface, which is
+   true of every place this is used (dialog/panel bodies).
+   https://css-tricks.com/scroll-shadows-with-background-attachment-local/ */
+.scroll-fade-y {
+  background:
+    linear-gradient(var(--background) 30%, transparent) local,
+    linear-gradient(transparent, var(--background) 70%) 0 100% local,
+    radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.35), transparent),
+    radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.35), transparent) 0 100%;
+  background-repeat: no-repeat;
+  background-color: var(--background);
+  background-size: 100% 24px, 100% 24px, 100% 10px, 100% 10px;
+  background-attachment: local, local, scroll, scroll;
+}
+
 @keyframes collapsible-down {
   from {
     height: 0;
