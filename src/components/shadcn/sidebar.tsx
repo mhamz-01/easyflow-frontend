@@ -55,6 +55,7 @@ function useSidebar() {
 
 function SidebarProvider({
   defaultOpen = true,
+  defaultIsMobile = false,
   open: openProp,
   onOpenChange: setOpenProp,
   className,
@@ -63,10 +64,11 @@ function SidebarProvider({
   ...props
 }: React.ComponentProps<"div"> & {
   defaultOpen?: boolean;
+  defaultIsMobile?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }) {
-  const isMobile = useIsMobile();
+  const isMobile = useIsMobile(defaultIsMobile);
   const [openMobile, setOpenMobile] = React.useState(false);
 
   // This is the internal state of the sidebar.
