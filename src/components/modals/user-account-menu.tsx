@@ -7,15 +7,14 @@ import { useOutsideClick } from "@/src/hooks/use-outside-click";
 import { useClerk, useUser } from "@clerk/nextjs";
 import { cn } from "@/src/lib/utils";
 import { Skeleton } from "../shadcn/skeleton";
-import Link from "next/link";
-import { useWorkspaceStore } from "@/src/store/workspace";
 import Avatar from "../custom/avatar";
+import { useSettingsModalStore } from "@/src/store/useSettingsModalStore";
 
 const UserAccountMenu = ({ floatRight }: { floatRight?: boolean }) => {
   // states
-  const workspace = useWorkspaceStore((s) => s.workspace);
   const { user, isLoaded } = useUser();
   const [open, setOpen] = useState(false);
+  const openSettings = useSettingsModalStore((s) => s.openSettings);
   const modalRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
   const { signOut } = useClerk();
@@ -59,13 +58,16 @@ const UserAccountMenu = ({ floatRight }: { floatRight?: boolean }) => {
 
         {/* Actions */}
         <div className="p-2">
-          <Link
-            href={`/${workspace?.workspaceSlug}/settings/profile?tab=account`}
+          <button
+            onClick={() => {
+              setOpen(false);
+              openSettings({ tab: "account", section: "profile" });
+            }}
             className="flex w-full items-center gap-3 px-3 py-2 rounded-md hover:bg-accent text-sm"
           >
             <Settings size={18} />
             Settings
-          </Link>
+          </button>
           {/* Clicking this button signs out a user // and redirects them to the
           home page */}
           <button

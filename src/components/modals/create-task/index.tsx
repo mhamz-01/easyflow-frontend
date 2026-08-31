@@ -20,7 +20,17 @@ import { useProjectStore } from "@/src/store/useProjectStore";
 import TaskSelectWhiteboard from "./task-select-whiteboard";
 import TaskVisibilityToggle from "./task-visibility-toggle";
 
-const CreateTaskModal = ({ onClose }: { onClose: () => void }) => {
+const CreateTaskModal = ({
+  onClose,
+  defaultState,
+  defaultPriority,
+}: {
+  onClose: () => void;
+  /** Pre-fills the state field — e.g. when created from a board column's "Add task" button. */
+  defaultState?: string;
+  /** Pre-fills the priority field — e.g. when created from a priority-grouped board column. */
+  defaultPriority?: string;
+}) => {
   const createTask = useCreateTask();
   const workspaceId = useWorkspaceStore((s) => s.workspace?.id);
   const projectId = useProjectStore((s) => s.project?.id);
@@ -38,8 +48,8 @@ const CreateTaskModal = ({ onClose }: { onClose: () => void }) => {
       ],
       documents: [],
       whiteboards: [],
-      state: "todo",
-      priority: "medium",
+      state: defaultState ?? "todo",
+      priority: defaultPriority ?? "medium",
       assignees: [],
       attachments: [],
       attachedFilesId: [],

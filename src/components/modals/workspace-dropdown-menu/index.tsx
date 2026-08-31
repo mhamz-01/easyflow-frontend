@@ -122,6 +122,7 @@ const WorkspaceDrodownMenu = () => {
               <WorkspaceMenuItem
                 key={workspace.workspaceName}
                 workspace={workspace}
+                onNavigate={() => setOpen(false)}
               />
             ))}
         {/* buttons */}

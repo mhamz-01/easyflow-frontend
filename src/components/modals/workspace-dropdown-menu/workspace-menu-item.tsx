@@ -1,6 +1,5 @@
 import { useWorkspaceStore } from "@/src/store/workspace";
 import { useAuth } from "@clerk/nextjs";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import WorkspaceIcon from "./workspace-icon";
@@ -13,16 +12,20 @@ import {
 import { isAdmin, isLong, truncateWord } from "@/src/lib/utils";
 import { Check, Dot, Settings, UserRoundPlus } from "lucide-react";
 import { workspaceItemProps } from "@/src/types/workspace";
+import { useSettingsModalStore } from "@/src/store/useSettingsModalStore";
 
 // workspace listing item
 const WorkspaceMenuItem = ({
   workspace,
+  onNavigate,
 }: {
   workspace: workspaceItemProps;
+  onNavigate?: () => void;
 }) => {
   // states
   const { updateWorkspace } = useWorkspaceStore();
   const { userId } = useAuth();
+  const openSettings = useSettingsModalStore((s) => s.openSettings);
   const pathname = usePathname(); // e.g., "/workspaceSlug/anotherURL"
   const [currentWorkspaceSlug, setCurrentWorkspaceSlug] = useState("");
   const router = useRouter();
@@ -46,6 +49,7 @@ const WorkspaceMenuItem = ({
           onClick={() => {
             updateWorkspace({ workspaceSlug: workspace.workspaceSlug });
             router.push("/" + workspace.workspaceSlug);
+            onNavigate?.();
           }}
           className="flex gap-2"
         >
@@ -88,20 +92,26 @@ const WorkspaceMenuItem = ({
           workspace.workspaceSlug === currentWorkspaceSlug &&
           isAdmin(userId, workspace.admin) && (
             <div className="flex gap-1 mt-1">
-              <Link
-                href={`/${currentWorkspaceSlug}/settings/general?tab=workspace`}
+              <button
+                onClick={() => {
+                  onNavigate?.();
+                  openSettings({ tab: "workspace", section: "general" });
+                }}
                 className="flex gap-2 items-center bg-accent text-xs py-2 px-2 rounded"
               >
                 <Settings size={16} />
                 Settings
-              </Link>
-              <Link
-                href={`/${currentWorkspaceSlug}/settings/members?tab=workspace`}
+              </button>
+              <button
+                onClick={() => {
+                  onNavigate?.();
+                  openSettings({ tab: "workspace", section: "members" });
+                }}
                 className="flex gap-2 items-center bg-accent text-xs py-2 px-2 rounded"
               >
                 <UserRoundPlus size={16} />
                 Invite members
-              </Link>
+              </button>
             </div>
           )}
       </div>

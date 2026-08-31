@@ -5,6 +5,7 @@ import { groupBy } from "lodash";
 import { TaskViewList } from "@/src/types/tasks";
 
 const STATE_ORDER = ["todo", "in progress", "done"];
+const PRIORITY_ORDER = ["urgent", "high", "medium", "low"];
 
 export function useBoardGroups(projectId: number, groupByField: string) {
   const { data, ...rest } = useInfiniteQuery({
@@ -46,6 +47,15 @@ export function useBoardGroups(projectId: number, groupByField: string) {
     // ✅ enforce stable column order
     if (groupByField === "none" || groupByField === "state") {
       return STATE_ORDER.map((key) => ({
+        key,
+        tasks: grouped[key] ?? [],
+      }));
+    }
+
+    if (groupByField === "priority") {
+      // always show every priority level, ordered by severity, so an empty
+      // level is still a valid drop target for the board's drag-and-drop
+      return PRIORITY_ORDER.map((key) => ({
         key,
         tasks: grouped[key] ?? [],
       }));

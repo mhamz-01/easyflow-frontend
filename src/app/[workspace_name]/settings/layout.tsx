@@ -5,6 +5,7 @@ import {
 } from "@/src/components/shadcn/sidebar";
 import { SettingsSidebar } from "@/src/components/sidebar/settings-sidebar";
 import SettingsHeaderBreadcrums from "@/src/components/custom/settings-header-breadcrums";
+import SettingsModal from "@/src/components/modals/settings-modal";
 
 export const metadata: Metadata = {
   title: "EasyFlow - Built for teams who want clarity",
@@ -25,6 +26,7 @@ export default function SettingsLayout({
         <SettingsHeaderBreadcrums />
         {children}
       </main>
+      <SettingsModal />
     </SidebarProvider>
   );
 }

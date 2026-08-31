@@ -32,10 +32,11 @@ import {
   AlertDialogTrigger,
 } from "@/src/components/shadcn/alert-dialog";
 import { Spinner } from "@/src/components/shadcn/spinner";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 const GeneralSettings = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const { workspace, setWorkspace } = useWorkspaceStore();
   const queryClient = useQueryClient();
 
@@ -74,8 +75,13 @@ const GeneralSettings = () => {
       // set the new workspaceSlug in localStorage
       localStorage.setItem("workspaceSlug", newWorkspaceSlug);
 
-      // change URL to the new workspaceSlug
-      router.replace(`/${newWorkspaceSlug}/settings/general?tab=workspace`);
+      // swap the old slug for the new one in the current URL, wherever the
+      // user is (settings page or elsewhere, e.g. this modal open over another page)
+      if (workspace?.workspaceSlug && pathname?.startsWith(`/${workspace.workspaceSlug}`)) {
+        router.replace(
+          pathname.replace(`/${workspace.workspaceSlug}`, `/${newWorkspaceSlug}`),
+        );
+      }
       queryClient.setQueryData(workspaceKeys.detail(newWorkspaceSlug!), {
         data: updated,
       });

@@ -132,9 +132,9 @@ const ProjectOverviewPage = () => {
           <QuickLinks basePath={basePath} chatHref={chatHref} chatUnread={isChatUnread} />
         </div>
 
-        <TaskHealthCard analytics={analytics} isLoading={isTasksLoading} />
+        <TaskHealthCard basePath={basePath} analytics={analytics} isLoading={isTasksLoading} />
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           <TasksPreview
             basePath={basePath}
             total={analytics.total}
@@ -144,16 +144,17 @@ const ProjectOverviewPage = () => {
           />
           <DocsPreview basePath={basePath} docs={docs} isLoading={isDocsLoading} />
           <WhiteboardsPreview basePath={basePath} whiteboards={whiteboards} isLoading={isWhiteboardsLoading} />
-          <UpdatesPanel
-            basePath={basePath}
-            chatHref={chatHref}
-            messages={chatMessages}
-            isChatLoading={isChatLoading}
-            isChatUnread={isChatUnread}
-            activities={activitiesData?.data ?? []}
-            isActivitiesLoading={isActivitiesLoading}
-          />
         </div>
+
+        <UpdatesPanel
+          basePath={basePath}
+          chatHref={chatHref}
+          messages={chatMessages}
+          isChatLoading={isChatLoading}
+          isChatUnread={isChatUnread}
+          activities={activitiesData?.data ?? []}
+          isActivitiesLoading={isActivitiesLoading}
+        />
       </div>
     </>
   );
