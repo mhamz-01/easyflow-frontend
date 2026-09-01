@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { Users } from "lucide-react";
 import { SidebarTrigger } from "@/src/components/shadcn/sidebar";
+import { Button } from "@/src/components/shadcn/button";
 import NotificationBell from "@/src/components/notifications/notification-bell";
+import ManageProjectMembersModal from "@/src/components/modals/manage-project-members-modal";
 import { useWorkspaceStore } from "@/src/store/workspace";
 import { useProjectStore } from "@/src/store/useProjectStore";
+import { useCurrentWorkspaceRole } from "@/src/lib/api/workspace/members/hooks";
 import { getProjectsByWorkspaceSlug } from "@/src/lib/api/project/services";
 import { taskService } from "@/src/lib/api/tasks/service";
 import { getAllDocs } from "@/src/lib/api/documents/services";
@@ -35,6 +39,8 @@ const ProjectOverviewPage = () => {
   const setProject = useProjectStore((s) => s.setProject);
   const workspaceId = workspace?.id;
   const workspaceSlug = workspace?.workspaceSlug;
+  const { isAdminOrOwner } = useCurrentWorkspaceRole(workspaceId);
+  const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
 
   const basePath = `/${workspaceSlug}/${projectId}`;
   const chatHref = `/${workspaceSlug}/chat?channel=${projectId}`;
@@ -129,8 +135,31 @@ const ProjectOverviewPage = () => {
             </h1>
           </div>
 
-          <QuickLinks basePath={basePath} chatHref={chatHref} chatUnread={isChatUnread} />
+          <div className="flex items-center gap-2">
+            {isAdminOrOwner && project && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsMembersModalOpen(true)}
+              >
+                <Users className="size-3.5" />
+                Members
+              </Button>
+            )}
+            <QuickLinks basePath={basePath} chatHref={chatHref} chatUnread={isChatUnread} />
+          </div>
         </div>
+
+        {project && (
+          <ManageProjectMembersModal
+            open={isMembersModalOpen}
+            onOpenChange={setIsMembersModalOpen}
+            projectId={project.id}
+            projectName={project.name}
+            projectType={project.type ?? "public"}
+          />
+        )}
 
         <TaskHealthCard basePath={basePath} analytics={analytics} isLoading={isTasksLoading} />
 

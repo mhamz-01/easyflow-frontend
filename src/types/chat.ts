@@ -22,6 +22,9 @@ export interface ChatMessage {
   workspaceId: number;
   // null = the workspace's General channel; set = that project's channel.
   projectId: number | null;
+  // null = General or the project's own main channel; set = a named
+  // sub-channel within that project.
+  channelId: number | null;
   userId: number;
   // Nullable: a message can be a bare attachment card with no text.
   content: string | null;
@@ -45,10 +48,23 @@ export interface ChatMessagesPage {
 }
 
 // One entry per channel the requesting user can see (General + every
-// project they have access to) — projectId null = General.
+// project's main channel + every project's sub-channels) — projectId null
+// = General; channelId null = General or a project's own main channel.
 export interface ChatUnreadChannel {
   projectId: number | null;
+  channelId: number | null;
   unread: boolean;
+}
+
+// A named sub-channel within a project's chat (Discord-style). Visibility
+// is exactly its parent project's — there's no separate per-channel ACL.
+export interface ChatChannel {
+  id: number;
+  projectId: number;
+  name: string;
+  createdBy: number | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ApiResponse<T> {

@@ -2,7 +2,8 @@
 import Image from "next/image";
 import docsIcon from "@/public/icons/docs.svg";
 import { MoreVertical, Edit, Trash, Loader2 } from "lucide-react";
-import Avatar from "@/src/components/custom/avatar";
+import ProjectMemberAvatar from "@/src/components/custom/project-member-avatar";
+import { useProjectMemberStatusMap } from "@/src/lib/api/project/members/hooks";
 import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
@@ -28,6 +29,8 @@ const DocsList = ({ docsListData }: { docsListData: Doc[] }) => {
   const queryClient = useQueryClient();
   const workspaceId = useWorkspaceStore((s) => s.workspace?.id);
   const projectId = useProjectStore((s) => s.project?.id);
+
+  const memberStatusMap = useProjectMemberStatusMap(projectId);
 
   const [navigatingId, setNavigatingId] = useState<number | null>(null);
   const [selectedDocId, setSelectedDocId] = useState<number | null>(null);
@@ -85,7 +88,12 @@ const DocsList = ({ docsListData }: { docsListData: Doc[] }) => {
     title={doc.creator?.username}
     className="relative z-10 rounded-full border-2 border-background"
   >
-    <Avatar src={doc.creator?.imageUrl} width={24} height={24} />
+    <ProjectMemberAvatar
+      src={doc.creator?.imageUrl}
+      width={24}
+      height={24}
+      status={doc.creator ? memberStatusMap.get(doc.creator.id) : undefined}
+    />
   </div>
   {doc.assignees?.map((assignee) => (
     <div
@@ -93,7 +101,12 @@ const DocsList = ({ docsListData }: { docsListData: Doc[] }) => {
       title={assignee.username}
       className="rounded-full border-2 border-background"
     >
-      <Avatar src={assignee.imageUrl} width={24} height={24} />
+      <ProjectMemberAvatar
+        src={assignee.imageUrl}
+        width={24}
+        height={24}
+        status={memberStatusMap.get(assignee.id)}
+      />
     </div>
   ))}
 </div>

@@ -17,6 +17,7 @@ import {
 import { useWorkspaceStore } from "@/src/store/workspace";
 import { useChatUnread, useMarkChannelRead, hasAnyUnread } from "@/src/hooks/use-chat-unread";
 import { useChatMessages, useChatRealtime } from "@/src/hooks/chat";
+import { useChatChannels } from "@/src/lib/api/chat/channels/hooks";
 import { getProjectsByWorkspaceSlug } from "@/src/lib/api/project/services";
 import type { sidebarProjectType } from "@/src/types/project";
 import ChatChannelRail from "./_components/channel-rail";
@@ -33,9 +34,13 @@ export default function ChatPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const channelParam = searchParams.get("channel");
+  const subParam = searchParams.get("sub");
   // Resolved as soon as the page mounts (searchParams is sync) — null means
   // General, a number means that project's channel.
   const projectId = channelParam ? Number(channelParam) : null;
+  // null means that project's own main channel (or General, which never has
+  // a sub-channel); a number means a named sub-channel within the project.
+  const channelId = subParam ? Number(subParam) : null;
 
   // Below md, the channel rail moves into a slide-out sheet instead of a
   // permanent column (it was eating ~60% of a phone's width otherwise).
@@ -49,20 +54,32 @@ export default function ChatPage() {
     queryFn: () => getProjectsByWorkspaceSlug(workspaceSlug!),
     enabled: Boolean(workspaceSlug),
   });
+  // Only fetched when a sub-channel is actually active — resolves its name
+  // for the header/mobile-trigger label. The rail fetches its own copy
+  // (lazily, per expanded project) independently of this.
+  const { data: activeProjectChannels } = useChatChannels(projectId, channelId !== null);
+
   const activeChannelLabel =
     projectId === null
       ? "General"
-      : ((projectsData?.projects as sidebarProjectType[] | undefined)?.find(
-          (p) => p.id === projectId,
-        )?.name ?? "Channel");
+      : channelId !== null
+        ? (activeProjectChannels?.find((c) => c.id === channelId)?.name ?? "Channel")
+        : ((projectsData?.projects as sidebarProjectType[] | undefined)?.find(
+            (p) => p.id === projectId,
+          )?.name ?? "Channel");
 
   const setChannel = useCallback(
-    (nextProjectId: number | null) => {
+    (nextProjectId: number | null, nextChannelId: number | null = null) => {
       const params = new URLSearchParams(searchParams.toString());
       if (nextProjectId === null) {
         params.delete("channel");
       } else {
         params.set("channel", String(nextProjectId));
+      }
+      if (nextChannelId === null) {
+        params.delete("sub");
+      } else {
+        params.set("sub", String(nextChannelId));
       }
       const query = params.toString();
       router.replace(query ? `?${query}` : "?", { scroll: false });
@@ -77,9 +94,9 @@ export default function ChatPage() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useChatMessages(workspaceId, projectId);
+  } = useChatMessages(workspaceId, projectId, channelId);
 
-  useChatRealtime(workspaceId, projectId);
+  useChatRealtime(workspaceId, projectId, channelId);
 
   const messages = useMemo(
     () => data?.pages.flatMap((page) => page.messages) ?? [],
@@ -101,10 +118,11 @@ export default function ChatPage() {
     if (!workspaceId || lastRealMessageId === undefined) return;
     markChannelRead.mutate({
       projectId: projectId ?? undefined,
+      channelId: channelId ?? undefined,
       lastMessageId: lastRealMessageId,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workspaceId, projectId, lastRealMessageId]);
+  }, [workspaceId, projectId, channelId, lastRealMessageId]);
 
   return (
     <div className="flex h-svh flex-col">
@@ -132,6 +150,7 @@ export default function ChatPage() {
           workspaceId={workspaceId}
           workspaceSlug={workspaceSlug}
           activeProjectId={projectId}
+          activeChannelId={channelId}
           onSelect={setChannel}
           className="hidden md:flex"
         />
@@ -145,8 +164,9 @@ export default function ChatPage() {
               workspaceId={workspaceId}
               workspaceSlug={workspaceSlug}
               activeProjectId={projectId}
-              onSelect={(nextProjectId) => {
-                setChannel(nextProjectId);
+              activeChannelId={channelId}
+              onSelect={(nextProjectId, nextChannelId) => {
+                setChannel(nextProjectId, nextChannelId);
                 setIsRailOpen(false);
               }}
               className="w-full border-r-0"
@@ -174,10 +194,11 @@ export default function ChatPage() {
               onLoadMore={() => fetchNextPage()}
               workspaceId={workspaceId}
               projectId={projectId}
+              channelId={channelId}
             />
           )}
 
-          <ChatComposer workspaceId={workspaceId} projectId={projectId} />
+          <ChatComposer workspaceId={workspaceId} projectId={projectId} channelId={channelId} />
         </div>
       </div>
     </div>

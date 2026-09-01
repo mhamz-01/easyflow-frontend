@@ -16,6 +16,7 @@ export const chatService = {
    */
   getMessages: async (params?: {
     projectId?: number;
+    channelId?: number;
     cursor?: number;
     limit?: number;
   }): Promise<ChatMessagesPage> => {
@@ -33,6 +34,7 @@ export const chatService = {
    */
   sendMessage: async (payload: {
     projectId?: number;
+    channelId?: number;
     content?: string;
     attachment?: ChatAttachment;
   }): Promise<ChatMessage> => {
@@ -47,10 +49,12 @@ export const chatService = {
    * Soft-delete a message you authored. Server enforces ownership — a 403
    * comes back if it isn't yours.
    */
-  deleteMessage: async (messageId: number): Promise<{ id: number; projectId: number | null }> => {
-    const response = await api.delete<ApiResponse<{ id: number; projectId: number | null }>>(
-      `/chat/messages/${messageId}`,
-    );
+  deleteMessage: async (
+    messageId: number,
+  ): Promise<{ id: number; projectId: number | null; channelId: number | null }> => {
+    const response = await api.delete<
+      ApiResponse<{ id: number; projectId: number | null; channelId: number | null }>
+    >(`/chat/messages/${messageId}`);
     return response.data.data;
   },
 
@@ -73,10 +77,19 @@ export const chatService = {
    */
   markRead: async (payload: {
     projectId?: number;
+    channelId?: number;
     lastMessageId?: number;
-  }): Promise<{ projectId: number | null; lastReadMessageId: number | null }> => {
+  }): Promise<{
+    projectId: number | null;
+    channelId: number | null;
+    lastReadMessageId: number | null;
+  }> => {
     const response = await api.post<
-      ApiResponse<{ projectId: number | null; lastReadMessageId: number | null }>
+      ApiResponse<{
+        projectId: number | null;
+        channelId: number | null;
+        lastReadMessageId: number | null;
+      }>
     >("/chat/read", payload);
     return response.data.data;
   },

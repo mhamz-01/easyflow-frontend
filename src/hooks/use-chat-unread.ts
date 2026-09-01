@@ -35,7 +35,9 @@ export const useChatUnread = (workspaceId: number | null | undefined) => {
 export const isChannelUnread = (
   channels: ChatUnreadChannel[] | undefined,
   projectId: number | null,
-) => !!channels?.find((c) => c.projectId === projectId)?.unread;
+  channelId: number | null = null,
+) =>
+  !!channels?.find((c) => c.projectId === projectId && c.channelId === channelId)?.unread;
 
 export const hasAnyUnread = (channels: ChatUnreadChannel[] | undefined) =>
   !!channels?.some((c) => c.unread);
@@ -48,7 +50,7 @@ export const useMarkChannelRead = (workspaceId: number | null | undefined) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: { projectId?: number; lastMessageId?: number }) =>
+    mutationFn: (payload: { projectId?: number; channelId?: number; lastMessageId?: number }) =>
       chatService.markRead(payload),
 
     // Optimistic: clear this channel's badge the instant we ask the server
@@ -56,10 +58,13 @@ export const useMarkChannelRead = (workspaceId: number | null | undefined) => {
     onMutate: (payload) => {
       if (!workspaceId) return;
       const projectId = payload.projectId ?? null;
+      const channelId = payload.channelId ?? null;
       const key = unreadKeys.summary(workspaceId);
 
       queryClient.setQueryData<ChatUnreadChannel[]>(key, (data) =>
-        data?.map((c) => (c.projectId === projectId ? { ...c, unread: false } : c)),
+        data?.map((c) =>
+          c.projectId === projectId && c.channelId === channelId ? { ...c, unread: false } : c,
+        ),
       );
     },
   });

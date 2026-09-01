@@ -2,8 +2,10 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { UserPlus } from "lucide-react";
 import { useWorkspaceStore } from "@/src/store/workspace";
+import { useProjectStore } from "@/src/store/useProjectStore";
 import { getWorkspaceMembers } from "@/src/lib/api/workspace/members/services";
-import Avatar from "../custom/avatar";
+import { useProjectMemberStatusMap } from "@/src/lib/api/project/members/hooks";
+import ProjectMemberAvatar from "../custom/project-member-avatar";
 import DropdownSelect from "./wrapper";
 import {
   Popover,
@@ -38,6 +40,8 @@ function SelectAssignees({
   maxVisible = MAX_VISIBLE_DEFAULT,
 }: SelectAssigneesProps) {
   const workspace = useWorkspaceStore((s) => s.workspace);
+  const projectId = useProjectStore((s) => s.project?.id);
+  const memberStatusMap = useProjectMemberStatusMap(projectId);
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(true);
 
@@ -102,13 +106,14 @@ function SelectAssignees({
             <div className="flex items-center">
               <div className="flex -space-x-2">
                 {visibleMembers.map((member) => (
-                  <Avatar
+                  <ProjectMemberAvatar
                     key={member.User.id}
                     src={member.User.imageUrl}
                     className="w-6 h-6 ring-2 ring-background rounded-full"
                     width={24}
                     height={24}
                     alt={member.User.username}
+                    status={memberStatusMap.get(member.User.id)}
                   />
                 ))}
               </div>

@@ -21,6 +21,7 @@ const ChatMessageList = ({
   onLoadMore,
   workspaceId,
   projectId,
+  channelId = null,
 }: {
   messages: ChatMessage[];
   currentUserEmail: string | undefined;
@@ -29,6 +30,7 @@ const ChatMessageList = ({
   onLoadMore: () => void;
   workspaceId: number | null | undefined;
   projectId: number | null;
+  channelId?: number | null;
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const wasNearBottom = useRef(true);
@@ -97,6 +99,7 @@ const ChatMessageList = ({
           isOwn={message.author.email === currentUserEmail}
           workspaceId={workspaceId}
           projectId={projectId}
+          channelId={channelId}
         />
       ))}
     </div>

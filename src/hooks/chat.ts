@@ -33,8 +33,8 @@ const reconcileKey = (m: Pick<ChatMessage, "content" | "attachment"> & {
 // channel gets its own cache entry so switching channels never mixes history.
 
 export const chatKeys = {
-  messages: (workspaceId: number, projectId: number | null) =>
-    ["chat", "messages", workspaceId, projectId ?? "general"] as const,
+  messages: (workspaceId: number, projectId: number | null, channelId: number | null = null) =>
+    ["chat", "messages", workspaceId, projectId ?? "general", channelId ?? "main"] as const,
 };
 
 // ─── History (cursor-paginated, oldest page loaded on scroll-up) ──────────────
@@ -42,12 +42,14 @@ export const chatKeys = {
 export const useChatMessages = (
   workspaceId: number | null | undefined,
   projectId: number | null | undefined,
+  channelId: number | null | undefined = null,
 ) => {
   return useInfiniteQuery({
-    queryKey: chatKeys.messages(workspaceId as number, projectId ?? null),
+    queryKey: chatKeys.messages(workspaceId as number, projectId ?? null, channelId ?? null),
     queryFn: ({ pageParam }: { pageParam: number | undefined }) =>
       chatService.getMessages({
         projectId: projectId ?? undefined,
+        channelId: channelId ?? undefined,
         cursor: pageParam,
         limit: 30,
       }),
@@ -73,18 +75,23 @@ export const useChatMessages = (
 export const useSendMessage = (
   workspaceId: number | null | undefined,
   projectId: number | null | undefined,
+  channelId: number | null | undefined = null,
 ) => {
   const queryClient = useQueryClient();
   const { user } = useUser();
 
   return useMutation({
     mutationFn: (payload: { content?: string; attachment?: ChatAttachment }) =>
-      chatService.sendMessage({ ...payload, projectId: projectId ?? undefined }),
+      chatService.sendMessage({
+        ...payload,
+        projectId: projectId ?? undefined,
+        channelId: channelId ?? undefined,
+      }),
 
     onMutate: async (payload: { content?: string; attachment?: ChatAttachment }) => {
       if (!workspaceId || projectId === undefined) return undefined;
 
-      const key = chatKeys.messages(workspaceId, projectId);
+      const key = chatKeys.messages(workspaceId, projectId, channelId ?? null);
       await queryClient.cancelQueries({ queryKey: key });
 
       const previous = queryClient.getQueryData<ChatCache>(key);
@@ -94,6 +101,7 @@ export const useSendMessage = (
         id: tempId,
         workspaceId,
         projectId,
+        channelId: channelId ?? null,
         userId: -1,
         content: payload.content ?? null,
         attachment: payload.attachment ?? null,
@@ -164,6 +172,7 @@ export const useSendMessage = (
 export const useDeleteMessage = (
   workspaceId: number | null | undefined,
   projectId: number | null | undefined,
+  channelId: number | null | undefined = null,
 ) => {
   const queryClient = useQueryClient();
 
@@ -173,7 +182,7 @@ export const useDeleteMessage = (
     onMutate: async (messageId: number) => {
       if (!workspaceId || projectId === undefined) return undefined;
 
-      const key = chatKeys.messages(workspaceId, projectId);
+      const key = chatKeys.messages(workspaceId, projectId, channelId ?? null);
       await queryClient.cancelQueries({ queryKey: key });
 
       const previous = queryClient.getQueryData<ChatCache>(key);
@@ -206,20 +215,25 @@ export const useDeleteMessage = (
 export const useChatRealtime = (
   workspaceId: number | null | undefined,
   projectId: number | null | undefined,
+  channelId: number | null | undefined = null,
 ) => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!workspaceId || projectId === undefined) return;
 
-    const topic = `workspace-chat:${workspaceId}:${projectId ?? "general"}`;
+    // General and a project's own main channel keep the exact same
+    // 3-segment topic they always had; a sub-channel appends a 4th segment.
+    // See chat-sub-channels-realtime-update.sql for why the RLS policy
+    // never needed to change for this.
+    const topic = `workspace-chat:${workspaceId}:${projectId ?? "general"}${channelId ? `:${channelId}` : ""}`;
 
     const unsubscribeMessage = subscribeToChatTopic(
       topic,
       "chat_message",
       (payload) => {
         const message = payload as ChatMessage;
-        const key = chatKeys.messages(workspaceId, projectId);
+        const key = chatKeys.messages(workspaceId, projectId, channelId ?? null);
 
         queryClient.setQueryData<ChatCache>(key, (data) => {
           if (!data) return data;
@@ -264,7 +278,7 @@ export const useChatRealtime = (
         if (status === "CHANNEL_ERROR") {
           // Connection dropped — refetch to catch up on anything missed.
           queryClient.invalidateQueries({
-            queryKey: chatKeys.messages(workspaceId, projectId),
+            queryKey: chatKeys.messages(workspaceId, projectId, channelId ?? null),
           });
         }
       },
@@ -275,7 +289,7 @@ export const useChatRealtime = (
       "chat_message_deleted",
       (payload) => {
         const { id } = payload as { id: number };
-        const key = chatKeys.messages(workspaceId, projectId);
+        const key = chatKeys.messages(workspaceId, projectId, channelId ?? null);
 
         queryClient.setQueryData<ChatCache>(key, (data) => {
           if (!data) return data;
@@ -294,5 +308,5 @@ export const useChatRealtime = (
       unsubscribeMessage();
       unsubscribeDeleted();
     };
-  }, [workspaceId, projectId, queryClient]);
+  }, [workspaceId, projectId, channelId, queryClient]);
 };

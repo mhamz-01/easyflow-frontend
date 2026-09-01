@@ -40,3 +40,15 @@ export const deleteProject = async ({
     params: { projectId }, // must be an object
   });
 };
+
+// Currently only used to flip public <-> private.
+export const updateProject = async ({
+  projectId,
+  type,
+}: {
+  projectId: number;
+  type: "public" | "private";
+}) => {
+  const response = await api.patch(`/project/${projectId}`, { type });
+  return response.data as { success: boolean; project: { id: number; name: string; type: "public" | "private" } };
+};

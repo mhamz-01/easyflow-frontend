@@ -20,14 +20,16 @@ const ATTACHMENT_LABEL: Record<ChatAttachment["type"], string> = {
 const ChatComposer = ({
   workspaceId,
   projectId,
+  channelId = null,
 }: {
   workspaceId: number | null | undefined;
   projectId: number | null;
+  channelId?: number | null;
 }) => {
   const workspaceSlug = useWorkspaceStore((s) => s.workspace?.workspaceSlug);
   const [value, setValue] = useState("");
   const [attachment, setAttachment] = useState<ChatAttachment | null>(null);
-  const sendMessage = useSendMessage(workspaceId, projectId);
+  const sendMessage = useSendMessage(workspaceId, projectId, channelId);
 
   const handleSend = () => {
     const content = value.trim();

@@ -20,14 +20,16 @@ const ChatMessageItem = ({
   isOwn,
   workspaceId,
   projectId,
+  channelId = null,
 }: {
   message: ChatMessage;
   isOwn: boolean;
   workspaceId: number | null | undefined;
   projectId: number | null;
+  channelId?: number | null;
 }) => {
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const deleteMessage = useDeleteMessage(workspaceId, projectId);
+  const deleteMessage = useDeleteMessage(workspaceId, projectId, channelId);
   const canDelete = isOwn && !message.pending && message.id > 0;
 
   return (
