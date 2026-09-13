@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 import { getWorkspaces } from "@/src/lib/api/workspace/services";
+import { workspaceKeys } from "@/src/lib/api/workspace/keys";
 import GlobalLoader from "@/src/components/custom/global-loader";
 
 type WorkspaceRef = { workspaceSlug: string };
@@ -26,8 +27,12 @@ const HomePage = () => {
   const router = useRouter();
   const { isLoaded, isSignedIn } = useAuth();
 
+  // Same query key as the sidebar's workspace dropdown menu — this page
+  // unmounts the moment it redirects, but sharing the key means the
+  // dropdown's fetch on the workspace page can be served from cache instead
+  // of re-hitting GET /workspace/getWorkspaces a second time.
   const { data, isError } = useQuery({
-    queryKey: ["workspaces", "home-gate"],
+    queryKey: workspaceKeys.list(),
     queryFn: getWorkspaces,
     enabled: isSignedIn === true,
   });
