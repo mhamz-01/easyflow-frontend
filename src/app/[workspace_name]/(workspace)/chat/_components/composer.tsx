@@ -33,7 +33,7 @@ const ChatComposer = ({
 
   const handleSend = () => {
     const content = value.trim();
-    if ((!content && !attachment) || sendMessage.isPending) return;
+    if (!content && !attachment) return;
 
     sendMessage.mutate({
       content: content || undefined,
@@ -86,8 +86,7 @@ const ChatComposer = ({
           size="icon"
           variant="primary"
           onClick={handleSend}
-          disabled={(!value.trim() && !attachment) || sendMessage.isPending}
-          isLoading={sendMessage.isPending}
+          disabled={!value.trim() && !attachment}
           aria-label="Send message"
         >
           <SendHorizontal />
